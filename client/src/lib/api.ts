@@ -93,9 +93,40 @@ export const importApi = {
     }),
 };
 
+export type ExportSection = 'transactions' | 'dashboard' | 'analytics';
+export type ExportFormat = 'xlsx' | 'pdf';
+export type ExportTypeFilter = 'all' | 'expense' | 'income';
+
+export interface ExportOptions {
+  format: ExportFormat;
+  fromYear: number; fromMonth: number;
+  toYear: number;   toMonth: number;
+  sections: ExportSection[];
+  typeFilter: ExportTypeFilter;
+}
+
 export const exportApi = {
-  download: (year: number, month: number) => {
-    window.location.href = `/api/export/${year}/${month}`;
+  download: async (opts: ExportOptions) => {
+    const res = await fetch('/api/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(opts),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error ?? `Export failed (${res.status})`);
+    }
+    const blob = await res.blob();
+    const cd = res.headers.get('Content-Disposition') ?? '';
+    const filename = /filename="([^"]+)"/.exec(cd)?.[1] ?? `finance.${opts.format}`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   },
 };
 

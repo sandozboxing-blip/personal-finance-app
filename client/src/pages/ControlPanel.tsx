@@ -19,6 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CategoryBadge } from '@/components/CategoryBadge';
 import { categoriesApi, budgetsApi, stableBudgetsApi, monthsApi, exportApi, merchantRulesApi, transactionsApi } from '@/lib/api';
+import type { ExportFormat, ExportSection, ExportTypeFilter } from '@/lib/api';
 import { cn, formatCurrency, formatDate } from '@/lib/utils';
 import { useMonth } from '@/contexts/MonthContext';
 import type { Category, Budget, StableBudget, MerchantRule, Transaction } from '@/lib/types';
@@ -32,7 +33,7 @@ export function ControlPanel() {
         <TabsList className="mb-6">
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="budgets">Budgets</TabsTrigger>
-          <TabsTrigger value="recurring">Recurring</TabsTrigger>
+          <TabsTrigger value="recurring">Automatic Matching</TabsTrigger>
           <TabsTrigger value="data">Data</TabsTrigger>
         </TabsList>
         <TabsContent value="categories"><CategoriesTab /></TabsContent>
@@ -256,7 +257,7 @@ function BudgetsTab({ year, month, onMonthChange }: { year: number; month: numbe
   };
 
   return (
-    <Card className="p-4 space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="inline-flex rounded-md border border-zinc-800 p-0.5 text-xs">
           <button
@@ -280,11 +281,11 @@ function BudgetsTab({ year, month, onMonthChange }: { year: number; month: numbe
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <BudgetTable title="Expenses" categories={expenseCats} getRow={getRow} onSave={save} />
         <BudgetTable title="Income" categories={incomeCats} getRow={getRow} onSave={save} />
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -295,9 +296,11 @@ function BudgetTable({ title, categories, getRow, onSave }: {
   onSave: (catId: number, planned: number, is_active: boolean) => void | Promise<void>;
 }) {
   return (
-    <div>
-      <h3 className="text-sm font-medium uppercase tracking-wider text-zinc-400 mb-2">{title}</h3>
-      <div className="text-xs text-zinc-500 grid grid-cols-[1fr_100px_60px] gap-3 pb-2 border-b border-zinc-800 mb-1 uppercase tracking-wider">
+    <Card className="p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium uppercase tracking-wider text-zinc-400">{title}</h3>
+      </div>
+      <div className="text-xs text-zinc-500 grid grid-cols-[1fr_100px_44px] gap-3 pb-2 border-b border-zinc-800 mb-1 uppercase tracking-wider">
         <span>Category</span>
         <span className="text-right">Planned</span>
         <span className="text-right">Active</span>
@@ -308,7 +311,7 @@ function BudgetTable({ title, categories, getRow, onSave }: {
           return <BudgetRow key={cat.id} category={cat} planned={row.planned} isActive={row.is_active} onSave={onSave} />;
         })}
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -337,8 +340,11 @@ function BudgetRow({ category, planned, isActive, onSave }: {
   };
 
   return (
-    <div className="grid grid-cols-[1fr_100px_60px] gap-3 items-center py-1.5 hover:bg-zinc-800/30 rounded px-1 -mx-1">
-      <span className="text-sm truncate">{category.display_name}</span>
+    <div className="grid grid-cols-[1fr_100px_44px] gap-3 items-center py-1.5 hover:bg-zinc-800/40 rounded px-2 -mx-2">
+      <span className="flex items-center gap-2 min-w-0">
+        <span className="h-3 w-3 rounded-sm shrink-0" style={{ backgroundColor: category.color }} />
+        <span className="text-sm truncate">{category.display_name}</span>
+      </span>
       <Input
         type="number" step="0.01" min="0"
         value={value}
@@ -921,16 +927,169 @@ function EditRuleDialog({ rule, onOpenChange }: {
 
 /* ─── Data Tab ─── */
 
-type DataOperation = 'export' | 'delete';
-
 function DataTab() {
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <ExportPanel />
+      <DeletePanel />
+    </div>
+  );
+}
+
+const SECTION_LABELS: Record<ExportSection, string> = {
+  transactions: 'Transactions',
+  dashboard: 'Dashboard',
+  analytics: 'Analytics',
+};
+
+function ExportPanel() {
+  const today = new Date();
+  const [fromYear, setFromYear]   = useState(today.getFullYear());
+  const [fromMonth, setFromMonth] = useState(today.getMonth() + 1);
+  const [toYear, setToYear]       = useState(today.getFullYear());
+  const [toMonth, setToMonth]     = useState(today.getMonth() + 1);
+  const [format, setFormat]       = useState<ExportFormat>('xlsx');
+  const [sections, setSections]   = useState<Record<ExportSection, boolean>>({
+    transactions: true, dashboard: true, analytics: false,
+  });
+  const [typeFilter, setTypeFilter] = useState<ExportTypeFilter>('all');
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState('');
+
+  const fromKey = fromYear * 100 + fromMonth;
+  const toKey   = toYear   * 100 + toMonth;
+  const rangeValid = fromKey <= toKey;
+
+  const selectedSections = (Object.entries(sections)
+    .filter(([, v]) => v)
+    .map(([k]) => k)) as ExportSection[];
+
+  const canDownload = selectedSections.length > 0 && rangeValid && !downloading;
+
+  const setFrom = (y: number, m: number) => {
+    setFromYear(y); setFromMonth(m);
+    if (y * 100 + m > toKey) { setToYear(y); setToMonth(m); }
+  };
+  const setTo = (y: number, m: number) => {
+    setToYear(y); setToMonth(m);
+    if (y * 100 + m < fromKey) { setFromYear(y); setFromMonth(m); }
+  };
+
+  const handleDownload = async () => {
+    setError('');
+    setDownloading(true);
+    try {
+      await exportApi.download({
+        format,
+        fromYear, fromMonth,
+        toYear, toMonth,
+        sections: selectedSections,
+        typeFilter,
+      });
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Export failed');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <Card className="p-5 space-y-5">
+      <h3 className="text-sm font-medium uppercase tracking-wider text-zinc-400">Export</h3>
+
+      {/* Format */}
+      <Field label="Format">
+        <Segmented
+          value={format}
+          onChange={setFormat}
+          options={[{ value: 'xlsx', label: 'Excel' }, { value: 'pdf', label: 'PDF' }]}
+        />
+      </Field>
+
+      {/* Period */}
+      <Field label="Period">
+        <div className="flex items-center gap-2">
+          <MonthYearPicker value={{ year: fromYear, month: fromMonth }} onChange={setFrom} />
+          <span className="text-zinc-500">→</span>
+          <MonthYearPicker value={{ year: toYear, month: toMonth }} onChange={setTo} />
+        </div>
+      </Field>
+
+      {/* Sections */}
+      <Field label="Include">
+        <div className="space-y-2">
+          {(Object.keys(SECTION_LABELS) as ExportSection[]).map(key => (
+            <div key={key} className="flex items-center justify-between py-1 px-2 rounded hover:bg-zinc-800/40">
+              <span className="text-sm">{SECTION_LABELS[key]}</span>
+              <Switch
+                checked={sections[key]}
+                onCheckedChange={(v: boolean) => setSections(s => ({ ...s, [key]: v }))}
+              />
+            </div>
+          ))}
+        </div>
+      </Field>
+
+      {/* Type filter */}
+      <Field label="Type">
+        <Segmented
+          value={typeFilter}
+          onChange={setTypeFilter}
+          options={[
+            { value: 'all', label: 'All' },
+            { value: 'expense', label: 'Expenses' },
+            { value: 'income', label: 'Income' },
+          ]}
+        />
+      </Field>
+
+      {error && <p className="text-xs text-rose-400">{error}</p>}
+
+      <Button onClick={handleDownload} disabled={!canDownload}>
+        {downloading ? 'Generating…' : `Download .${format}`}
+      </Button>
+    </Card>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs text-zinc-400 uppercase tracking-wider">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function Segmented<T extends string>({ value, onChange, options }: {
+  value: T;
+  onChange: (v: T) => void;
+  options: Array<{ value: T; label: string }>;
+}) {
+  return (
+    <div className="inline-flex rounded-md border border-zinc-800 p-0.5 text-xs">
+      {options.map(o => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          className={cn(
+            'px-3 py-1 rounded transition-colors',
+            value === o.value ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200',
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function DeletePanel() {
   const qc = useQueryClient();
-  const { year: ctxYear, month: ctxMonth } = useMonth();
   const todayYear = new Date().getFullYear();
   const todayMonth = new Date().getMonth() + 1;
   const [selYear, setSelYear] = useState(todayYear);
   const [selMonth, setSelMonth] = useState(todayMonth);
-  const [operation, setOperation] = useState<DataOperation | null>(null);
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
 
@@ -939,15 +1098,9 @@ function DataTab() {
   const { data: monthRecord } = useQuery({
     queryKey: ['month', selYear, selMonth],
     queryFn: () => monthsApi.getOrCreate(selYear, selMonth),
-    enabled: operation === 'delete',
   });
 
-  // Reset confirm text when month or operation changes
-  useEffect(() => { setConfirmText(''); }, [selYear, selMonth, operation]);
-
-  const handleExport = () => {
-    exportApi.download(selYear, selMonth);
-  };
+  useEffect(() => { setConfirmText(''); }, [selYear, selMonth]);
 
   const handleDelete = async () => {
     if (confirmText !== monthLabel || !monthRecord) return;
@@ -959,97 +1112,51 @@ function DataTab() {
       qc.invalidateQueries({ queryKey: ['summary'] });
       qc.invalidateQueries({ queryKey: ['allocation'] });
       setConfirmText('');
-      setOperation(null);
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <div className="space-y-5 max-w-xl">
-      {/* Month selector */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium">Select Month</h3>
-          {(selYear !== todayYear || selMonth !== todayMonth) && (
-            <button
-              onClick={() => { setSelYear(todayYear); setSelMonth(todayMonth); }}
-              className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
-            >
-              ↩ This month
-            </button>
-          )}
-        </div>
+    <Card className="p-5 border-rose-900/60 space-y-4">
+      <div>
+        <h3 className="text-sm font-medium uppercase tracking-wider text-rose-400">Delete</h3>
+        <p className="text-xs text-zinc-500 mt-1">
+          Permanently removes all transactions for the selected month. Budgets and recurring rules are not affected.
+        </p>
+      </div>
+
+      <Field label="Month">
         <MonthYearPicker value={{ year: selYear, month: selMonth }} onChange={(y, m) => { setSelYear(y); setSelMonth(m); }} />
-      </Card>
+      </Field>
 
-      {/* Operation picker */}
-      <Card className="p-4">
-        <h3 className="text-sm font-medium mb-3">Operation</h3>
+      <Field label={`Type "${monthLabel}" to confirm`}>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant={operation === 'export' ? 'default' : 'outline'}
-            onClick={() => setOperation('export')}
-          >
-            Export
-          </Button>
-          <Button
-            size="sm"
-            variant={operation === 'delete' ? 'destructive' : 'outline'}
-            onClick={() => setOperation('delete')}
-            className={operation !== 'delete' ? 'border-rose-900 text-rose-400 hover:bg-rose-950 hover:text-rose-300' : ''}
-          >
-            Delete
-          </Button>
+          <Input
+            placeholder={monthLabel}
+            value={confirmText}
+            onChange={e => setConfirmText(e.target.value)}
+            className="h-8 text-sm font-mono"
+          />
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="destructive" disabled={confirmText !== monthLabel || deleting}>
+                {deleting ? 'Deleting…' : 'Delete all'}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete all transactions for {monthLabel}?</AlertDialogTitle>
+                <AlertDialogDescription>This cannot be undone. Budgets and recurring rules are not affected.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction className="bg-rose-600 hover:bg-rose-700" onClick={handleDelete}>Delete all</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
-      </Card>
-
-      {/* Export panel */}
-      {operation === 'export' && (
-        <Card className="p-4">
-          <h3 className="text-sm font-medium mb-1">Export <span className="font-mono text-zinc-300">{monthLabel}</span></h3>
-          <p className="text-xs text-zinc-500 mb-3">Downloads an Excel file with all transactions and a summary sheet.</p>
-          <Button size="sm" variant="outline" onClick={handleExport}>
-            Download {monthLabel}.xlsx
-          </Button>
-        </Card>
-      )}
-
-      {/* Delete panel */}
-      {operation === 'delete' && (
-        <Card className="p-4 border-rose-900">
-          <h3 className="text-sm font-medium text-rose-400 mb-1">Delete all transactions for <span className="font-mono">{monthLabel}</span></h3>
-          <p className="text-xs text-zinc-500 mb-3">
-            This cannot be undone. Type <span className="font-mono text-zinc-300">{monthLabel}</span> to confirm.
-          </p>
-          <div className="flex gap-2">
-            <Input
-              placeholder={monthLabel}
-              value={confirmText}
-              onChange={e => setConfirmText(e.target.value)}
-              className="h-8 text-sm font-mono"
-            />
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button size="sm" variant="destructive" disabled={confirmText !== monthLabel || deleting}>
-                  {deleting ? 'Deleting…' : 'Delete all'}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete all transactions for {monthLabel}?</AlertDialogTitle>
-                  <AlertDialogDescription>This cannot be undone. Budgets and recurring rules are not affected.</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className="bg-rose-600 hover:bg-rose-700" onClick={handleDelete}>Delete all</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </Card>
-      )}
-    </div>
+      </Field>
+    </Card>
   );
 }
