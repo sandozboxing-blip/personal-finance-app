@@ -58,12 +58,13 @@ function ChartCard({ title, children, className = '' }: { title: string; childre
 export function Analytics() {
   const { year, month, setMonth } = useMonth();
 
-  // Period picker state — defaults to last 12 months
+  // Period picker state — defaults to the last 12 months, inclusive, ending this month.
   const _now = new Date();
   const _todayYear  = _now.getFullYear();
   const _todayMonth = _now.getMonth() + 1;
-  const _fromMonth  = _todayMonth === 1 ? 12 : _todayMonth - 1;
-  const _fromYear   = _todayMonth === 1 ? _todayYear - 1 : _todayYear - 1;
+  const _fromIdx    = _todayYear * 12 + (_todayMonth - 1) - 11; // 12 months back (inclusive)
+  const _fromYear   = Math.floor(_fromIdx / 12);
+  const _fromMonth  = (_fromIdx % 12) + 1;
   const [periodFrom, setPeriodFrom] = useState({ year: _fromYear, month: _fromMonth });
   const [periodTo,   setPeriodTo]   = useState({ year: _todayYear, month: _todayMonth });
 

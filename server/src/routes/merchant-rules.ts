@@ -67,11 +67,13 @@ router.put('/:id', (req: Request, res: Response) => {
   };
 
   try {
+    // description_clean is COALESCEd so omitting it (the edit dialog doesn't send
+    // it) preserves the stored clean name instead of wiping it to NULL.
     db.prepare(`
       UPDATE merchant_rules SET
         pattern           = ?,
         category_id       = ?,
-        description_clean = ?,
+        description_clean = COALESCE(?, description_clean),
         match_amount      = ?,
         match_type        = ?
       WHERE id = ?

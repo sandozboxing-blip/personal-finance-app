@@ -75,9 +75,10 @@ function CategorySection({ type }: { type: 'expense' | 'income' }) {
     const oldIdx = displayCats.findIndex(c => c.id === active.id);
     const newIdx = displayCats.findIndex(c => c.id === over.id);
     const reordered = arrayMove(displayCats, oldIdx, newIdx);
-    setItems(reordered);
+    setItems(reordered); // optimistic order while the server round-trips
     await Promise.all(reordered.map((c, i) => categoriesApi.update(c.id, { sort_order: i + 1 })));
-    qc.invalidateQueries({ queryKey: ['categories'] });
+    await qc.invalidateQueries({ queryKey: ['categories'] });
+    setItems([]); // clear so fresh (re-sorted) query data drives the list again
   };
 
   const addCategory = async () => {
@@ -162,16 +163,11 @@ function SortableCategoryRow({ category: cat, onRefresh }: { category: Category;
 }
 
 function DeleteCategoryButton({ category, onDeleted }: { category: Category; onDeleted: () => void }) {
-  const [count, setCount] = useState<number | null>(null);
+  const count = category.tx_count ?? 0;
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-6 w-6 text-rose-500 opacity-0 group-hover:opacity-100 shrink-0"
-          onClick={async () => {
-            const res = await categoriesApi.delete(category.id) as { error?: string; count?: number; success?: boolean };
-            if (res.count) setCount(res.count);
-          }}
-        >
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-rose-500 opacity-0 group-hover:opacity-100 shrink-0">
           <Trash2 className="h-3 w-3" />
         </Button>
       </AlertDialogTrigger>
@@ -179,16 +175,18 @@ function DeleteCategoryButton({ category, onDeleted }: { category: Category; onD
         <AlertDialogHeader>
           <AlertDialogTitle>Delete "{category.display_name}"?</AlertDialogTitle>
           <AlertDialogDescription>
-            {count ? `${count} transaction(s) use this category. Deleting will set them to Uncategorized.` : 'This cannot be undone.'}
+            {count > 0
+              ? `${count} transaction(s) will be moved to Uncategorized, then this category (and its budget entries) will be permanently deleted.`
+              : 'This category has no transactions and will be permanently deleted.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction className="bg-rose-600 hover:bg-rose-700" onClick={async () => {
-            await categoriesApi.update(category.id, { is_active: 0 });
+            await categoriesApi.delete(category.id);
             onDeleted();
           }}>
-            {count ? 'Deactivate' : 'Delete'}
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

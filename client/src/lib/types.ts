@@ -7,6 +7,7 @@ export interface Category {
   is_active: number;
   sort_order: number;
   created_at: string;
+  tx_count?: number;
 }
 
 export interface Month {

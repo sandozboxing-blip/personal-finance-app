@@ -51,7 +51,7 @@ export const categoriesApi = {
   update: (id: number, data: Partial<Category>) =>
     apiFetch<Category>(`/api/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id: number) =>
-    apiFetch<{ success: boolean } | { error: string; count: number }>(`/api/categories/${id}`, { method: 'DELETE' }),
+    apiFetch<{ success: boolean; reassigned: number }>(`/api/categories/${id}`, { method: 'DELETE' }),
 };
 
 export const budgetsApi = {

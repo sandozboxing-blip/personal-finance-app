@@ -67,7 +67,9 @@ function getMonthsInRange(db: ReturnType<typeof getDb>, opts: ExportOptions): Mo
 function getTransactions(db: ReturnType<typeof getDb>, monthIds: number[], typeFilter: TypeFilter): TxRow[] {
   if (monthIds.length === 0) return [];
   const placeholders = monthIds.map(() => '?').join(', ');
-  const typeClause = typeFilter === 'all' ? '' : `AND t.type = '${typeFilter}'`;
+  // 'all' means all *real* flows — exclude transfers (internal moves), which are
+  // neither income nor expense and would otherwise be miscounted as +income.
+  const typeClause = typeFilter === 'all' ? "AND t.type IN ('expense', 'income')" : `AND t.type = '${typeFilter}'`;
   return db.prepare(`
     SELECT t.id, t.month_id, t.date, t.description, t.amount, t.type, t.bank,
            c.display_name AS category_display_name
@@ -95,6 +97,7 @@ function getMonthSummary(db: ReturnType<typeof getDb>, m: MonthRow): MonthSummar
     FROM categories c
     LEFT JOIN transactions t ON t.category_id = c.id AND t.month_id = ? AND t.group_id IS NULL
     WHERE c.is_active = 1
+       OR EXISTS (SELECT 1 FROM transactions t2 WHERE t2.category_id = c.id AND t2.month_id = ? AND t2.group_id IS NULL)
     GROUP BY c.id
     UNION ALL
     SELECT CASE WHEN t.type = 'income' THEN -(g.id + 1000000) ELSE -g.id END as category_id,
@@ -104,8 +107,15 @@ function getMonthSummary(db: ReturnType<typeof getDb>, m: MonthRow): MonthSummar
     FROM groups g
     JOIN transactions t ON t.group_id = g.id AND t.month_id = ?
     GROUP BY g.id, t.type
+    UNION ALL
+    SELECT CASE WHEN t.type = 'income' THEN -1000000 ELSE 0 END as category_id,
+           'uncategorized' as category_name, 'Uncategorized' as display_name,
+           t.type as type, '#71717a' as color, COALESCE(SUM(t.amount), 0) as total
+    FROM transactions t
+    WHERE t.month_id = ? AND t.group_id IS NULL AND t.category_id IS NULL AND t.type IN ('expense', 'income')
+    GROUP BY t.type
     ORDER BY type, category_name
-  `).all(m.id, m.id) as CategoryTotalRow[];
+  `).all(m.id, m.id, m.id, m.id) as CategoryTotalRow[];
 
   const budgets = db.prepare(`
     SELECT b.category_id, b.planned, b.is_active,

@@ -6,7 +6,11 @@ const router = Router();
 
 router.get('/', (_req: Request, res: Response) => {
   const db = getDb();
-  const categories = db.prepare('SELECT * FROM categories ORDER BY type, sort_order').all();
+  const categories = db.prepare(`
+    SELECT c.*, (SELECT COUNT(*) FROM transactions t WHERE t.category_id = c.id) AS tx_count
+    FROM categories c
+    ORDER BY c.type, c.sort_order
+  `).all();
   res.json(categories);
 });
 
@@ -53,17 +57,19 @@ router.delete('/:id', (req: Request, res: Response) => {
   const db = getDb();
   const id = parseInt(req.params.id);
 
-  const txCount = (db.prepare('SELECT COUNT(*) as c FROM transactions WHERE category_id = ?').get(id) as { c: number }).c;
-  if (txCount > 0) {
-    res.status(409).json({
-      error: `${txCount} transaction(s) use this category. Reassign them first or use deactivate instead.`,
-      count: txCount,
-    });
-    return;
-  }
+  // Reassign the category's transactions to Uncategorized, then remove every
+  // reference (budgets, stable budgets, rules) so the FK-constrained delete can
+  // succeed — all atomically.
+  const removed = (db.prepare('SELECT COUNT(*) as c FROM transactions WHERE category_id = ?').get(id) as { c: number }).c;
+  db.transaction(() => {
+    db.prepare('UPDATE transactions SET category_id = NULL WHERE category_id = ?').run(id);
+    db.prepare('DELETE FROM budgets WHERE category_id = ?').run(id);
+    db.prepare('DELETE FROM stable_budgets WHERE category_id = ?').run(id);
+    db.prepare('UPDATE merchant_rules SET category_id = NULL WHERE category_id = ?').run(id);
+    db.prepare('DELETE FROM categories WHERE id = ?').run(id);
+  })();
 
-  db.prepare('DELETE FROM categories WHERE id = ?').run(id);
-  res.json({ success: true });
+  res.json({ success: true, reassigned: removed });
 });
 
 export default router;

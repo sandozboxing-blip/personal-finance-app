@@ -25,13 +25,15 @@ export async function categorize(
       continue;
     }
 
-    // Step 2: Merchant rules lookup
-    const rawLower = tx.raw_description.toLowerCase();
+    // Step 2: Merchant rules lookup. Match against BOTH the raw bank text and the
+    // cleaned display description, so a rule whose pattern came from either field
+    // matches (and manual entries, which may lack raw text, still match).
+    const rawLower = (tx.raw_description ?? '').toLowerCase();
+    const cleanLower = (tx.description ?? '').toLowerCase();
     const matchedRule = rules.find(r => {
-      // Description match: contains (substring) or regex
       const descMatch = r.match_type === 'regex'
-        ? (() => { try { return new RegExp(r.pattern, 'i').test(tx.raw_description); } catch { return false; } })()
-        : rawLower.includes(r.pattern.toLowerCase());
+        ? (() => { try { const re = new RegExp(r.pattern, 'i'); return re.test(tx.raw_description ?? '') || re.test(tx.description ?? ''); } catch { return false; } })()
+        : (rawLower.includes(r.pattern.toLowerCase()) || cleanLower.includes(r.pattern.toLowerCase()));
       if (!descMatch) return false;
       // Optional amount constraint (±0.005 tolerance)
       if (r.match_amount != null) {

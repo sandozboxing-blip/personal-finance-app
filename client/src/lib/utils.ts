@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number): string {
-  return `€${Math.abs(amount).toFixed(2)}`;
+  return `${amount < 0 ? '-' : ''}€${Math.abs(amount).toFixed(2)}`;
 }
 
 // Date helpers live in lib/dates.ts — re-exported here for back-compat.

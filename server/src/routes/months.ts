@@ -109,6 +109,7 @@ router.get('/:year/:month/summary', (req: Request, res: Response) => {
     FROM categories c
     LEFT JOIN transactions t ON t.category_id = c.id AND t.month_id = ? AND t.group_id IS NULL
     WHERE c.is_active = 1
+       OR EXISTS (SELECT 1 FROM transactions t2 WHERE t2.category_id = c.id AND t2.month_id = ? AND t2.group_id IS NULL)
     GROUP BY c.id
     UNION ALL
     SELECT CASE WHEN t.type = 'income' THEN -(g.id + 1000000) ELSE -g.id END as category_id,
@@ -118,8 +119,15 @@ router.get('/:year/:month/summary', (req: Request, res: Response) => {
     FROM groups g
     JOIN transactions t ON t.group_id = g.id AND t.month_id = ?
     GROUP BY g.id, t.type
+    UNION ALL
+    SELECT CASE WHEN t.type = 'income' THEN -1000000 ELSE 0 END as category_id,
+           'uncategorized' as category_name, 'Uncategorized' as display_name,
+           t.type as type, '#71717a' as color, COALESCE(SUM(t.amount), 0) as total
+    FROM transactions t
+    WHERE t.month_id = ? AND t.group_id IS NULL AND t.category_id IS NULL AND t.type IN ('expense', 'income')
+    GROUP BY t.type
     ORDER BY type, category_name
-  `).all(monthRecord.id, monthRecord.id);
+  `).all(monthRecord.id, monthRecord.id, monthRecord.id, monthRecord.id);
 
   // Effective budgets for the month: active monthly rows take precedence over
   // active stable rows. Inactive rows of either kind are excluded entirely.

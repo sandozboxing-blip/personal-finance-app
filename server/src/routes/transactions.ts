@@ -58,9 +58,11 @@ router.post('/', (req: Request, res: Response) => {
     return;
   }
 
+  // Store raw_description = description for manual entries so merchant rules and
+  // duplicate detection (which key on raw_description) work on them too.
   const result = db.prepare(
-    'INSERT INTO transactions (month_id, date, amount, description, type, category_id, bank, manually_reviewed) VALUES (?, ?, ?, ?, ?, ?, ?, 1)'
-  ).run(month_id, date, amount, description, type, category_id ?? null, bank);
+    'INSERT INTO transactions (month_id, date, amount, description, raw_description, type, category_id, bank, manually_reviewed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
+  ).run(month_id, date, amount, description, description, type, category_id ?? null, bank);
 
   const created = db.prepare('SELECT * FROM transactions WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json(created);
@@ -124,11 +126,13 @@ router.post('/bulk-categorize', (req: Request, res: Response) => {
     return;
   }
 
-  // Build the description-match clause depending on match_type
+  // Match against BOTH the raw bank text and the cleaned description (a rule's
+  // pattern may have come from either; manual entries may lack raw text).
   const descClause = match_type === 'regex'
-    ? 'raw_description REGEXP ?'
-    : 'raw_description LIKE ?';
-  const descParam = match_type === 'regex' ? pattern : `%${pattern}%`;
+    ? '(raw_description REGEXP ? OR description REGEXP ?)'
+    : '(raw_description LIKE ? OR description LIKE ?)';
+  const descValue = match_type === 'regex' ? pattern : `%${pattern}%`;
+  const descParams = [descValue, descValue];
 
   // Optional amount filter: ABS(amount) must match within ±0.005 (rounding safety)
   const amountClause = match_amount != null ? ' AND ABS(ABS(amount) - ?) < 0.005' : '';
@@ -140,7 +144,7 @@ router.post('/bulk-categorize', (req: Request, res: Response) => {
       UPDATE transactions
       SET category_id = ?, manually_reviewed = 1
       WHERE ${descClause}${amountClause}
-    `).run(category_id, descParam, ...amountParam) as { changes: number };
+    `).run(category_id, ...descParams, ...amountParam) as { changes: number };
 
   } else if (scope === 'month') {
     const monthRecord = db.prepare('SELECT id FROM months WHERE year = ? AND month = ?').get(year, month) as { id: number } | undefined;
@@ -149,7 +153,7 @@ router.post('/bulk-categorize', (req: Request, res: Response) => {
       UPDATE transactions
       SET category_id = ?, manually_reviewed = 1
       WHERE month_id = ? AND ${descClause}${amountClause}
-    `).run(category_id, monthRecord.id, descParam, ...amountParam) as { changes: number };
+    `).run(category_id, monthRecord.id, ...descParams, ...amountParam) as { changes: number };
 
   } else if (scope === 'before') {
     result = db.prepare(`
@@ -160,7 +164,7 @@ router.post('/bulk-categorize', (req: Request, res: Response) => {
           SELECT id FROM months
           WHERE year < ? OR (year = ? AND month <= ?)
         )
-    `).run(category_id, descParam, ...amountParam, year, year, month) as { changes: number };
+    `).run(category_id, ...descParams, ...amountParam, year, year, month) as { changes: number };
 
   } else { // future
     result = db.prepare(`
@@ -171,7 +175,7 @@ router.post('/bulk-categorize', (req: Request, res: Response) => {
           SELECT id FROM months
           WHERE year > ? OR (year = ? AND month >= ?)
         )
-    `).run(category_id, descParam, ...amountParam, year, year, month) as { changes: number };
+    `).run(category_id, ...descParams, ...amountParam, year, year, month) as { changes: number };
   }
 
   res.json({ updated: result.changes });

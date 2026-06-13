@@ -18,7 +18,7 @@ export function StatCard({ label, value, diff, className }: StatCardProps) {
             ? diff > 0 ? 'text-emerald-500' : diff < 0 ? 'text-rose-500' : 'text-zinc-400'
             : 'text-white'
         )}>
-          {diff !== undefined && diff < 0 ? '-' : ''}{formatCurrency(value)}
+          {formatCurrency(value)}
         </p>
       </CardContent>
     </Card>
