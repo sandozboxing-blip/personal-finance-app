@@ -17,9 +17,9 @@ export function SummaryPanel({ type, current, previous }: SummaryPanelProps) {
 
   return (
     <div className="text-sm">
-      <div className="grid grid-cols-4 gap-2 text-xs text-zinc-400 uppercase tracking-wider pb-2 border-b border-zinc-800 mb-1">
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-2 text-xs text-zinc-400 uppercase tracking-wider pb-2 border-b border-zinc-800 mb-1">
         <span className="col-span-1">Category</span>
-        <span className="text-right font-mono">Previous</span>
+        <span className="text-right font-mono hidden md:block">Previous</span>
         <span className="text-right font-mono">Actual</span>
         <span className="text-right font-mono">Diff</span>
       </div>
@@ -29,9 +29,9 @@ export function SummaryPanel({ type, current, previous }: SummaryPanelProps) {
         const diff = cat.total - prev;
         const isPositive = type === 'expense' ? diff < 0 : diff > 0;
         return (
-          <div key={cat.category_id} className="grid grid-cols-4 gap-2 py-1 hover:bg-zinc-800/40 rounded px-1 -mx-1">
+          <div key={cat.category_id} className="grid grid-cols-3 md:grid-cols-4 gap-2 py-1 hover:bg-zinc-800/40 rounded px-1 -mx-1">
             <span className="col-span-1 text-zinc-300 truncate">{cat.display_name}</span>
-            <span className="text-right font-mono tabular-nums text-zinc-400 text-xs">{formatCurrency(prev)}</span>
+            <span className="text-right font-mono tabular-nums text-zinc-400 text-xs hidden md:block">{formatCurrency(prev)}</span>
             <span className="text-right font-mono tabular-nums text-xs">{formatCurrency(cat.total)}</span>
             <span className={cn('text-right font-mono tabular-nums text-xs',
               diff === 0 ? 'text-zinc-400' : isPositive ? 'text-emerald-500' : 'text-rose-500'
@@ -43,9 +43,9 @@ export function SummaryPanel({ type, current, previous }: SummaryPanelProps) {
       })}
 
       {/* Totals row — pinned to the bottom with a top border */}
-      <div className="grid grid-cols-4 gap-2 py-1.5 border-t border-zinc-700 mt-1 font-medium text-xs">
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-2 py-1.5 border-t border-zinc-700 mt-1 font-medium text-xs">
         <span className="col-span-1 text-zinc-300">Total</span>
-        <span className="text-right font-mono tabular-nums text-zinc-300">{formatCurrency(totalPrev)}</span>
+        <span className="text-right font-mono tabular-nums text-zinc-300 hidden md:block">{formatCurrency(totalPrev)}</span>
         <span className="text-right font-mono tabular-nums text-zinc-300">{formatCurrency(totalActual)}</span>
         <span className={cn('text-right font-mono tabular-nums',
           type === 'expense'

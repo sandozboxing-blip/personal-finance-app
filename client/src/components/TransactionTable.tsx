@@ -241,7 +241,9 @@ export const TransactionTable = memo(function TransactionTable({ monthId, type, 
   return (
     <div>
       <div className="border border-zinc-800 rounded-md overflow-x-auto">
-        <table className="w-full text-sm">
+        {/* Phone: fixed min-width so columns keep proper room and the card scrolls
+            horizontally; md+ autofits to the container. */}
+        <table className="w-full min-w-[600px] md:min-w-0 text-sm">
           <thead className="bg-zinc-800/50">
             {table.getHeaderGroups().map(hg => (
               <tr key={hg.id}>

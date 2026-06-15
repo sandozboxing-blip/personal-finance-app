@@ -13,7 +13,7 @@ export function StatCard({ label, value, diff, className }: StatCardProps) {
     <Card className={cn('p-4', className)}>
       <CardContent className="p-0">
         <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-1">{label}</p>
-        <p className={cn('font-mono text-2xl tabular-nums text-right',
+        <p className={cn('font-mono text-2xl tabular-nums text-left md:text-right',
           diff !== undefined
             ? diff > 0 ? 'text-emerald-500' : diff < 0 ? 'text-rose-500' : 'text-zinc-400'
             : 'text-white'

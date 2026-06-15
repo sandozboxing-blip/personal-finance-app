@@ -1,30 +1,14 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import { LayoutDashboard, ArrowLeftRight, BarChart2, Settings2, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Dashboard } from '@/pages/Dashboard';
 import { Transactions } from '@/pages/Transactions';
 import { Analytics } from '@/pages/Analytics';
 import { ControlPanel } from '@/pages/ControlPanel';
+import { MobileNav } from '@/components/MobileNav';
 import { MonthProvider } from '@/contexts/MonthContext';
+import { NAV_GROUPS, CONTROL_PANEL } from '@/lib/nav';
 import { cn } from '@/lib/utils';
-
-const NAV_GROUPS = [
-  {
-    label: 'Record',
-    items: [
-      { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
-    ],
-  },
-  {
-    label: 'Review',
-    items: [
-      { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-      { to: '/analytics', icon: BarChart2, label: 'Analytics' },
-    ],
-  },
-];
-
-const CONTROL_PANEL = { to: '/control-panel', icon: Settings2, label: 'Control Panel' };
 
 function NavItem({ to, icon: Icon, label, end, collapsed }: { to: string; icon: React.ElementType; label: string; end?: boolean; collapsed?: boolean }) {
   return (
@@ -59,7 +43,7 @@ function Sidebar() {
 
   return (
     <aside className={cn(
-      'shrink-0 flex flex-col border-r border-zinc-800 bg-zinc-950 py-6 transition-[width] duration-200',
+      'shrink-0 hidden md:flex flex-col border-r border-zinc-800 bg-zinc-950 py-6 transition-[width] duration-200',
       collapsed ? 'w-14' : 'w-56'
     )}>
       <div className={cn('mb-6 flex items-center', collapsed ? 'justify-center px-0' : 'justify-between px-4')}>
@@ -83,7 +67,7 @@ function Sidebar() {
             )}
             <div className="space-y-0.5">
               {group.items.map(item => (
-                <NavItem key={item.to} to={item.to} icon={item.icon} label={item.label} end={item.to === '/'} collapsed={collapsed} />
+                <NavItem key={item.to} to={item.to} icon={item.icon} label={item.label} end={item.end} collapsed={collapsed} />
               ))}
             </div>
           </div>
@@ -103,7 +87,7 @@ export function App() {
       <BrowserRouter>
         <div className="flex h-screen bg-zinc-950 overflow-hidden">
           <Sidebar />
-          <main className="flex-1 overflow-auto p-6">
+          <main className="flex-1 overflow-auto p-4 pb-24 md:p-6">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/transactions" element={<Transactions />} />
@@ -111,6 +95,7 @@ export function App() {
               <Route path="/control-panel" element={<ControlPanel />} />
             </Routes>
           </main>
+          <MobileNav />
         </div>
       </BrowserRouter>
     </MonthProvider>

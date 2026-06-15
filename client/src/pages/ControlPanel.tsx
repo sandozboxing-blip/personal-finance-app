@@ -30,7 +30,7 @@ export function ControlPanel() {
     <div>
       <PageHeader title="Control Panel" />
       <Tabs defaultValue="categories">
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 max-w-full justify-start overflow-x-auto">
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="budgets">Budgets</TabsTrigger>
           <TabsTrigger value="recurring">Automatic Matching</TabsTrigger>
@@ -49,7 +49,7 @@ export function ControlPanel() {
 
 function CategoriesTab() {
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <CategorySection type="expense" />
       <CategorySection type="income" />
     </div>
@@ -154,7 +154,7 @@ function SortableCategoryRow({ category: cat, onRefresh }: { category: Category;
         <span className="flex-1 text-sm truncate">{cat.display_name}</span>
       )}
       <Switch checked={!!cat.is_active} onCheckedChange={toggleActive} className="shrink-0" />
-      <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 shrink-0" onClick={() => setEditing(e => !e)}>
+      <Button variant="ghost" size="icon" className="h-6 w-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 shrink-0" onClick={() => setEditing(e => !e)}>
         <Pencil className="h-3 w-3" />
       </Button>
       <DeleteCategoryButton category={cat} onDeleted={onRefresh} />
@@ -167,7 +167,7 @@ function DeleteCategoryButton({ category, onDeleted }: { category: Category; onD
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-6 w-6 text-rose-500 opacity-0 group-hover:opacity-100 shrink-0">
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-rose-500 opacity-100 md:opacity-0 md:group-hover:opacity-100 shrink-0">
           <Trash2 className="h-3 w-3" />
         </Button>
       </AlertDialogTrigger>
@@ -283,7 +283,7 @@ function BudgetsTab({ year, month, onMonthChange }: { year: number; month: numbe
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="inline-flex rounded-md border border-zinc-800 p-0.5 text-xs">
           <button
             onClick={() => setScope('stable')}
@@ -305,7 +305,7 @@ function BudgetsTab({ year, month, onMonthChange }: { year: number; month: numbe
           </button>
         </div>
         {scope === 'monthly' && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <MonthYearPicker value={{ year, month }} onChange={onMonthChange} />
             <Button size="sm" variant="outline" onClick={copyPrev}>Copy from previous month</Button>
           </div>
@@ -317,7 +317,7 @@ function BudgetsTab({ year, month, onMonthChange }: { year: number; month: numbe
           Budgeting is off. Switch to Stable or Monthly to start planning.
         </Card>
       ) : (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <BudgetTable
             title="Expenses"
             categories={expenseCats}
@@ -462,7 +462,8 @@ function RecurringTab() {
         ) : rules.length === 0 ? (
           <p className="text-sm text-zinc-600 py-4 text-center">No rules match "{search}".</p>
         ) : (
-          <table className="w-full text-sm border-collapse">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm border-collapse min-w-[460px]">
             <thead>
               <tr className="border-b border-zinc-800">
                 <th className="text-left text-xs font-medium uppercase tracking-wider text-zinc-500 pb-2 pr-4">Pattern</th>
@@ -514,6 +515,7 @@ function RecurringTab() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </Card>
 
@@ -1068,7 +1070,7 @@ function ExportPanel() {
 
       {/* Period */}
       <Field label="Period">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <MonthYearPicker value={{ year: fromYear, month: fromMonth }} onChange={setFrom} label="From" />
           <MonthYearPicker value={{ year: toYear, month: toMonth }} onChange={setTo} label="To" />
         </div>

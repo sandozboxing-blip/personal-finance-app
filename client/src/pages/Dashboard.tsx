@@ -43,7 +43,7 @@ export function Dashboard() {
         <MonthYearPicker value={{ year, month }} onChange={setMonth} />
       </PageHeader>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard label="Start Balance" value={summary?.start_balance ?? 0} />
         <StatCard label="End Balance" value={summary?.end_balance ?? 0} />
         <StatCard label="Saved This Month" value={summary?.saved ?? 0} diff={summary?.saved} />
@@ -58,7 +58,7 @@ export function Dashboard() {
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <Card className="p-4 space-y-4">
               <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">Expenses</h2>
               <BudgetBar label="Budget" planned={totalExpensePlanned} actual={summary?.expenses ?? 0} />

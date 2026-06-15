@@ -170,14 +170,14 @@ export function Analytics() {
 
       {/* ── PERIOD ─────────────────────────────────────────────────────── */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Period</h2>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <MonthYearPicker value={periodFrom} onChange={handleFromChange} label="From" />
             <MonthYearPicker value={periodTo} onChange={handleToChange} label="To" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <ChartCard title="Total expenses by month">
             {!hasTrend ? (
               <Empty />
@@ -227,14 +227,14 @@ export function Analytics() {
           <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Monthly</h2>
           <MonthYearPicker value={{ year, month }} onChange={setMonth} />
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
 
           {/* Donut */}
           <ChartCard title="Expenses by category">
             {!hasDonut ? (
               <Empty />
             ) : (
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
                 <ResponsiveContainer width={180} height={180}>
                   <PieChart>
                     <Pie

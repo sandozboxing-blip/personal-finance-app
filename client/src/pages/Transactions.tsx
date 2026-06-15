@@ -54,12 +54,12 @@ export function Transactions() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Expenses */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
             <Input
               placeholder="Search date, category, amount, bank…"
               value={expenseSearch}
               onChange={e => setExpenseSearch(e.target.value)}
-              className="h-8 text-sm"
+              className="h-8 text-sm w-full md:flex-1 md:min-w-[150px]"
             />
             <Select value={expenseCatFilter} onValueChange={setExpenseCatFilter}>
               <SelectTrigger className="h-8 w-36 text-xs"><SelectValue placeholder="All categories" /></SelectTrigger>
@@ -78,12 +78,12 @@ export function Transactions() {
 
         {/* Income */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
             <Input
               placeholder="Search date, category, amount, bank…"
               value={incomeSearch}
               onChange={e => setIncomeSearch(e.target.value)}
-              className="h-8 text-sm"
+              className="h-8 text-sm w-full md:flex-1 md:min-w-[150px]"
             />
             <Select value={incomeCatFilter} onValueChange={setIncomeCatFilter}>
               <SelectTrigger className="h-8 w-36 text-xs"><SelectValue placeholder="All categories" /></SelectTrigger>
