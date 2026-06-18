@@ -35,16 +35,6 @@ function MoneyTooltip({ active, payload, label }: any) {
   );
 }
 
-// ── Section wrapper ───────────────────────────────────────────────────────────
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">{title}</h2>
-      {children}
-    </div>
-  );
-}
-
 function ChartCard({ title, children, className = '' }: { title: string; children: React.ReactNode; className?: string }) {
   return (
     <div className={`bg-zinc-900 border border-zinc-800 rounded-lg p-4 ${className}`}>

@@ -27,7 +27,7 @@ export function ImportDialog({ open, onOpenChange, year, month }: ImportDialogPr
   const [removedRows, setRemovedRows] = useState<Set<number>>(new Set());
   const [duplicateRows, setDuplicateRows] = useState<Set<number>>(new Set());
   const [zeroRows, setZeroRows] = useState<Set<number>>(new Set());
-  const [importResult, setImportResult] = useState<{ imported: number; skipped: number } | null>(null);
+  const [, setImportResult] = useState<{ imported: number; skipped: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: categoriesApi.getAll });

@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Pencil, Trash2, Plus, Info, Check, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { categoriesApi } from '@/lib/api';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -21,7 +20,7 @@ function loadConfig(): AllocationRowConfig[] | null {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return null;
     // Migrate old rows that lack formula field
-    return parsed.map((r: AllocationRowConfig) => ({ formula: [], ...r }));
+    return parsed.map((r: AllocationRowConfig) => ({ ...r, formula: r.formula ?? [] }));
   } catch { return null; }
 }
 
@@ -42,10 +41,9 @@ function buildDefault(categories: Category[]): AllocationRowConfig[] {
 
 interface AllocationBreakdownProps {
   currentByCategory: CategoryTotal[];
-  prevByCategory: CategoryTotal[];
 }
 
-export function AllocationBreakdown({ currentByCategory, prevByCategory }: AllocationBreakdownProps) {
+export function AllocationBreakdown({ currentByCategory }: AllocationBreakdownProps) {
   const [rows, setRows] = useState<AllocationRowConfig[]>([]);
   const [editMode, setEditMode] = useState(false);
   const seeded = useRef(false);
@@ -114,7 +112,6 @@ export function AllocationBreakdown({ currentByCategory, prevByCategory }: Alloc
   const regularRows = rows.filter(r => !r.isDifference);
 
   const curMap  = computeAll(currentByCategory);
-  const prevMap = computeAll(prevByCategory);
 
   return (
     <div>

@@ -74,7 +74,6 @@ export function Dashboard() {
           <Card className="p-4">
             <AllocationBreakdown
               currentByCategory={summary?.byCategory ?? []}
-              prevByCategory={prevSummary?.byCategory ?? []}
             />
           </Card>
         </>
