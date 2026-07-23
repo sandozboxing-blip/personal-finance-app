@@ -14,7 +14,7 @@ function normalizeData(){leads.forEach(function(l){l.tags=l.tags||[];l.extra=l.e
 function loadData(){try{leads=JSON.parse(localStorage.getItem('d8l')||'[]');smm=JSON.parse(localStorage.getItem('d8s2')||'[]');web=JSON.parse(localStorage.getItem('d8w')||'[]');sharedTasks=JSON.parse(localStorage.getItem('d8tasks')||'[]');}catch(e){leads=[];smm=[];web=[];sharedTasks=[];}normalizeData();fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){if(r.status===401){location.reload();throw new Error('auth');}return r.json();}).then(function(d){var state=d.state||{},serverHasData=!!state.updatedAt||(state.leads||[]).length||(state.smm||[]).length||(state.web||[]).length||(state.tasks||[]).length;if(serverHasData){leads=state.leads||[];smm=state.smm||[];web=state.web||[];sharedTasks=state.tasks||[];normalizeData();saveLocal();}else if(leads.length||smm.length||web.length||sharedTasks.length){saveData();}populateCats();updateBadges();if(curpg==='dash')renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();}).catch(function(e){if(e.message!=='auth')toast('⚠ Работа офлайн — промените се пазят на това устройство','var(--yellow)');});}
 
 // ── NAVIGATION ─────────────────────────────────────────
-var PTITLES = {dash: 'Dashboard', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
+var PTITLES = {dash: 'Dashboard', tasks: 'Task Manager', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
 
 function goPage(id, el) {
   curpg = id;
@@ -31,6 +31,7 @@ function goPage(id, el) {
   if (id === 'smm') renderSmm();
   if (id === 'web') renderWeb();
   if (id === 'leads') renderLeads();
+  if (id === 'tasks') renderTaskManager();
   updateBadges();
   closeSb();
 }
@@ -46,7 +47,7 @@ function updateBadges() {
   document.getElementById('bdg-dash').textContent = fmt(mon) + ' €/м';
   document.getElementById('bdg-smm').textContent = smm.length;
   document.getElementById('bdg-web').textContent = web.length;
-  document.getElementById('bdg-leads').textContent = leads.length;
+  document.getElementById('bdg-leads').textContent = leads.length; var taskBadge=document.getElementById('bdg-tasks');if(taskBadge)taskBadge.textContent=getTasks().filter(function(t){return !t.done;}).length;
 }
 
 // ── DASHBOARD ──────────────────────────────────────────
@@ -69,8 +70,8 @@ function jumpPage(id){var btn=Array.prototype.find.call(document.querySelectorAl
 function getTasks(){return sharedTasks;}
 function saveTasks(tasks){sharedTasks=tasks;saveData();}
 function addTask(){var input=document.getElementById('taskInp'),value=input.value.trim();if(!value)return;var tasks=getTasks();tasks.unshift({id:Date.now().toString(36),text:value,done:false});saveTasks(tasks);input.value='';renderTasks();}
-function toggleTask(id){var tasks=getTasks();tasks.forEach(function(t){if(t.id===id)t.done=!t.done;});saveTasks(tasks);renderTasks();}
-function deleteTask(id){saveTasks(getTasks().filter(function(t){return t.id!==id;}));renderTasks();}
+function toggleTask(id){var tasks=getTasks();tasks.forEach(function(t){if(t.id===id)t.done=!t.done;});saveTasks(tasks);renderTasks();renderTaskManager();}
+function deleteTask(id){saveTasks(getTasks().filter(function(t){return t.id!==id;}));renderTasks();renderTaskManager();}
 function renderTasks(){var el=document.getElementById('taskList');if(!el)return;var tasks=getTasks();el.innerHTML=tasks.length?tasks.map(function(t){return '<label class="task '+(t.done?'done':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTask(\''+t.id+'\')"><span>'+esc(t.text)+'</span><button type="button" aria-label="Изтрий задача" onclick="event.preventDefault();deleteTask(\''+t.id+'\')">×</button></label>';}).join(''):'<div class="emptymini">Добави до 3 важни задачи за деня.</div>';}
 
 
@@ -306,12 +307,17 @@ function renderLeads() {
   var cat = document.getElementById('lCatF').value;
   var sort = document.getElementById('lSortF').value;
   var contact = (document.getElementById('lContactF') || {}).value || '';
+  var rating = parseFloat((document.getElementById('lRatingF') || {}).value) || 0;
+  var follow = (document.getElementById('lFollowF') || {}).value || '';
   var fil = leads.filter(function(l) {
     var mQ = !q || [l.name,l.website,l.phone,l.email,l.category,l.address,l.note,l.reviews,l.price,(l.tags||[]).join(' ')].join(' ').toLowerCase().indexOf(q) >= 0;
     var mC = !cat || l.category === cat;
     var mF = lftab === 'all' || l.status === lftab;
     var mContact = !contact || (contact==='phone'&&l.phone) || (contact==='email'&&l.email) || (contact==='website'&&l.website) || (contact==='missing'&&!l.phone&&!l.email);
-    return mQ && mC && mF && mContact;
+    var mRating = !rating || (parseFloat(l.stars)||0) >= rating;
+    var now=new Date();now.setHours(0,0,0,0);var fu=l.followup?new Date(l.followup):null;if(fu)fu.setHours(0,0,0,0);var week=new Date(now);week.setDate(week.getDate()+7);
+    var mFollow=!follow||(follow==='none'&&!fu)||(follow==='today'&&fu&&fu<=now)||(follow==='week'&&fu&&fu>=now&&fu<=week);
+    return mQ && mC && mF && mContact && mRating && mFollow;
   });
   fil.sort(function(a,b){
     var contactScore=function(x){return (x.phone?3:0)+(x.email?2:0)+(x.website?1:0);};
@@ -327,7 +333,7 @@ function renderLeads() {
     if(sort==='newest') return String(b.id).localeCompare(String(a.id));
     return b.stars-a.stars;
   });
-  var filterKey=[q,cat,sort,contact,lftab].join('|');if(filterKey!==leadFilterKey){leadFilterKey=filterKey;leadPage=1;}
+  var filterKey=[q,cat,sort,contact,rating,follow,lftab].join('|');if(filterKey!==leadFilterKey){leadFilterKey=filterKey;leadPage=1;}
   var pages=Math.max(1,Math.ceil(fil.length/leadPageSize));leadPage=Math.min(leadPage,pages);
   var rowStart=(leadPage-1)*leadPageSize,rows=fil.slice(rowStart,rowStart+leadPageSize);
   var has = leads.length > 0;
@@ -339,7 +345,7 @@ function renderLeads() {
   var bdg = document.getElementById('pgbdg');
   bdg.style.display = has ? '' : 'none';
   bdg.textContent = fil.length + ' записа';
-  document.getElementById('bdg-leads').textContent = leads.length;
+  document.getElementById('bdg-leads').textContent = leads.length; var taskBadge=document.getElementById('bdg-tasks');if(taskBadge)taskBadge.textContent=getTasks().filter(function(t){return !t.done;}).length;
   if (!has || !fil.length) { document.getElementById('ltbody').innerHTML = ''; return; }
   var today = new Date(); today.setHours(0, 0, 0, 0);
   document.getElementById('ltbody').innerHTML = rows.map(function(l) {
@@ -363,7 +369,7 @@ function renderLeads() {
 }
 function changeLeadPage(delta){leadPage=Math.max(1,leadPage+delta);renderLeads();document.getElementById('pgleads').scrollIntoView({behavior:'smooth'});}
 function changeLeadPageSize(value){leadPageSize=parseInt(value)||25;leadPage=1;renderLeads();}
-function resetLeadFilters(){document.getElementById('srchQ').value='';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lSortF').value='quality';setLFTab(document.querySelector('#lfTabs .btn'));}
+function resetLeadFilters(){document.getElementById('srchQ').value='';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='quality';setLFTab(document.querySelector('#lfTabs .btn'));}
 function deleteAllLeads(){if(!leads.length)return;if(!confirm('Изтрий всички '+leads.length+' leads? Това действие не може да се върне.'))return;leads=[];leadPage=1;saveData();renderLeads();populateCats();updateBadges();toast('Всички leads са изтрити','var(--red)');}
 function deleteAllWeb(){if(!web.length)return;if(!confirm('Изтрий всички '+web.length+' Web Design проекта? Това действие не може да се върне.'))return;web=[];saveData();renderWeb();updateBadges();toast('Всички Web Design проекти са изтрити','var(--red)');}
 function lCS(id) { var l = leads.find(function(x) { return x.id === id; }); if (!l) return; l.status = SC[l.status] || 'unset'; saveData(); renderLeads(); }
@@ -523,6 +529,23 @@ function doExport() {
   toast('↓ CSV изтегля се', 'var(--green)');
 }
 
+
+// ── LEADS FILTER BUILDER ──
+var leadAddons=[];
+try{leadAddons=JSON.parse(localStorage.getItem('d8LeadAddons')||'[]');}catch(e){leadAddons=[];}
+function renderLeadAddons(){document.querySelectorAll('.lead-addon').forEach(function(el){var on=leadAddons.indexOf(el.dataset.addon)>=0;el.classList.toggle('shown',on);var mark=document.getElementById('fa-'+el.dataset.addon);if(mark)mark.textContent=on?'✓':'＋';});}
+function toggleLeadFilterMenu(e){if(e)e.stopPropagation();document.getElementById('leadFilterMenu').classList.toggle('open');}
+function toggleLeadAddon(key){var i=leadAddons.indexOf(key);if(i>=0){leadAddons.splice(i,1);var el=document.querySelector('.lead-addon[data-addon="'+key+'"]');if(el)el.value='';}else leadAddons.push(key);localStorage.setItem('d8LeadAddons',JSON.stringify(leadAddons));renderLeadAddons();renderLeads();}
+document.addEventListener('click',function(e){var menu=document.getElementById('leadFilterMenu');if(menu&&!e.target.closest('.leadfilterpicker'))menu.classList.remove('open');});
+
+// ── TASK MANAGER ──
+var taskViewDate=new Date();taskViewDate.setDate(1);
+function taskIso(d){var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day;}
+function focusTaskComposer(){var el=document.getElementById('tmTitle');if(el){el.focus();document.getElementById('taskComposer').scrollIntoView({behavior:'smooth',block:'center'});}}
+function addManagerTask(){var title=document.getElementById('tmTitle').value.trim();if(!title){toast('Добави име на задачата','var(--yellow)');return;}var tasks=getTasks();tasks.unshift({id:Date.now().toString(36),text:title,due:document.getElementById('tmDate').value||'',priority:document.getElementById('tmPriority').value,category:document.getElementById('tmCategory').value.trim(),done:false,createdAt:new Date().toISOString()});saveTasks(tasks);document.getElementById('tmTitle').value='';document.getElementById('tmCategory').value='';renderTasks();renderTaskManager();toast('Задачата е добавена','var(--green)');}
+function changeTaskMonth(delta){taskViewDate.setMonth(taskViewDate.getMonth()+delta);renderTaskManager();}
+function selectTaskDay(iso){document.getElementById('tmDate').value=iso;document.getElementById('tmFilter').value='all';renderTaskManager();focusTaskComposer();}
+function renderTaskManager(){var cal=document.getElementById('taskCalendar');if(!cal)return;var tasks=getTasks();tasks.forEach(function(t){if(!t.priority)t.priority='normal';if(!t.category)t.category='';if(!t.due)t.due='';});var y=taskViewDate.getFullYear(),m=taskViewDate.getMonth(),first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),offset=(first.getDay()+6)%7,today=taskIso(new Date());document.getElementById('taskMonthLabel').textContent=first.toLocaleDateString('bg-BG',{month:'long',year:'numeric'});var html='';for(var i=0;i<offset;i++)html+='<div class="calday muted"></div>';for(var d=1;d<=days;d++){var iso=taskIso(new Date(y,m,d)),dayTasks=tasks.filter(function(t){return t.due===iso;}),open=dayTasks.filter(function(t){return !t.done;}).length;html+='<button class="calday '+(iso===today?'today ':'')+(open?'hasTasks':'')+'" onclick="selectTaskDay(\''+iso+'\')"><span>'+d+'</span>'+(open?'<b>'+open+'</b>':'')+'</button>';}cal.innerHTML=html;var filter=document.getElementById('tmFilter').value,now=new Date();now.setHours(0,0,0,0),selected=document.getElementById('tmDate').value;var list=tasks.filter(function(t){var due=t.due?new Date(t.due):null;if(due)due.setHours(0,0,0,0);if(selected&&filter==='all')return t.due===selected;if(filter==='open')return !t.done;if(filter==='today')return !t.done&&t.due===today;if(filter==='overdue')return !t.done&&due&&due<now;if(filter==='done')return t.done;return true;}).sort(function(a,b){return(a.done-b.done)||((a.due||'9999').localeCompare(b.due||'9999'))||({high:0,normal:1,low:2}[a.priority]-{high:0,normal:1,low:2}[b.priority]);});var openCount=tasks.filter(function(t){return !t.done;}).length,overdue=tasks.filter(function(t){return !t.done&&t.due&&t.due<today;}).length;document.getElementById('taskManagerSummary').textContent=openCount+' отворени · '+overdue+' просрочени';document.getElementById('taskManagerList').innerHTML=list.length?list.map(function(t){return '<article class="mtask '+(t.done?'done':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTask(\''+t.id+'\')"><div class="mtaskbody"><strong>'+esc(t.text)+'</strong><div><span class="priority '+t.priority+'">'+({high:'Висок',normal:'Нормален',low:'Нисък'}[t.priority]||'Нормален')+'</span>'+(t.category?'<span>'+esc(t.category)+'</span>':'')+(t.due?'<span class="'+(t.due<today&&!t.done?'late':'')+'">'+fmtD(t.due)+'</span>':'<span>Без срок</span>')+'</div></div><button onclick="deleteTask(\''+t.id+'\')">×</button></article>';}).join(''):'<div class="emptymini">Няма задачи в този изглед.</div>';updateBadges();}
 // ── UTILS ──────────────────────────────────────────────
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmt(n) { return Number(n || 0).toLocaleString('bg-BG', {maximumFractionDigits: 0}); }
@@ -565,4 +588,5 @@ function nukeAll() {
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeLB(); closeAdd(); } });
 
 // ── INIT ───────────────────────────────────────────────
+renderLeadAddons();
 (function(){fetch('api.php?action=me',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){if(d.authenticated)startApp(d.user);}).catch(function(){});})();
