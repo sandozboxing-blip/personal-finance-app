@@ -193,6 +193,16 @@
         </div>
         <div class="fdiv"></div>
         <div class="fg">
+          <label class="flbl">Архив и прехвърляне на данни</label>
+          <div class="fhint" style="margin-bottom:10px">Пълният backup съдържа SMM клиенти, web проекти, leads и задачи. Използвай го за прехвърляне от localhost към онлайн панела.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btng" onclick="exportFullBackup()">↓ Свали пълен backup</button>
+            <button class="btn btnp" onclick="document.getElementById('backupFile').click()">↑ Възстанови backup</button>
+            <input type="file" id="backupFile" accept=".json,application/json" style="display:none" onchange="importFullBackup(event)">
+          </div>
+        </div>
+        <div class="fdiv"></div>
+        <div class="fg">
           <label class="flbl">Опасна зона</label>
           <div class="fhint" style="margin-bottom:10px">Изтрива всички данни без възможност за възстановяване.</div>
           <button class="btn btnd" onclick="nukeAll()">⚠ Изчисти всички данни</button>
