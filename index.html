@@ -38,7 +38,7 @@
     <button class="sbi" onclick="goPage('web',this)"><span class="ic" style="color:var(--blue)">◈</span> Уеб Дизайн <span class="sbdg" id="bdg-web">0</span></button>
     <div class="sbsec">Продажби</div>
     <button class="sbi" onclick="goPage('leads',this)"><span class="ic" style="color:var(--green)">◈</span> Leads <span class="sbdg" id="bdg-leads">0</span></button>
-    <div class="sbdiv"></div>
+    <button class="sbi" onclick="goPage('tasks',this)"><span class="ic" style="color:var(--yellow)">▣</span> Task Manager <span class="sbdg" id="bdg-tasks">0</span></button>    <div class="sbdiv"></div>
     <button class="sbi" onclick="goPage('settings',this)"><span class="ic">⚙</span> Настройки</button>
   </nav>
   <div class="sbfoot">
@@ -127,14 +127,24 @@
           <button class="btn btng btnsm" data-f="maybe" onclick="setLFTab(this)">? Може би</button>
           <button class="btn btng btnsm" data-f="not" onclick="setLFTab(this)">✗ Не</button>
         </div>
-        <select class="btn btng btnsm" id="lCatF" onchange="renderLeads()" style="cursor:pointer"><option value="">Всички категории</option></select>
-        <select class="btn btng btnsm" id="lContactF" onchange="renderLeads()" style="cursor:pointer">
+        <div class="leadfilterpicker">
+          <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">＋ Добави филтър</button>
+          <div class="filtermenu" id="leadFilterMenu">
+            <button onclick="toggleLeadAddon('category')">Категория <span id="fa-category">＋</span></button>
+            <button onclick="toggleLeadAddon('contact')">Контакт <span id="fa-contact">＋</span></button>
+            <button onclick="toggleLeadAddon('rating')">Минимална оценка <span id="fa-rating">＋</span></button>
+            <button onclick="toggleLeadAddon('followup')">Follow-up <span id="fa-followup">＋</span></button>
+          </div>
+        </div>        <select class="btn btng btnsm lead-addon" data-addon="category" id="lCatF" onchange="renderLeads()" style="cursor:pointer"><option value="">Всички категории</option></select>
+        <select class="btn btng btnsm lead-addon" data-addon="contact" id="lContactF" onchange="renderLeads()" style="cursor:pointer">
           <option value="">Всички контакти</option>
           <option value="phone">С телефон</option>
           <option value="email">С имейл</option>
           <option value="website">С уебсайт</option>
           <option value="missing">Без телефон и имейл</option>
         </select>
+        <select class="btn btng btnsm lead-addon" data-addon="rating" id="lRatingF" onchange="renderLeads()"><option value="">Всяка оценка</option><option value="4.5">4.5+ звезди</option><option value="4">4+ звезди</option><option value="3">3+ звезди</option></select>
+        <select class="btn btng btnsm lead-addon" data-addon="followup" id="lFollowF" onchange="renderLeads()"><option value="">Всеки follow-up</option><option value="today">Днес / просрочен</option><option value="week">Следващите 7 дни</option><option value="none">Без follow-up</option></select>
         <select class="btn btng btnsm" id="lSortF" onchange="renderLeads()" style="cursor:pointer">
           <option value="quality">Най-добри първо</option>
           <option value="stars_desc">Оценка: висока → ниска</option>
@@ -178,6 +188,32 @@
       </div>
     </div>
 
+    <div class="page" id="pgtasks">
+      <div class="taskmgr">
+        <section class="taskhero">
+          <div><div class="dashdate">ПЛАНИРАНЕ И ИЗПЪЛНЕНИЕ</div><h2>Task Manager</h2><p>Задачи, крайни срокове и календар на едно място.</p></div>
+          <button class="btn btnp" onclick="focusTaskComposer()">＋ Нова задача</button>
+        </section>
+        <section class="taskcomposer" id="taskComposer">
+          <input id="tmTitle" class="fi" placeholder="Какво трябва да се свърши?">
+          <input id="tmDate" class="fi" type="date">
+          <select id="tmPriority" class="fi"><option value="normal">Нормален приоритет</option><option value="high">Висок приоритет</option><option value="low">Нисък приоритет</option></select>
+          <input id="tmCategory" class="fi" placeholder="Категория (напр. Sales)">
+          <button class="btn btnp" onclick="addManagerTask()">Добави</button>
+        </section>
+        <div class="tasklayout">
+          <section class="taskcalendar cardpanel">
+            <div class="calhead"><button class="btn btng btnsm" onclick="changeTaskMonth(-1)">←</button><h3 id="taskMonthLabel"></h3><button class="btn btng btnsm" onclick="changeTaskMonth(1)">→</button></div>
+            <div class="calweek"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
+            <div class="calgrid" id="taskCalendar"></div>
+          </section>
+          <section class="taskboard cardpanel">
+            <div class="taskboardhead"><div><h3>Задачи</h3><span id="taskManagerSummary"></span></div><select id="tmFilter" class="fi" onchange="renderTaskManager()"><option value="open">Отворени</option><option value="today">За днес</option><option value="overdue">Просрочени</option><option value="done">Завършени</option><option value="all">Всички</option></select></div>
+            <div class="managerlist" id="taskManagerList"></div>
+          </section>
+        </div>
+      </div>
+    </div>
     <div class="page" id="pgsettings">
       <div class="setwrap">
         <h2>Настройки</h2>
