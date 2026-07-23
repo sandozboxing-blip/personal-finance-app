@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 ini_set('display_errors','0');
+$isHttps=(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off')||strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO']??''))==='https';
+ini_set('session.use_strict_mode','1');
+ini_set('session.gc_maxlifetime','43200');
 session_name('digital_eight_session');
-session_set_cookie_params(['lifetime'=>60*60*24*30,'path'=>'/','secure'=>(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off'),'httponly'=>true,'samesite'=>'Strict']);
+session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>$isHttps,'httponly'=>true,'samesite'=>'Lax']);
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
