@@ -133,7 +133,7 @@
             <button onclick="toggleLeadAddon('category')">Категория <span id="fa-category">＋</span></button>
             <button onclick="toggleLeadAddon('contact')">Контакт <span id="fa-contact">＋</span></button>
             <button onclick="toggleLeadAddon('rating')">Минимална оценка <span id="fa-rating">＋</span></button>
-            <button onclick="toggleLeadAddon('followup')">Follow-up <span id="fa-followup">＋</span></button>
+            <button onclick="toggleLeadAddon('followup')">Follow-up <span id="fa-followup">＋</span></button><div class="filterdivider"></div><small class="filtertitle">ПРАВИЛА ЗА ПРИОРИТЕТ</small><button onclick="toggleLeadPriority('no_site')">Без сайт първо <span id="fp-no_site">＋</span></button><button onclick="toggleLeadPriority('low_reviews')">Малко ревюта първо <span id="fp-low_reviews">＋</span></button><button onclick="toggleLeadPriority('low_rating')">Ниска оценка първо <span id="fp-low_rating">＋</span></button><button onclick="toggleLeadPriority('has_phone')">С телефон първо <span id="fp-has_phone">＋</span></button><button onclick="toggleLeadPriority('has_email')">С имейл първо <span id="fp-has_email">＋</span></button>
           </div>
         </div>        <select class="btn btng btnsm lead-addon" data-addon="category" id="lCatF" onchange="renderLeads()" style="cursor:pointer"><option value="">Всички категории</option></select>
         <select class="btn btng btnsm lead-addon" data-addon="contact" id="lContactF" onchange="renderLeads()" style="cursor:pointer">
@@ -146,7 +146,7 @@
         <select class="btn btng btnsm lead-addon" data-addon="rating" id="lRatingF" onchange="renderLeads()"><option value="">Всяка оценка</option><option value="4.5">4.5+ звезди</option><option value="4">4+ звезди</option><option value="3">3+ звезди</option></select>
         <select class="btn btng btnsm lead-addon" data-addon="followup" id="lFollowF" onchange="renderLeads()"><option value="">Всеки follow-up</option><option value="today">Днес / просрочен</option><option value="week">Следващите 7 дни</option><option value="none">Без follow-up</option></select>
         <select class="btn btng btnsm" id="lSortF" onchange="renderLeads()" style="cursor:pointer">
-          <option value="quality">Най-добри първо</option>
+          <option value="priority">Моят приоритет</option><option value="quality">Най-добри първо</option>
           <option value="stars_desc">Оценка: висока → ниска</option>
           <option value="stars_asc">Оценка: ниска → висока</option>
           <option value="name_asc">Име: А → Я</option>
@@ -158,6 +158,8 @@
           <option value="newest">Последно добавени</option>
         </select>
         <div style="flex:1"></div>
+        <div class="leadpriorityrules" id="leadPriorityRules"></div>
+
         <button class="btn btng btnsm" onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
         <button class="btn btnd btnsm" onclick="deleteAllLeads()">⌫ Изтрий всички</button>
         <button class="btn btng btnsm" onclick="doExport()">↓ CSV</button>
@@ -196,7 +198,7 @@
         </section>
         <section class="taskcomposer" id="taskComposer">
           <input id="tmTitle" class="fi" placeholder="Какво трябва да се свърши?">
-          <input id="tmDate" class="fi" type="date">
+          <label class="taskdatefield"><span>ОТ</span><input id="tmDate" class="fi" type="date" title="Начална дата"></label><label class="taskdatefield"><span>ДО</span><input id="tmEndDate" class="fi" type="date" title="Крайна дата (по желание)"></label>
           <select id="tmPriority" class="fi"><option value="normal">Нормален приоритет</option><option value="high">Висок приоритет</option><option value="low">Нисък приоритет</option></select>
           <input id="tmCategory" class="fi" list="tmCategoryOptions" placeholder="Категория (напр. Sales)" onchange="applyCategoryDefaults()"><datalist id="tmCategoryOptions"></datalist><select id="tmRepeat" class="fi"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select>
           <button class="btn btnp" onclick="addManagerTask()">Добави</button>
@@ -299,7 +301,7 @@
       <input type="hidden" id="teId">
       <div class="taskeditgrid">
         <div class="taskeditwide"><label class="flbl" for="teTitle">Име на събитието</label><input id="teTitle" class="fi" placeholder="Име"></div>
-        <div><label class="flbl" for="teDate">Дата</label><input id="teDate" class="fi" type="date"></div>
+        <div><label class="flbl" for="teDate">Начална дата</label><input id="teDate" class="fi" type="date"></div><div><label class="flbl" for="teEndDate">Крайна дата</label><input id="teEndDate" class="fi" type="date"></div>
         <div><label class="flbl" for="tePriority">Приоритет</label><select id="tePriority" class="fi"><option value="normal">Нормален</option><option value="high">Висок</option><option value="low">Нисък</option></select></div>
         <div><label class="flbl" for="teCategory">Категория</label><input id="teCategory" class="fi" list="tmCategoryOptions" placeholder="Категория"></div>
         <div><label class="flbl" for="teRepeat">Повторение</label><select id="teRepeat" class="fi"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select></div>
