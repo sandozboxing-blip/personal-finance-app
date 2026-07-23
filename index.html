@@ -292,6 +292,27 @@
   </div>
 </div>
 
+<div class="ov" id="taskEditOv" onclick="if(event.target===this)closeTaskEditor()">
+  <div class="modal taskeditmodal">
+    <div class="mhdr"><div><span class="modaleyebrow">КАЛЕНДАРНО СЪБИТИЕ</span><h3>Редактиране на събитие</h3></div><button class="mclose" onclick="closeTaskEditor()">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="teId">
+      <div class="taskeditgrid">
+        <div class="taskeditwide"><label class="flbl" for="teTitle">Име на събитието</label><input id="teTitle" class="fi" placeholder="Име"></div>
+        <div><label class="flbl" for="teDate">Дата</label><input id="teDate" class="fi" type="date"></div>
+        <div><label class="flbl" for="tePriority">Приоритет</label><select id="tePriority" class="fi"><option value="normal">Нормален</option><option value="high">Висок</option><option value="low">Нисък</option></select></div>
+        <div><label class="flbl" for="teCategory">Категория</label><input id="teCategory" class="fi" list="tmCategoryOptions" placeholder="Категория"></div>
+        <div><label class="flbl" for="teRepeat">Повторение</label><select id="teRepeat" class="fi"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select></div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btnd btnsm" onclick="deleteEditedTask()">⌫ Изтрий</button>
+      <div style="flex:1"></div>
+      <button class="btn btng" onclick="closeTaskEditor()">Отказ</button>
+      <button class="btn btnp" onclick="saveTaskEditor()">Запази промените</button>
+    </div>
+  </div>
+</div>
 <div class="toasts" id="toasts"></div>
 
 <script src="assets/app.js"></script>
