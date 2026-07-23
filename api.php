@@ -6,6 +6,8 @@ ini_set('session.use_strict_mode','1');
 ini_set('session.gc_maxlifetime','43200');
 session_name('digital_eight_session');
 session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>$isHttps,'httponly'=>true,'samesite'=>'Lax']);
+$sessionToken=(string)($_SERVER['HTTP_X_D8_SESSION']??'');
+if($sessionToken!==''&&preg_match('/^[a-zA-Z0-9,-]{22,256}$/',$sessionToken)) session_id($sessionToken);
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -19,7 +21,7 @@ function decodeState(string $raw): array { $json=preg_replace('/^<\?php exit; \?
 function emptyState(): array { return ['version'=>3,'leads'=>[],'smm'=>[],'web'=>[],'tasks'=>[],'userData'=>[]]; }
 if($action==='login'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $b=body();$u=trim((string)($b['username']??''));$p=(string)($b['password']??'');$users=$config['users']??[];
-  if(isset($users[$u])&&hash_equals((string)$users[$u],$p)){session_regenerate_id(true);$_SESSION['user']=$u;reply(['ok'=>true,'user'=>$u]);}
+  if(isset($users[$u])&&hash_equals((string)$users[$u],$p)){session_regenerate_id(true);$_SESSION['user']=$u;reply(['ok'=>true,'user'=>$u,'sessionToken'=>session_id()]);}
   reply(['ok'=>false,'error'=>'Грешно име или парола'],401);
 }
 if($action==='logout'){$_SESSION=[];if(ini_get('session.use_cookies')){$x=session_get_cookie_params();setcookie(session_name(),'',time()-42000,$x['path'],$x['domain']??'',(bool)$x['secure'],(bool)$x['httponly']);}session_destroy();reply(['ok'=>true]);}
