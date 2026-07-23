@@ -1,22 +1,4 @@
-node_modules/
-dist/
-data/*.db
-data/*.db-shm
-data/*.db-wal
-server/data/*.db
-server/data/*.db-shm
-server/data/*.db-wal
-.env
-*.js.map
-.DS_Store
-.claude/
-
-# Financial data files
-*.csv
-*.xlsx
-*.xls
-*.ods
-*.pdf
-*.ofx
-*.qfx
-*.qif
+config.php
+data/panel-data.php
+data/*.tmp
+data/*.bak
