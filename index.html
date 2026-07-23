@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Eight Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<div id="lw">
+  <div class="lcard">
+    <div class="llogo">Digital <span>Eight</span></div>
+    <div class="lsub">MANAGEMENT PANEL</div>
+    <label class="llbl" for="lu">Потребителско име</label>
+    <input type="text" id="lu" class="linp" placeholder="Username" autocomplete="username">
+    <label class="llbl" for="lp">Парола</label>
+    <input type="password" id="lp" class="linp" placeholder="Password" autocomplete="current-password">
+    <label class="lchk"><input type="checkbox" id="rem"> Запомни ме</label>
+    <button class="lbtn" id="loginBtn">Влез в панела →</button>
+    <div class="lerr" id="lerr">Грешно потребителско име или парола</div>
+  </div>
+</div>
+
+<div class="app" id="app">
+<div class="sbd" id="sbbd" onclick="closeSb()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sbr">
+    <div class="sblogo">Digital <span>Eight</span></div>
+    <button class="sbx" onclick="closeSb()">✕</button>
+  </div>
+  <nav class="sbnav">
+    <div class="sbsec">Главно</div>
+    <button class="sbi active" onclick="goPage('dash',this)"><span class="ic">⌂</span> Dashboard <span class="sbdg" id="bdg-dash">—</span></button>
+    <div class="sbsec">Клиенти</div>
+    <button class="sbi" onclick="goPage('smm',this)"><span class="ic" style="color:var(--pll)">◈</span> SMM Клиенти <span class="sbdg" id="bdg-smm">0</span></button>
+    <button class="sbi" onclick="goPage('web',this)"><span class="ic" style="color:var(--blue)">◈</span> Уеб Дизайн <span class="sbdg" id="bdg-web">0</span></button>
+    <div class="sbsec">Продажби</div>
+    <button class="sbi" onclick="goPage('leads',this)"><span class="ic" style="color:var(--green)">◈</span> Leads <span class="sbdg" id="bdg-leads">0</span></button>
+    <div class="sbdiv"></div>
+    <button class="sbi" onclick="goPage('settings',this)"><span class="ic">⚙</span> Настройки</button>
+  </nav>
+  <div class="sbfoot">
+    <div class="sbuser" onclick="logout()">
+      <div class="sbav" id="sbav">A</div>
+      <div><div class="sbuname" id="sbname">Admin</div><div class="sbrole">Излез от акаунта →</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <button class="hmbg" onclick="openSb()">☰</button>
+    <span class="tbtitle" id="pgtitle">Dashboard</span>
+    <span class="tbbdg" id="pgbdg" style="display:none"></span>
+    <div class="tbsep"></div>
+    <div class="tbsr" id="tbsr" style="display:none">
+      <span class="tbsic">⌕</span>
+      <input type="text" id="srchQ" placeholder="Търси..." oninput="onSearch()">
+    </div>
+  </div>
+
+  <div class="content">
+
+
+    <div class="page active" id="pgdash">
+      <div class="dashwrap">
+        <section class="dashhero">
+          <div><div class="dashdate" id="dashDate"></div><h1>Добре дошъл, <span id="dashName">Admin</span></h1><p>Ето най-важното за приходите, проектите и следващите ти действия.</p></div>
+          <div class="dashactions"><button class="btn btng btnsm" onclick="jumpPage('leads')">＋ Lead</button><button class="btn btng btnsm" onclick="openAdd('web')">＋ Уеб проект</button><button class="btn btnp btnsm" onclick="openAdd('smm')">＋ SMM клиент</button></div>
+        </section>
+        <div class="dgrid" id="dashCards"></div>
+        <div class="dashcols">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <section class="dashpanel"><div class="dashpanelhead"><div><h3>Финансов преглед</h3><span>Активни договори и проекти</span></div><button class="btn btng btnsm" onclick="jumpPage('smm')">Клиенти →</button></div><div class="dashpanelbody"><div class="pipeline" id="dashPipeline"></div></div></section>
+            <section class="dashpanel"><div class="dashpanelhead"><div><h3>Нуждае се от внимание</h3><span id="alertCount">0 известия</span></div></div><div class="dashpanelbody"><div class="alertlist" id="dashAlerts"></div></div></section>
+            <section class="dashpanel"><div class="dashpanelhead"><div><h3>Бизнес анализ</h3><span>Автоматично от твоите данни</span></div></div><div class="dashpanelbody"><div class="insightgrid" id="dashAnalysis"></div></div></section>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <section class="dashpanel"><div class="dashpanelhead"><div><h3>Продажбена фуния</h3><span>Разпределение на leads</span></div><button class="btn btng btnsm" onclick="jumpPage('leads')">Виж →</button></div><div class="dashpanelbody"><div class="funnel" id="dashFunnel"></div></div></section>
+            <section class="dashpanel"><div class="dashpanelhead"><div><h3>Фокус за днес</h3><span>Запазва се автоматично</span></div></div><div class="dashpanelbody"><div class="taskform"><input id="taskInp" placeholder="Добави кратка задача..." onkeydown="if(event.key==='Enter')addTask()"><button class="btn btnp btnsm" onclick="addTask()">Добави</button></div><div class="tasklist" id="taskList"></div></div></section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="pgsmm">
+      <div class="sgrid" id="smmStats"></div>
+      <div class="ptbar">
+        <select class="btn btng btnsm" id="smmF" onchange="renderSmm()" style="cursor:pointer">
+          <option value="">Всички статуси</option>
+          <option value="active">Активни</option>
+          <option value="paused">Пауза</option>
+          <option value="ended">Приключени</option>
+        </select>
+        <div style="flex:1"></div>
+        <button class="btn btnp btnsm" onclick="openAdd('smm')">+ Нов SMM клиент</button>
+      </div>
+      <div class="twrap" id="smmCards"></div>
+    </div>
+
+    <div class="page" id="pgweb">
+      <div class="sgrid" id="webStats"></div>
+      <div class="ptbar">
+        <select class="btn btng btnsm" id="webF" onchange="renderWeb()" style="cursor:pointer">
+          <option value="">Всички статуси</option>
+          <option value="in_progress">В процес · подготвяме</option>
+          <option value="active">Активни · плащат месечно</option>
+          <option value="waiting">Чакащи</option>
+          <option value="paused">В пауза</option>
+          <option value="completed">Завършени · платени</option>
+        </select>
+        <div style="flex:1"></div>
+        <button class="btn btnd btnsm" onclick="deleteAllWeb()">⌫ Изтрий всички</button>
+        <button class="btn btnp btnsm" onclick="openAdd('web')">+ Нов WD проект</button>
+      </div>
+      <div class="twrap" id="webCards"></div>
+    </div>
+
+    <div class="page" id="pgleads">
+      <div class="leadsummary" id="leadSummary"></div>
+      <div class="ptbar" style="gap:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:3px;background:var(--b2);border:1px solid var(--line);border-radius:var(--r);padding:3px" id="lfTabs">
+          <button class="btn btnsm active" data-f="all" onclick="setLFTab(this)" style="background:var(--b4);color:var(--w0)">Всички</button>
+          <button class="btn btng btnsm" data-f="prospect" onclick="setLFTab(this)">✓ Потенциални</button>
+          <button class="btn btng btnsm" data-f="maybe" onclick="setLFTab(this)">? Може би</button>
+          <button class="btn btng btnsm" data-f="not" onclick="setLFTab(this)">✗ Не</button>
+        </div>
+        <select class="btn btng btnsm" id="lCatF" onchange="renderLeads()" style="cursor:pointer"><option value="">Всички категории</option></select>
+        <select class="btn btng btnsm" id="lContactF" onchange="renderLeads()" style="cursor:pointer">
+          <option value="">Всички контакти</option>
+          <option value="phone">С телефон</option>
+          <option value="email">С имейл</option>
+          <option value="website">С уебсайт</option>
+          <option value="missing">Без телефон и имейл</option>
+        </select>
+        <select class="btn btng btnsm" id="lSortF" onchange="renderLeads()" style="cursor:pointer">
+          <option value="quality">Най-добри първо</option>
+          <option value="stars_desc">Оценка: висока → ниска</option>
+          <option value="stars_asc">Оценка: ниска → висока</option>
+          <option value="name_asc">Име: А → Я</option>
+          <option value="name_desc">Име: Я → А</option>
+          <option value="category">Категория</option>
+          <option value="status">Статус</option>
+          <option value="contacts">Най-много контакти</option>
+          <option value="followup">Следващ follow-up</option>
+          <option value="newest">Последно добавени</option>
+        </select>
+        <div style="flex:1"></div>
+        <button class="btn btng btnsm" onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
+        <button class="btn btnd btnsm" onclick="deleteAllLeads()">⌫ Изтрий всички</button>
+        <button class="btn btng btnsm" onclick="doExport()">↓ CSV</button>
+        <button class="btn btnp btnsm" onclick="document.getElementById('fi').click()">↑ Импортирай файл</button>
+        <input type="file" id="fi" accept=".csv,.json,text/csv,application/json" style="display:none" onchange="handleFile(event)">
+      </div>
+      <div class="twrap">
+        <div class="upzone" id="upzone"
+             onclick="document.getElementById('fi').click()"
+             ondragover="event.preventDefault();this.classList.add('drag')"
+             ondragleave="this.classList.remove('drag')"
+             ondrop="this.classList.remove('drag');handleDrop(event)">
+          <div style="font-size:42px;margin-bottom:16px">📥</div>
+          <h2>Пусни файл от Instant Data Scraper</h2>
+          <p>Влачи CSV или JSON тук, или кликни за избор на файл.<br>Колоните се разпознават автоматично.</p>
+          <div style="margin-top:20px;display:flex;gap:10px;justify-content:center" onclick="event.stopPropagation()">
+            <button class="btn btnp btnsm" onclick="loadSample()">Зареди примерни данни</button>
+          </div>
+        </div>
+        <table id="ltable" style="display:none">
+          <thead><tr>
+            <th>Наименование</th><th>Оценка</th><th>Статус</th><th>Категория</th><th>Контакти</th><th>Follow-up</th><th style="min-width:130px">Действия</th>
+          </tr></thead>
+          <tbody id="ltbody"></tbody>
+        </table>
+        <div class="leadpager" id="leadPager" style="display:none"></div>
+        <div class="empty" id="lempty" style="display:none"><div class="ei">🔍</div><h3>Няма резултати</h3><p>Промени търсенето или филтъра</p></div>
+      </div>
+    </div>
+
+    <div class="page" id="pgsettings">
+      <div class="setwrap">
+        <h2>Настройки</h2>
+        <p class="setsub">Digital Eight Management Panel</p>
+        <div class="fg">
+          <label class="flbl">OpenAI API ключ</label>
+          <input type="password" class="fi" id="openaiKeyInp" placeholder="sk-...">
+          <div class="fhint">Ключът се изпраща само до локалния сървър на твоя компютър и се пази временно в паметта. Изтрива се при затваряне на панела.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button class="btn btnp" onclick="saveOpenAIKey()">Свържи ChatGPT</button>
+          <span class="chip cgr" id="apiStatus">Не е свързан</span>
+        </div>
+        <div class="fdiv"></div>
+        <div class="fg">
+          <label class="flbl">Опасна зона</label>
+          <div class="fhint" style="margin-bottom:10px">Изтрива всички данни без възможност за възстановяване.</div>
+          <button class="btn btnd" onclick="nukeAll()">⚠ Изчисти всички данни</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="ov" id="lbOv" onclick="if(event.target===this)closeLB()">
+  <div class="modal lbm">
+    <div class="lbhdr" id="lbhdr"></div>
+    <div class="lbbody">
+      <div class="lbcol" id="lbinfo"></div>
+      <div class="lbcol" id="lbnotes"></div>
+      <div class="lbcol" id="lbai"></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btnd btnsm" onclick="lbDel()">⌫ Изтрий запис</button>
+      <div style="flex:1"></div>
+      <button class="btn btng" onclick="closeLB()">Затвори</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="addOv" onclick="if(event.target===this)closeAdd()">
+  <div class="modal" style="max-width:580px">
+    <div class="mhdr"><h3 id="addTitle">Добави</h3><button class="mclose" onclick="closeAdd()">✕</button></div>
+    <div class="mbody" id="addBody"></div>
+    <div class="mfoot">
+      <button class="btn btnd btnsm" id="addDelBtn" style="display:none" onclick="delClient()">⌫ Изтрий</button>
+      <div style="flex:1"></div>
+      <button class="btn btng" onclick="closeAdd()">Отказ</button>
+      <button class="btn btnp" onclick="saveClient()">Запази</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
