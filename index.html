@@ -6,6 +6,7 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css">
+  <link rel="icon" type="image/png" href="assets/favicon.png"><link rel="apple-touch-icon" href="assets/favicon.png">
 </head>
 <body>
 
@@ -210,8 +211,8 @@
             <div class="calgrid" id="taskCalendar"></div>
           </section>
           <section class="taskboard cardpanel">
-            <div class="taskboardhead"><div><h3>Задачи</h3><span id="taskManagerSummary"></span></div><select id="tmFilter" class="fi" onchange="renderTaskManager()"><option value="open">Отворени</option><option value="today">За днес</option><option value="overdue">Просрочени</option><option value="done">Завършени</option><option value="all">Всички предстоящи · тази година</option></select></div>
-            <div class="managerlist" id="taskManagerList"></div>
+            <div class="taskboardhead"><div><h3>Задачи</h3><span id="taskManagerSummary"></span></div><select id="tmFilter" class="fi" onchange="renderTaskManager()"><option value="open">Отворени</option><option value="today">За днес</option><option value="overdue">Просрочени</option><option value="all">Всички предстоящи · тази година</option></select></div>
+            <div class="managerlist" id="taskManagerList"></div><section class="completedday"><div class="completeddayhead"><div><span class="completedeyebrow">ДНЕВЕН ОТЧЕТ</span><h4 id="completedDayTitle">Завършени задачи за деня</h4></div><b id="completedDayCount">0</b></div><div class="completeddaylist" id="completedDayList"></div></section>
           </section>
         </div>
         <section class="categorypanel cardpanel">
