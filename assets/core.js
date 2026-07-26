@@ -44,6 +44,7 @@ function startApp(user){
   setSyncState('loading','Зареждане');
   goPage('dash',document.querySelector('.sbi.active'));
   loadData();
+  setTimeout(hideAppLoader,4000);
 }
 function logout(){
   fetch('api.php?action=logout',{credentials:'same-origin'}).catch(function(){})
@@ -57,6 +58,10 @@ function localState(){return{leads:leads,smm:smm,web:web,tasks:sharedTasks,focus
 function setSyncState(state,text){
   var el=document.getElementById('syncStatus');if(!el)return;
   el.dataset.state=state;var span=el.querySelector('span');if(span)span.textContent=text;
+}
+function hideAppLoader(){
+  var loader=document.getElementById('appLoader');
+  if(loader)loader.classList.add('done');
 }
 function saveLocal(markDirty){
   try{
@@ -91,7 +96,7 @@ function readLocalData(){
 function finishDataLoad(){
   dataLoaded=true;populateCats();renderLeadAddons();renderTaskCategories();applyProfileSettings();updateBadges();
   renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();if(curpg==='tasks')renderTaskManager();
-  var loader=document.getElementById('appLoader');if(loader)setTimeout(function(){loader.classList.add('done');},100);
+  setTimeout(hideAppLoader,100);
 }
 function loadData(){
   readLocalData();var localSnapshot=localState(),hasUnsyncedLocal=localStorage.getItem('d8SyncDirty')==='1';
