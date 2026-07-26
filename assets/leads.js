@@ -128,11 +128,12 @@ function renderLeads() {
   var contact = (document.getElementById('lContactF') || {}).value || '';
   var rating = parseFloat((document.getElementById('lRatingF') || {}).value) || 0;
   var follow = (document.getElementById('lFollowF') || {}).value || '';
+  renderActiveLeadFilters();
   var fil = leads.filter(function(l) {
     var mQ = !q || [l.name,l.website,l.phone,l.email,l.category,l.address,l.note,l.reviews,l.price,(l.tags||[]).join(' ')].join(' ').toLowerCase().indexOf(q) >= 0;
     var mC = !cat || l.category === cat;
     var mF = lftab === 'all' || l.status === lftab;
-    var mContact = !contact || (contact==='phone'&&l.phone) || (contact==='email'&&l.email) || (contact==='website'&&l.website) || (contact==='missing'&&!l.phone&&!l.email);
+    var mContact = !contact || (contact==='phone'&&l.phone) || (contact==='email'&&l.email) || (contact==='website'&&l.website) || (contact==='no_website'&&!l.website) || (contact==='missing'&&!l.phone&&!l.email);
     var mRating = !rating || (parseFloat(l.stars)||0) >= rating;
     var now=new Date();now.setHours(0,0,0,0);var fu=l.followup?new Date(l.followup):null;if(fu)fu.setHours(0,0,0,0);var week=new Date(now);week.setDate(week.getDate()+7);
     var mFollow=!follow||(follow==='none'&&!fu)||(follow==='today'&&fu&&fu<=now)||(follow==='week'&&fu&&fu>=now&&fu<=week);
@@ -191,7 +192,18 @@ function renderLeads() {
 }
 function changeLeadPage(delta){leadPage=Math.max(1,leadPage+delta);renderLeads();document.getElementById('pgleads').scrollIntoView({behavior:'smooth'});}
 function changeLeadPageSize(value){leadPageSize=parseInt(value)||25;userSettings.leadPageSize=leadPageSize;saveData('profile');leadPage=1;renderLeads();}
-function resetLeadFilters(){document.getElementById('srchQ').value='';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='priority';setLFTab(document.querySelector('#lfTabs .btn'));}
+function leadFilterLabel(id,value){var el=document.getElementById(id);if(!el||!value)return'';var option=Array.prototype.find.call(el.options,function(o){return o.value===String(value);});return option?option.textContent:String(value);}
+function renderActiveLeadFilters(){
+  var box=document.getElementById('activeLeadFilters'),count=document.getElementById('leadFilterCount');if(!box)return;
+  var filters=[],q=(document.getElementById('srchQ').value||'').trim(),pairs=[['category','lCatF'],['contact','lContactF'],['rating','lRatingF'],['followup','lFollowF']];
+  if(q)filters.push({key:'search',label:'Търсене: '+q});if(lftab!=='all')filters.push({key:'status',label:{prospect:'Потенциални',maybe:'Може би',not:'Не'}[lftab]||lftab});
+  pairs.forEach(function(x){var value=document.getElementById(x[1]).value;if(value)filters.push({key:x[0],label:leadFilterLabel(x[1],value)});});
+  if(count){count.textContent=filters.length||'';count.style.display=filters.length?'inline-grid':'none';}
+  box.innerHTML=filters.length?'<span>Активни:</span>'+filters.map(function(f){return'<button onclick="clearLeadFilter(\''+f.key+'\')">'+esc(f.label)+' <b>×</b></button>';}).join('')+'<button class="clearall" onclick="resetLeadFilters()">Изчисти всички</button>':'';
+}
+function clearLeadFilter(key){var ids={category:'lCatF',contact:'lContactF',rating:'lRatingF',followup:'lFollowF'};if(key==='search')document.getElementById('srchQ').value='';else if(key==='status')lftab='all';else if(ids[key])document.getElementById(ids[key]).value='';if(key==='status'){var first=document.querySelector('#lfTabs .btn');if(first)setLFTab(first);else renderLeads();}else renderLeads();}
+function applyLeadQuickFilter(key,value){var ids={category:'lCatF',contact:'lContactF',rating:'lRatingF',followup:'lFollowF'},id=ids[key],el=document.getElementById(id);if(!el)return;if(leadAddons.indexOf(key)<0)leadAddons.push(key);localStorage.setItem('d8LeadAddons',JSON.stringify(leadAddons));el.value=value;renderLeadAddons();document.getElementById('leadFilterMenu').classList.remove('open');renderLeads();}
+function resetLeadFilters(){document.getElementById('srchQ').value='';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='priority';lftab='all';setLFTab(document.querySelector('#lfTabs .btn'));}
 function deleteAllLeads(){if(!leads.length)return;if(!confirm('Изтрий всички '+leads.length+' leads? Това действие не може да се върне.'))return;leads=[];leadPage=1;saveData();renderLeads();populateCats();updateBadges();toast('Всички leads са изтрити','var(--red)');}
 function deleteAllWeb(){if(!web.length)return;if(!confirm('Изтрий всички '+web.length+' Web Design проекта? Това действие не може да се върне.'))return;web=[];saveData();renderWeb();updateBadges();toast('Всички Web Design проекти са изтрити','var(--red)');}
 function lCS(id) { var l = leads.find(function(x) { return x.id === id; }); if (!l) return; l.status = SC[l.status] || 'unset'; saveData(); renderLeads(); }
