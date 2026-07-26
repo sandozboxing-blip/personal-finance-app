@@ -37,6 +37,7 @@ document.getElementById('lp').addEventListener('keydown',function(e){if(e.key===
 document.getElementById('lu').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('lp').focus();});
 function startApp(user,showTransition){
   currentUser=user||'Admin';
+  if(window.D8OneSignal)window.D8OneSignal.login(currentUser);
   var loader=document.getElementById('appLoader');
   if(loader){loader.classList.remove('done');loader.classList.toggle('login-transition',!!showTransition);var welcome=document.getElementById('loaderWelcome');if(welcome)welcome.textContent=showTransition?'Добре дошъл, '+currentUser:'Синхронизираме данните';}
   window.d8LoaderUntil=Date.now()+(showTransition?750:0);
@@ -50,6 +51,7 @@ function startApp(user,showTransition){
   setTimeout(hideAppLoader,showTransition?1200:2500);
 }
 function logout(){
+  if(window.D8OneSignal)window.D8OneSignal.logout();
   fetch('api.php?action=logout',{credentials:'same-origin'}).catch(function(){})
     .finally(function(){sessionStorage.removeItem(AUTH_KEY);showLogin();});
 }
@@ -168,6 +170,7 @@ function goPage(id, el) {
   if (id === 'leads') renderLeads();
   if (id === 'tasks') renderTaskManager();
   if (id === 'work') renderWorkTaskManager();
+  if (id === 'settings' && window.D8OneSignal) window.D8OneSignal.refresh();
   updateBadges();
   closeSb();
 }

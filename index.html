@@ -6,14 +6,15 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260726-19">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-19">
+<link rel="stylesheet" href="assets/styles.css?v=20260726-20">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-20">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="D8 PANEL" />
 <link rel="manifest" href="/site.webmanifest" />
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 </head>
 <body>
 
@@ -232,6 +233,7 @@
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">⌕</span><div><h3>Leads</h3><p>Колко бизнеса да виждаш наведнъж.</p></div></div><div class="settings-fields"><label>Записи на страница<select class="fi" id="settingsLeadPageSize" onchange="saveProfileSettings()"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label></div><div class="settings-note">Тази настройка се запомня само за текущия профил.</div></section>
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">◐</span><div><h3>Изглед</h3><p>Настрой плътността и движенията в интерфейса.</p></div></div><div class="settings-fields"><label>Плътност<select class="fi" id="settingsDensity" onchange="saveProfileSettings()"><option value="comfortable">Комфортна</option><option value="compact">Компактна</option></select></label><label class="setting-toggle"><span><b>Намалени анимации</b><small>Подходящо за по-слаби устройства</small></span><input type="checkbox" id="settingsReduceMotion" onchange="saveProfileSettings()"><i></i></label><label class="setting-toggle"><span><b>Компактни показатели</b><small>По-ниски карти на Dashboard</small></span><input type="checkbox" id="settingsCompactMetrics" onchange="saveProfileSettings()"><i></i></label></div></section>
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">↻</span><div><h3>Синхронизация</h3><p>SMM, Web и Leads са общи за двата профила.</p></div></div><div class="settings-actions"><button class="btn btnp" onclick="manualDataSync()">Синхронизирай сега</button><button class="btn btng" onclick="exportFullBackup()">Свали backup</button><button class="btn btng" onclick="document.getElementById('backupFile').click()">Възстанови backup</button><input type="file" id="backupFile" accept=".json,application/json" hidden onchange="importFullBackup(event)"></div></section>
+          <section class="settings-card settings-card-wide pushsettings"><div class="settings-card-head"><span class="settings-card-icon">◉</span><div><h3>Телефонни известия</h3><p>Получавай push известия на телефона, дори когато панелът е затворен.</p></div></div><div class="settings-actions"><button class="btn btnp" type="button" onclick="enablePhoneNotifications()">Включи известията</button><span class="chip cgr" id="pushStatus" data-state="off">Известията не са включени</span></div><div class="settings-note">На iPhone първо добави панела на Home Screen, отвори го от иконата и натисни бутона.</div></section>
           <section class="settings-card settings-card-wide"><div class="settings-card-head"><span class="settings-card-icon">✦</span><div><h3>ChatGPT скриптове</h3><p>API ключът остава само в текущата браузърна сесия и не се записва в общите данни.</p></div></div><div class="settings-inline"><input type="password" class="fi" id="openaiKeyInp" placeholder="sk-..."><button class="btn btnp" onclick="saveOpenAIKey()">Свържи ChatGPT</button><span class="chip cgr" id="apiStatus">Не е свързан</span></div></section>
           <section class="settings-card settings-danger"><div class="settings-card-head"><span class="settings-card-icon">!</span><div><h3>Опасна зона</h3><p>Изтрива всички бизнес данни за двата профила.</p></div></div><button class="btn btnd" onclick="nukeAll()">Изчисти всички данни</button></section>
         </div>
@@ -329,10 +331,11 @@
   </div>
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
-<script src="assets/core.js?v=20260726-19"></script>
-<script src="assets/clients.js?v=20260726-19"></script>
-<script src="assets/leads.js?v=20260726-19"></script>
-<script src="assets/tasks.js?v=20260726-19"></script><script src="assets/worktasks.js?v=20260726-19"></script>
-<script src="assets/app.js?v=20260726-19"></script>
+<script src="assets/onesignal.js?v=20260726-20"></script>
+<script src="assets/core.js?v=20260726-20"></script>
+<script src="assets/clients.js?v=20260726-20"></script>
+<script src="assets/leads.js?v=20260726-20"></script>
+<script src="assets/tasks.js?v=20260726-20"></script><script src="assets/worktasks.js?v=20260726-20"></script>
+<script src="assets/app.js?v=20260726-20"></script>
 </body>
 </html>
