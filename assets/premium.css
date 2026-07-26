@@ -239,3 +239,13 @@ body[data-density="compact"] .tr,body[data-density="compact"] td{padding-top:8px
   .taskcomposer[data-event-type="day"] #tmPriority{grid-column:span 3!important}
   .taskcomposer[data-event-type="day"] #tmCategory,.taskcomposer[data-event-type="day"] #tmRepeat{grid-column:span 3!important}
 }
+/* Larger responsive calendar with category labels */
+.taskcalendar{min-width:0}
+.calday{min-height:92px!important;padding:9px!important}
+.calday em{left:7px!important;right:7px;bottom:7px!important;display:flex!important;flex-direction:column;gap:3px!important;min-width:0}
+.calday em i{display:block!important;width:100%!important;height:17px!important;padding:2px 5px!important;border:1px solid color-mix(in srgb,var(--cat) 34%,transparent);border-radius:5px!important;background:color-mix(in srgb,var(--cat) 16%,#141419)!important;color:var(--cat);box-shadow:none!important;font-style:normal;line-height:11px;overflow:hidden}
+.calday em i span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:8px/11px var(--mono)}
+@media(min-width:1201px){.tasklayout{grid-template-columns:minmax(620px,1.35fr) minmax(330px,.65fr)!important}}
+@media(min-width:769px) and (max-width:1200px){.calday{min-height:82px!important}.tasklayout{grid-template-columns:1fr!important}}
+@media(max-width:768px){.calday{min-height:68px!important;padding:5px!important}.calgrid{gap:4px!important}.calday em{left:3px!important;right:3px;bottom:4px!important;gap:2px!important}.calday em i{height:14px!important;padding:1px 3px!important;border-radius:4px!important}.calday em i span{font-size:7px;line-height:10px}}
+@media(max-width:380px){.calday{min-height:62px!important}.calday em i:nth-child(n+2){display:none!important}}
