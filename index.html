@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260726-15">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-15">
+<link rel="stylesheet" href="assets/styles.css?v=20260726-16">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-16">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -140,7 +140,7 @@
         <div class="leadfilterpicker">
           <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
           <div class="filtermenu filterpanel" id="leadFilterMenu">
-            <div class="filtermenuhead"><div><b>Всички филтри</b><span>Комбинирай няколко условия</span></div><button onclick="resetLeadFilters();toggleLeadFilterMenu(event)">Изчисти</button></div>
+            <div class="filtermenuhead"><div><b>Всички филтри</b><span>Комбинирай няколко условия</span></div><button onclick="if(resetLeadFilters())toggleLeadFilterMenu(event)">Изчисти</button></div>
             <div class="filterfields">
               <label>Статус<select class="fi" id="lStatusF" onchange="setLeadStatusFromFilter(this.value)"><option value="all">Всички статуси</option><option value="prospect">Потенциални</option><option value="maybe">Може би</option><option value="not">Не</option></select></label>
               <label>Категория<select class="fi" id="lCatF" onchange="renderLeads()"><option value="">Всички категории</option></select></label>
@@ -154,7 +154,6 @@
           </div>
         </div>
         <div style="flex:1"></div>
-        <div class="leadpriorityrules" id="leadPriorityRules"></div>
 
         <button class="btn btng btnsm" onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
         <button class="btn btnd btnsm" onclick="deleteAllLeads()">⌫ Изтрий всички</button>
@@ -330,10 +329,10 @@
   </div>
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
-<script src="assets/core.js?v=20260726-15"></script>
-<script src="assets/clients.js?v=20260726-15"></script>
-<script src="assets/leads.js?v=20260726-15"></script>
-<script src="assets/tasks.js?v=20260726-15"></script><script src="assets/worktasks.js?v=20260726-15"></script>
-<script src="assets/app.js?v=20260726-15"></script>
+<script src="assets/core.js?v=20260726-16"></script>
+<script src="assets/clients.js?v=20260726-16"></script>
+<script src="assets/leads.js?v=20260726-16"></script>
+<script src="assets/tasks.js?v=20260726-16"></script><script src="assets/worktasks.js?v=20260726-16"></script>
+<script src="assets/app.js?v=20260726-16"></script>
 </body>
 </html>

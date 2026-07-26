@@ -240,8 +240,8 @@ function getTasks(){return sharedTasks;}
 function saveTasks(tasks){sharedTasks=tasks;saveData('profile');}
 function addTask(){var input=document.getElementById('taskInp'),value=input.value.trim();if(!value)return;focusTasks.unshift({id:'f'+Date.now().toString(36),text:value,done:false,createdAt:new Date().toISOString()});saveData('profile');input.value='';renderTasks();}
 function toggleFocusTask(id){focusTasks.forEach(function(t){if(t.id===id)t.done=!t.done;});saveData('profile');renderTasks();}
-function deleteFocusTask(id){focusTasks=focusTasks.filter(function(t){return t.id!==id;});saveData('profile');renderTasks();}
+function deleteFocusTask(id){if(!confirm('Изтрий тази кратка задача?'))return;focusTasks=focusTasks.filter(function(t){return t.id!==id;});saveData('profile');renderTasks();}
 function toggleTask(id,occurrenceIso){var tasks=getTasks(),day=occurrenceIso||taskSelectedDate||taskIso(new Date());tasks.forEach(function(t){if(t.id!==id)return;if((t.repeat||'none')!=='none'){t.completedDates=Array.isArray(t.completedDates)?t.completedDates:[];var i=t.completedDates.indexOf(day);if(i>=0)t.completedDates.splice(i,1);else t.completedDates.push(day);t.done=false;}else{t.done=!t.done;t.completedAtDate=t.done?day:'';}});saveTasks(tasks);renderTaskManager();}
-function deleteTask(id){saveTasks(getTasks().filter(function(t){return t.id!==id;}));renderTaskManager();}
+function deleteTask(id){if(!confirm('Изтрий тази задача от календара?'))return;saveTasks(getTasks().filter(function(t){return t.id!==id;}));renderTaskManager();}
 function renderTasks(){var el=document.getElementById('taskList');if(!el)return;el.innerHTML=focusTasks.length?focusTasks.map(function(t){return'<label class="task '+(t.done?'done':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleFocusTask(\''+t.id+'\')"><span>'+esc(t.text)+'</span><button type="button" aria-label="Изтрий задача" onclick="event.preventDefault();deleteFocusTask(\''+t.id+'\')">×</button></label>';}).join(''):'<div class="emptymini">Добави кратка задача само за твоя профил.</div>';}
 
