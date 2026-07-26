@@ -284,3 +284,31 @@ body[data-density="compact"] .tr,body[data-density="compact"] td{padding-top:8px
   .filtermenu.filterpanel{transform:translate3d(0,calc(100% + 30px),0)!important;backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:transform,opacity;contain:layout paint}
   .filtermenu.filterpanel.open{transform:translate3d(0,0,0)!important}
 }
+/* 2026-07-27: cross-page responsive containment and iOS form stability */
+.fi,.fsel,.fta,input,select,textarea{min-inline-size:0;max-inline-size:100%}
+input[type="date"],input[type="time"]{display:block;inline-size:100%;min-inline-size:0!important;max-inline-size:100%!important}
+input[type="date"]::-webkit-date-and-time-value,input[type="time"]::-webkit-date-and-time-value{min-inline-size:0;text-align:left}
+.taskcomposer,.workcomposergrid,.taskeditgrid,.frow,.settings-grid,.settings-fields,.filterfields,.dashcols,.cgrid,.sgrid{min-inline-size:0;max-inline-size:100%}
+.taskcomposer>*,.workcomposergrid>*,.taskeditgrid>*,.frow>*,.settings-grid>*,.settings-fields>*,.filterfields>*,.dashcols>*,.cgrid>*,.sgrid>*{min-inline-size:0;max-inline-size:100%}
+.ccname,.cccat,.ccnote,.alerttitle,.alertmeta,.settings-card-head p{overflow-wrap:anywhere}
+@media(max-width:768px){
+  html,body,.app,.main,.content,.page{max-inline-size:100%;overflow-x:hidden}
+  input,select,textarea,.fi,.fsel,.fta{font-size:16px!important}
+  input[type="date"],input[type="time"]{position:relative;-webkit-appearance:none;appearance:none;block-size:48px!important;padding:10px 42px 10px 12px!important;border-radius:10px;text-align:left}
+  input[type="date"]::-webkit-calendar-picker-indicator,input[type="time"]::-webkit-calendar-picker-indicator{position:absolute;inset-inline-end:12px;width:20px;height:20px;margin:0;opacity:.72}
+  .taskdatefield,.tasktimefield,.eventtypefield,.fg,.setting-toggle{inline-size:100%!important;min-inline-size:0!important;max-inline-size:100%!important}
+  .taskcomposer,.workcomposergrid{inline-size:100%!important;max-inline-size:100%!important;overflow:visible}
+  .taskcomposer>*:not(datalist),.workcomposergrid>*{inline-size:100%!important;min-inline-size:0!important;max-inline-size:100%!important}
+  .taskcomposer .fi,.workcomposergrid .fi,.taskeditgrid .fi,.frow .fi,.frow .fsel{inline-size:100%!important;min-inline-size:0!important;max-inline-size:100%!important}
+  .modal,.lbm{inline-size:calc(100vw - 12px)!important;max-inline-size:calc(100vw - 12px)!important;margin-inline:auto!important}
+  .mbody,.lbbody,.setwrap,.settings-card,.dashpanelbody,.ccard{min-inline-size:0;max-inline-size:100%;overflow-x:hidden}
+  .settings-inline>*{min-inline-size:0!important;max-inline-size:100%!important}.settings-inline .fi{flex-basis:100%}
+  .cctop>div,.workbody,.mtaskbody,.alertitem>div{min-inline-size:0}
+  .content{scroll-padding-bottom:calc(118px + env(safe-area-inset-bottom,0px))}
+  .taskmgr,.workmgr,.setwrap{padding-bottom:calc(116px + env(safe-area-inset-bottom,0px))!important}
+}
+@media(max-width:380px){
+  .taskcomposer,.workcomposergrid,.settings-card{padding-inline:10px!important}
+  .mobile-nav{left:6px!important;right:6px!important}.mobile-nav button{font-size:8.5px!important}
+  .mobile-nav button>span:last-of-type{max-width:54px;overflow:hidden;text-overflow:ellipsis}
+}

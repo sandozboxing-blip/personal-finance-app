@@ -210,8 +210,9 @@ function onSearch() {
   if (curpg === 'web') renderWeb();
 }
 function updateBadges() {
-  var mon = smm.filter(function(c) { return c.status === 'active'; }).reduce(function(s, c) { return s + (parseFloat(c.monthly) || 0); }, 0);
-  document.getElementById('bdg-dash').textContent = fmt(mon) + ' €/м';
+  var smmMonthly=smm.filter(function(c){return c.status==='active';}).reduce(function(sum,c){return sum+(parseFloat(c.monthly)||0);},0);
+  var webMonthly=web.filter(function(c){return c.status==='active'&&(c.paymentType||'monthly')==='monthly';}).reduce(function(sum,c){return sum+(parseFloat(c.monthly)||0);},0);
+  document.getElementById('bdg-dash').textContent=fmt(smmMonthly+webMonthly)+' €/м';
   document.getElementById('bdg-smm').textContent = smm.length;
   document.getElementById('bdg-web').textContent = web.length;
   document.getElementById('bdg-leads').textContent = leads.length; var taskBadge=document.getElementById('bdg-tasks'),workBadge=document.getElementById('bdg-work');if(taskBadge)taskBadge.textContent=getTasks().filter(function(t){return !t.done;}).length;if(workBadge)workBadge.textContent=workTasks.filter(function(t){return t.status!=='done';}).length;
