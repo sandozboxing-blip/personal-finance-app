@@ -20,7 +20,7 @@ function showLogin(message){
   sessionStorage.removeItem(AUTH_KEY);
   document.getElementById('app').classList.remove('on');
   document.getElementById('lw').classList.remove('hidden');
-  var loader=document.getElementById('appLoader');if(loader)loader.classList.remove('done');
+  var loader=document.getElementById('appLoader');if(loader)loader.classList.add('done');
   if(message){var err=document.getElementById('lerr');err.textContent=message;err.classList.add('show');}
 }
 function doLogin(){
