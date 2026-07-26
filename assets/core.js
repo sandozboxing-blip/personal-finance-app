@@ -28,15 +28,18 @@ function doLogin(){
   err.classList.remove('show');btn.disabled=true;btn.textContent='Влизане...';
   fetch('api.php?action=login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})})
     .then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||'Грешка при вход');return d;});})
-    .then(function(d){if(!d.authToken)throw new Error('Сървърът не върна защитена сесия');sessionStorage.setItem(AUTH_KEY,d.authToken);startApp(d.user||u);})
+    .then(function(d){if(!d.authToken)throw new Error('Сървърът не върна защитена сесия');sessionStorage.setItem(AUTH_KEY,d.authToken);startApp(d.user||u,true);})
     .catch(function(e){err.textContent=e.message||'Грешно потребителско име или парола';err.classList.add('show');document.getElementById('lp').value='';document.getElementById('lp').focus();})
     .finally(function(){btn.disabled=false;btn.textContent='Влез в панела →';});
 }
 document.getElementById('loginBtn').addEventListener('click',doLogin);
 document.getElementById('lp').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 document.getElementById('lu').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('lp').focus();});
-function startApp(user){
+function startApp(user,showTransition){
   currentUser=user||'Admin';
+  var loader=document.getElementById('appLoader');
+  if(loader){loader.classList.remove('done');loader.classList.toggle('login-transition',!!showTransition);var welcome=document.getElementById('loaderWelcome');if(welcome)welcome.textContent=showTransition?'Добре дошъл, '+currentUser:'Синхронизираме данните';}
+  window.d8LoaderUntil=Date.now()+(showTransition?750:0);
   document.getElementById('lw').classList.add('hidden');
   document.getElementById('app').classList.add('on');
   document.getElementById('sbav').textContent=(user||'A')[0].toUpperCase();
@@ -44,7 +47,7 @@ function startApp(user){
   setSyncState('loading','Зареждане');
   goPage('dash',document.querySelector('.sbi.active'));
   loadData();
-  setTimeout(hideAppLoader,4000);
+  setTimeout(hideAppLoader,showTransition?1200:2500);
 }
 function logout(){
   fetch('api.php?action=logout',{credentials:'same-origin'}).catch(function(){})
@@ -61,8 +64,10 @@ function setSyncState(state,text){
   if(label)label.textContent=text;
 }
 function hideAppLoader(){
-  var loader=document.getElementById('appLoader');
-  if(loader)loader.classList.add('done');
+  var loader=document.getElementById('appLoader');if(!loader)return;
+  var wait=Math.max(0,(window.d8LoaderUntil||0)-Date.now());
+  if(wait){setTimeout(hideAppLoader,wait);return;}
+  loader.classList.add('done');
 }
 function saveLocal(markDirty,scope){
   try{

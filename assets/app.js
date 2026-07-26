@@ -44,6 +44,6 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { clo
   setSyncState('loading','Проверка на сесията');
   fetch('api.php?action=me',{credentials:'same-origin'})
     .then(function(r){return r.json();})
-    .then(function(d){if(d.authenticated)startApp(d.user);else showLogin();})
+    .then(function(d){if(d.authenticated)startApp(d.user,false);else showLogin();})
     .catch(function(){showLogin('Няма връзка със сървъра. Опитай отново.');});
 })();

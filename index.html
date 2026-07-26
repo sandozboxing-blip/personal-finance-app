@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260726-8">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-8">
+<link rel="stylesheet" href="assets/styles.css?v=20260726-9">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-9">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -32,7 +32,7 @@
 </div>
 
 <div class="app" id="app">
-<div class="app-loader" id="appLoader"><div class="loader-mark">D8</div><div class="loader-line"><i></i></div><span>Зареждаме работното пространство...</span></div>
+<div class="app-loader" id="appLoader"><div class="loader-glow"></div><div class="loader-mark">D8</div><strong id="loaderWelcome">Подготвяме панела</strong><div class="loader-line"><i></i></div><span>Данните ти са защитени и синхронизирани</span></div>
 <div class="sbd" id="sbbd" onclick="closeSb()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sbr">
@@ -137,8 +137,8 @@
           <button class="btn btng btnsm" data-f="not" onclick="setLFTab(this)">✗ Не</button>
         </div>
         <div class="leadfilterpicker">
-          <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">＋ Добави филтър</button>
-          <div class="filtermenu" id="leadFilterMenu">
+          <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
+          <div class="filtermenu" id="leadFilterMenu"><div class="filtermenuhead"><div><b>Филтри</b><span>Покажи най-подходящите бизнеси</span></div><button onclick="resetLeadFilters();toggleLeadFilterMenu(event)">Изчисти</button></div><small class="filtertitle">БЪРЗ ИЗБОР</small><div class="quickfilters"><button onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button><button onclick="applyLeadQuickFilter('contact','phone')">С телефон</button><button onclick="applyLeadQuickFilter('contact','email')">С имейл</button><button onclick="applyLeadQuickFilter('rating','4')">4+ звезди</button><button onclick="applyLeadQuickFilter('followup','today')">Follow-up днес</button></div><div class="filterdivider"></div><small class="filtertitle">ДОПЪЛНИТЕЛНИ ПОЛЕТА</small>
             <button onclick="toggleLeadAddon('category')">Категория <span id="fa-category">＋</span></button>
             <button onclick="toggleLeadAddon('contact')">Контакт <span id="fa-contact">＋</span></button>
             <button onclick="toggleLeadAddon('rating')">Минимална оценка <span id="fa-rating">＋</span></button>
@@ -149,7 +149,7 @@
           <option value="">Всички контакти</option>
           <option value="phone">С телефон</option>
           <option value="email">С имейл</option>
-          <option value="website">С уебсайт</option>
+          <option value="website">С уебсайт</option><option value="no_website">Без уебсайт</option>
           <option value="missing">Без телефон и имейл</option>
         </select>
         <select class="btn btng btnsm lead-addon" data-addon="rating" id="lRatingF" onchange="renderLeads()"><option value="">Всяка оценка</option><option value="4.5">4.5+ звезди</option><option value="4">4+ звезди</option><option value="3">3+ звезди</option></select>
@@ -175,6 +175,7 @@
         <button class="btn btnp btnsm" onclick="document.getElementById('fi').click()">↑ Импортирай файл</button>
         <input type="file" id="fi" accept=".csv,.json,text/csv,application/json" style="display:none" onchange="handleFile(event)">
       </div>
+      <div class="activeleadfilters" id="activeLeadFilters"></div>
       <div class="twrap">
         <div class="upzone" id="upzone"
              onclick="document.getElementById('fi').click()"
@@ -328,10 +329,10 @@
   </div>
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
-<script src="assets/core.js?v=20260726-8"></script>
-<script src="assets/clients.js?v=20260726-8"></script>
-<script src="assets/leads.js?v=20260726-8"></script>
-<script src="assets/tasks.js?v=20260726-8"></script>
-<script src="assets/app.js?v=20260726-8"></script>
+<script src="assets/core.js?v=20260726-9"></script>
+<script src="assets/clients.js?v=20260726-9"></script>
+<script src="assets/leads.js?v=20260726-9"></script>
+<script src="assets/tasks.js?v=20260726-9"></script>
+<script src="assets/app.js?v=20260726-9"></script>
 </body>
 </html>
