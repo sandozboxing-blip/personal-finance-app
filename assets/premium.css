@@ -225,3 +225,17 @@ body[data-density="compact"] .tr,body[data-density="compact"] td{padding-top:8px
   .taskcomposer .eventtypefield{grid-column:auto!important;width:100%;height:67px;grid-template-rows:14px 48px;gap:5px}
   .taskcomposer .eventtypefield .eventtypepicker{width:100%;height:48px!important}
 }
+/* Calendar composer for tablet and medium desktop widths */
+@media(min-width:769px) and (max-width:1200px){
+  .taskcomposer{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:10px!important}
+  .taskcomposer #tmTitle,.taskcomposer[data-event-type="day"] #tmTitle{grid-column:span 3!important}
+  .taskcomposer .eventtypefield{grid-column:span 3!important}
+  .taskcomposer #tmDateField,.taskcomposer[data-event-type="day"] #tmDateField{grid-column:span 3!important}
+  .taskcomposer #tmEndDateField{grid-column:span 3!important}
+  .taskcomposer #tmPriority{grid-column:span 2!important}
+  .taskcomposer #tmCategory{grid-column:span 2!important}
+  .taskcomposer #tmRepeat{grid-column:span 2!important}
+  .taskcomposer>button{grid-column:1/-1!important;justify-content:center}
+  .taskcomposer[data-event-type="day"] #tmPriority{grid-column:span 3!important}
+  .taskcomposer[data-event-type="day"] #tmCategory,.taskcomposer[data-event-type="day"] #tmRepeat{grid-column:span 3!important}
+}
