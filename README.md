@@ -35,3 +35,17 @@ The dashboard uses the OneSignal Web SDK v16 with App ID `258501b4-c99d-4ed1-92d
 5. On iPhone/iPad 16.4+, add the dashboard to the Home Screen and open it from the installed icon before enabling notifications.
 
 The OneSignal App ID is public. Never commit an App API key or REST API key.
+## Automatic calendar notifications
+
+Calendar events can have an optional time. Events with a time are sent two hours before it; events without a time are sent when their date begins in the `Europe/Sofia` timezone. Repeating weekly, monthly, and yearly events are supported, and delivery IDs prevent duplicates.
+
+1. In OneSignal, open **Settings > Keys & IDs** and copy the App API Key.
+2. Add the `onesignal` block from `config.example.php` to the server-only `config.php` and paste the key there.
+3. Never paste the App API Key into browser settings and never commit `config.php`.
+4. In cPanel **Cron Jobs**, run the following every five minutes (replace the path if the repository document root differs):
+
+```text
+*/5 * * * * /usr/local/bin/php /home/digiuczy/finance.management/cron-calendar-notifications.php >/dev/null 2>&1
+```
+
+The cron endpoint is CLI-only and returns 404 when opened through the website. Delivery history is stored in the protected `data/calendar-notifications.php` file.
