@@ -37,7 +37,7 @@ function nukeAll() {
   leads = []; smm = []; web = []; saveData(); renderDash(); renderLeads(); updateBadges();
   toast('Всички данни изчистени', 'var(--red)');
 }
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeLB(); closeAdd(); closeTaskEditor(); } });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeLB(); closeAdd(); closeTaskEditor(); closeMobileMore(); } });
 
 // ── INIT ───────────────────────────────────────────────
 (function bootstrap(){

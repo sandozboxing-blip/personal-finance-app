@@ -100,6 +100,7 @@ function finishDataLoad(){
 }
 function loadData(){
   readLocalData();var localSnapshot=localState(),hasUnsyncedLocal=localStorage.getItem('d8SyncDirty')==='1';
+  finishDataLoad();
   fetch('api.php?action=load',{credentials:'same-origin'})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error(d.error||'LOAD');return d;});})
     .then(function(d){
@@ -121,9 +122,11 @@ var PTITLES = {dash: 'Dashboard', tasks: 'Task Manager', smm: 'SMM Клиент�
 
 function goPage(id, el) {
   curpg = id;
+  closeMobileMore();
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.sbi').forEach(function(x) { x.classList.remove('active'); });
   document.querySelectorAll('.mobile-nav button[data-page]').forEach(function(x) { x.classList.toggle('active',x.dataset.page===id); });
+  var moreButton=document.getElementById('mobileMoreButton');if(moreButton)moreButton.classList.toggle('active',['smm','web','settings'].indexOf(id)>=0);
   var pg = document.getElementById('pg' + id);
   if (pg) pg.classList.add('active');
   if (el) el.classList.add('active');
@@ -140,6 +143,19 @@ function goPage(id, el) {
   closeSb();
 }
 function goPageFromMobile(id,el){goPage(id,el);}
+function toggleMobileMore(){
+  var sheet=document.getElementById('mobileMore'),backdrop=document.getElementById('mobileMoreBackdrop');
+  if(!sheet||!backdrop)return;
+  var open=!sheet.classList.contains('open');
+  sheet.classList.toggle('open',open);backdrop.classList.toggle('open',open);
+  var button=document.getElementById('mobileMoreButton');if(button)button.classList.toggle('active',open||['smm','web','settings'].indexOf(curpg)>=0);
+}
+function closeMobileMore(){
+  var sheet=document.getElementById('mobileMore'),backdrop=document.getElementById('mobileMoreBackdrop');
+  if(sheet)sheet.classList.remove('open');if(backdrop)backdrop.classList.remove('open');
+  var button=document.getElementById('mobileMoreButton');if(button)button.classList.toggle('active',['smm','web','settings'].indexOf(curpg)>=0);
+}
+function goPageFromMore(id){closeMobileMore();jumpPage(id);}
 function openMobileQuickAdd(){
   if(curpg==='leads'){document.getElementById('fi').click();return;}
   if(curpg==='tasks'){focusTaskComposer();return;}
