@@ -177,7 +177,6 @@ function goPage(id, el) {
 function goPageFromMobile(id,el){goPage(id,el);}
 function syncMobileNavActive(sheetType){
   var nav=document.getElementById('mobileNav');if(!nav)return;
-  Array.prototype.forEach.call(nav.children,function(button){button.classList.remove('active');});
   var target=null;
   if(sheetType==='clients')target=document.getElementById('mobileClientsButton');
   else if(sheetType==='tasks')target=document.getElementById('mobileTasksButton');
@@ -186,7 +185,7 @@ function syncMobileNavActive(sheetType){
   else if(['tasks','work'].indexOf(curpg)>=0)target=document.getElementById('mobileTasksButton');
   else if(curpg==='settings')target=document.getElementById('mobileMoreButton');
   else target=nav.querySelector('button[data-page="'+curpg+'"]');
-  if(target)target.classList.add('active');
+  Array.prototype.forEach.call(nav.children,function(button){button.classList.toggle('active',button===target);});
 }
 function setMobileSheet(type){
   var more=document.getElementById('mobileMore'),clients=document.getElementById('mobileClients'),tasks=document.getElementById('mobileTasks'),backdrop=document.getElementById('mobileMoreBackdrop');
