@@ -198,3 +198,11 @@ body[data-density="compact"] .tr,body[data-density="compact"] td{padding-top:8px
 }
 @keyframes d8NavPop{0%{transform:scale(.82)}68%{transform:scale(1.07)}100%{transform:scale(1)}}
 @keyframes d8SheetPop{0%{transform:translateY(18px) scale(.985);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
+/* Desktop calendar composer baseline alignment */
+@media(min-width:769px){
+  .taskcomposer .taskdatefield{height:62px!important;grid-template-rows:14px 44px!important;gap:4px!important}
+  .taskcomposer .taskdatefield>span{position:static!important;display:block!important;height:14px;padding:0 0 0 2px!important;line-height:14px!important}
+  .taskcomposer .taskdatefield>.fi{grid-row:2;height:44px!important;padding:10px 12px!important}
+  .taskcomposer .eventtypepicker{grid-template-rows:14px 34px!important;align-content:start!important}
+  .taskcomposer .eventtypepicker>span{height:14px;line-height:14px}
+}
