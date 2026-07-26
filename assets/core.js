@@ -122,11 +122,12 @@ var PTITLES = {dash: 'Dashboard', tasks: 'Task Manager', smm: 'SMM Клиент�
 
 function goPage(id, el) {
   curpg = id;
-  closeMobileMore();
+  closeMobileSheets();
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.sbi').forEach(function(x) { x.classList.remove('active'); });
   document.querySelectorAll('.mobile-nav button[data-page]').forEach(function(x) { x.classList.toggle('active',x.dataset.page===id); });
-  var moreButton=document.getElementById('mobileMoreButton');if(moreButton)moreButton.classList.toggle('active',['smm','web','settings'].indexOf(id)>=0);
+  var clientsButton=document.getElementById('mobileClientsButton'),moreButton=document.getElementById('mobileMoreButton'),leadButton=document.getElementById('mobileLeadAdd');
+  if(clientsButton)clientsButton.classList.toggle('active',['smm','web'].indexOf(id)>=0);if(moreButton)moreButton.classList.toggle('active',id==='settings');if(leadButton)leadButton.classList.toggle('current',id==='leads');
   var pg = document.getElementById('pg' + id);
   if (pg) pg.classList.add('active');
   if (el) el.classList.add('active');
@@ -143,24 +144,20 @@ function goPage(id, el) {
   closeSb();
 }
 function goPageFromMobile(id,el){goPage(id,el);}
-function toggleMobileMore(){
-  var sheet=document.getElementById('mobileMore'),backdrop=document.getElementById('mobileMoreBackdrop');
-  if(!sheet||!backdrop)return;
-  var open=!sheet.classList.contains('open');
-  sheet.classList.toggle('open',open);backdrop.classList.toggle('open',open);
-  var button=document.getElementById('mobileMoreButton');if(button)button.classList.toggle('active',open||['smm','web','settings'].indexOf(curpg)>=0);
+function setMobileSheet(type){
+  var more=document.getElementById('mobileMore'),clients=document.getElementById('mobileClients'),backdrop=document.getElementById('mobileMoreBackdrop');
+  if(more)more.classList.toggle('open',type==='more');if(clients)clients.classList.toggle('open',type==='clients');if(backdrop)backdrop.classList.toggle('open',!!type);
+  var clientsButton=document.getElementById('mobileClientsButton'),moreButton=document.getElementById('mobileMoreButton');
+  if(clientsButton)clientsButton.classList.toggle('active',type==='clients'||['smm','web'].indexOf(curpg)>=0);if(moreButton)moreButton.classList.toggle('active',type==='more'||curpg==='settings');
 }
-function closeMobileMore(){
-  var sheet=document.getElementById('mobileMore'),backdrop=document.getElementById('mobileMoreBackdrop');
-  if(sheet)sheet.classList.remove('open');if(backdrop)backdrop.classList.remove('open');
-  var button=document.getElementById('mobileMoreButton');if(button)button.classList.toggle('active',['smm','web','settings'].indexOf(curpg)>=0);
-}
-function goPageFromMore(id){closeMobileMore();jumpPage(id);}
-function openMobileQuickAdd(){
-  if(curpg==='leads'){document.getElementById('fi').click();return;}
-  if(curpg==='tasks'){focusTaskComposer();return;}
-  openAdd('smm');
-}
+function toggleMobileMore(){setMobileSheet(document.getElementById('mobileMore').classList.contains('open')?'':'more');}
+function toggleMobileClients(){setMobileSheet(document.getElementById('mobileClients').classList.contains('open')?'':'clients');}
+function closeMobileSheets(){setMobileSheet('');}
+function closeMobileMore(){closeMobileSheets();}
+function goPageFromMore(id){closeMobileSheets();jumpPage(id);}
+function goPageFromClients(id){closeMobileSheets();jumpPage(id);}
+function openMobileLeads(){closeMobileSheets();jumpPage('leads');}
+function openMobileQuickAdd(){openMobileLeads();}
 function openSb() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sbbd').classList.add('open'); }
 function closeSb() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sbbd').classList.remove('open'); }
 function onSearch() {
