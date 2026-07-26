@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260726-2">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-2">
+<link rel="stylesheet" href="assets/styles.css?v=20260726-3">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-3">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -20,7 +20,7 @@
 <div id="lw">
   <div class="lcard">
     <div class="loginbrand"><div class="loginmark">D8</div><div><div class="llogo">Digital <span>Eight</span></div><div class="lsub">AGENCY OPERATIONS</div></div></div>
-    <div class="loginintro"><span class="logineyebrow">PRIVATE WORKSPACE</span><h1>Добре дошъл отново.</h1><p>Клиенти, приходи, leads и задачи — на едно сигурно място.</p></div>
+    <div class="loginintro"><span class="logineyebrow">PRIVATE WORKSPACE</span><h1>Добре дошъл отново.</h1></div>
     <label class="llbl" for="lu">Потребителско име</label>
     <input type="text" id="lu" class="linp" placeholder="Username" autocomplete="username">
     <label class="llbl" for="lp">Парола</label>
@@ -333,12 +333,26 @@
   <button data-page="leads" onclick="goPageFromMobile('leads',this)"><i class="mi mi-leads"></i><span>Leads</span><b id="mbdg-leads">0</b></button>
   <button class="mobile-add" onclick="openMobileQuickAdd()" aria-label="Добави"><i>+</i></button>
   <button data-page="tasks" onclick="goPageFromMobile('tasks',this)"><i class="mi mi-tasks"></i><span>Задачи</span><b id="mbdg-tasks">0</b></button>
-  <button data-page="settings" onclick="goPageFromMobile('settings',this)"><i class="mi mi-settings"></i><span>Още</span></button>
+  <button id="mobileMoreButton" onclick="toggleMobileMore()"><i class="mi mi-settings"></i><span>Още</span></button>
 </nav>
-<script src="assets/core.js?v=20260726-2"></script>
-<script src="assets/clients.js?v=20260726-2"></script>
-<script src="assets/leads.js?v=20260726-2"></script>
-<script src="assets/tasks.js?v=20260726-2"></script>
-<script src="assets/app.js?v=20260726-2"></script>
+<div class="mobile-more-backdrop" id="mobileMoreBackdrop" onclick="closeMobileMore()"></div>
+<section class="mobile-more-sheet" id="mobileMore" aria-label="Всички секции">
+  <div class="mobile-more-handle"></div>
+  <div class="mobile-more-head"><div><span>DIGITAL EIGHT</span><h3>Всички секции</h3></div><button onclick="closeMobileMore()" aria-label="Затвори">×</button></div>
+  <div class="mobile-more-grid">
+    <button onclick="goPageFromMore('dash')"><i>⌂</i><span>Dashboard</span></button>
+    <button onclick="goPageFromMore('smm')"><i>◈</i><span>SMM клиенти</span></button>
+    <button onclick="goPageFromMore('web')"><i>◇</i><span>Уеб дизайн</span></button>
+    <button onclick="goPageFromMore('leads')"><i>◎</i><span>Leads</span></button>
+    <button onclick="goPageFromMore('tasks')"><i>▣</i><span>Task Manager</span></button>
+    <button onclick="goPageFromMore('settings')"><i>⚙</i><span>Настройки</span></button>
+  </div>
+  <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
+</section>
+<script src="assets/core.js?v=20260726-3"></script>
+<script src="assets/clients.js?v=20260726-3"></script>
+<script src="assets/leads.js?v=20260726-3"></script>
+<script src="assets/tasks.js?v=20260726-3"></script>
+<script src="assets/app.js?v=20260726-3"></script>
 </body>
 </html>
