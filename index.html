@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260726-16">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-16">
+<link rel="stylesheet" href="assets/styles.css?v=20260726-17">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-17">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -195,7 +195,7 @@
         </section>
         <section class="taskcomposer" id="taskComposer" data-event-type="day">
           <input id="tmTitle" class="fi" placeholder="Какво трябва да се свърши?">
-          <div class="eventtypepicker"><span>1 · ТИП</span><button class="active" data-type="day" onclick="setCalendarEventType('day')">Един ден</button><button data-type="period" onclick="setCalendarEventType('period')">Период</button></div><label class="taskdatefield" id="tmDateField"><span id="tmDateLabel">2 · ДАТА</span><input id="tmDate" class="fi" type="date" title="Дата"></label><label class="taskdatefield periodfield" id="tmEndDateField"><span>ДО</span><input id="tmEndDate" class="fi" type="date" title="Крайна дата"></label>
+          <div class="eventtypefield"><span>1 · ТИП</span><div class="eventtypepicker"><button class="active" data-type="day" onclick="setCalendarEventType('day')">Един ден</button><button data-type="period" onclick="setCalendarEventType('period')">Период</button></div></div><label class="taskdatefield" id="tmDateField"><span id="tmDateLabel">2 · ДАТА</span><input id="tmDate" class="fi" type="date" title="Дата"></label><label class="taskdatefield periodfield" id="tmEndDateField"><span>ДО</span><input id="tmEndDate" class="fi" type="date" title="Крайна дата"></label>
           <select id="tmPriority" class="fi"><option value="normal">Нормален приоритет</option><option value="high">Висок приоритет</option><option value="low">Нисък приоритет</option></select>
           <input id="tmCategory" class="fi" list="tmCategoryOptions" placeholder="Категория (напр. Sales)" onchange="applyCategoryDefaults()"><datalist id="tmCategoryOptions"></datalist><select id="tmRepeat" class="fi"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select>
           <button class="btn btnp" onclick="addManagerTask()">Добави</button>
@@ -329,10 +329,10 @@
   </div>
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
-<script src="assets/core.js?v=20260726-16"></script>
-<script src="assets/clients.js?v=20260726-16"></script>
-<script src="assets/leads.js?v=20260726-16"></script>
-<script src="assets/tasks.js?v=20260726-16"></script><script src="assets/worktasks.js?v=20260726-16"></script>
-<script src="assets/app.js?v=20260726-16"></script>
+<script src="assets/core.js?v=20260726-17"></script>
+<script src="assets/clients.js?v=20260726-17"></script>
+<script src="assets/leads.js?v=20260726-17"></script>
+<script src="assets/tasks.js?v=20260726-17"></script><script src="assets/worktasks.js?v=20260726-17"></script>
+<script src="assets/app.js?v=20260726-17"></script>
 </body>
 </html>
