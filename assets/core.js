@@ -175,17 +175,19 @@ function goPage(id, el) {
 }
 function goPageFromMobile(id,el){goPage(id,el);}
 function setMobileSheet(type){
-  var more=document.getElementById('mobileMore'),clients=document.getElementById('mobileClients'),backdrop=document.getElementById('mobileMoreBackdrop');
-  if(more)more.classList.toggle('open',type==='more');if(clients)clients.classList.toggle('open',type==='clients');if(backdrop)backdrop.classList.toggle('open',!!type);
-  var clientsButton=document.getElementById('mobileClientsButton'),moreButton=document.getElementById('mobileMoreButton');
-  if(clientsButton)clientsButton.classList.toggle('active',type==='clients'||['smm','web'].indexOf(curpg)>=0);if(moreButton)moreButton.classList.toggle('active',type==='more'||curpg==='settings');
+  var more=document.getElementById('mobileMore'),clients=document.getElementById('mobileClients'),tasks=document.getElementById('mobileTasks'),backdrop=document.getElementById('mobileMoreBackdrop');
+  if(more)more.classList.toggle('open',type==='more');if(clients)clients.classList.toggle('open',type==='clients');if(tasks)tasks.classList.toggle('open',type==='tasks');if(backdrop)backdrop.classList.toggle('open',!!type);
+  var clientsButton=document.getElementById('mobileClientsButton'),tasksButton=document.getElementById('mobileTasksButton'),moreButton=document.getElementById('mobileMoreButton');
+  if(clientsButton)clientsButton.classList.toggle('active',type==='clients'||['smm','web'].indexOf(curpg)>=0);if(tasksButton)tasksButton.classList.toggle('active',type==='tasks'||['tasks','work'].indexOf(curpg)>=0);if(moreButton)moreButton.classList.toggle('active',type==='more'||curpg==='settings');
 }
 function toggleMobileMore(){setMobileSheet(document.getElementById('mobileMore').classList.contains('open')?'':'more');}
 function toggleMobileClients(){setMobileSheet(document.getElementById('mobileClients').classList.contains('open')?'':'clients');}
+function toggleMobileTasks(){setMobileSheet(document.getElementById('mobileTasks').classList.contains('open')?'':'tasks');}
 function closeMobileSheets(){setMobileSheet('');}
 function closeMobileMore(){closeMobileSheets();}
 function goPageFromMore(id){closeMobileSheets();jumpPage(id);}
 function goPageFromClients(id){closeMobileSheets();jumpPage(id);}
+function goPageFromTasks(id){closeMobileSheets();jumpPage(id);}
 function openMobileLeads(){closeMobileSheets();jumpPage('leads');}
 function openMobileQuickAdd(){openMobileLeads();}
 function openSb() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sbbd').classList.add('open'); }
