@@ -154,9 +154,7 @@ function goPage(id, el) {
   closeMobileSheets();
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.sbi').forEach(function(x) { x.classList.remove('active'); });
-  document.querySelectorAll('.mobile-nav button[data-page]').forEach(function(x) { x.classList.toggle('active',x.dataset.page===id); });
-  var clientsButton=document.getElementById('mobileClientsButton'),moreButton=document.getElementById('mobileMoreButton'),leadButton=document.getElementById('mobileLeadAdd');
-  if(clientsButton)clientsButton.classList.toggle('active',['smm','web'].indexOf(id)>=0);if(moreButton)moreButton.classList.toggle('active',id==='settings'||id==='work');if(leadButton)leadButton.classList.toggle('current',id==='leads');
+  syncMobileNavActive('');
   var pg = document.getElementById('pg' + id);
   if (pg) pg.classList.add('active');
   if (el) el.classList.add('active');
@@ -174,11 +172,23 @@ function goPage(id, el) {
   closeSb();
 }
 function goPageFromMobile(id,el){goPage(id,el);}
+function syncMobileNavActive(sheetType){
+  var nav=document.getElementById('mobileNav');if(!nav)return;
+  Array.prototype.forEach.call(nav.children,function(button){button.classList.remove('active');});
+  var target=null;
+  if(sheetType==='clients')target=document.getElementById('mobileClientsButton');
+  else if(sheetType==='tasks')target=document.getElementById('mobileTasksButton');
+  else if(sheetType==='more')target=document.getElementById('mobileMoreButton');
+  else if(['smm','web'].indexOf(curpg)>=0)target=document.getElementById('mobileClientsButton');
+  else if(['tasks','work'].indexOf(curpg)>=0)target=document.getElementById('mobileTasksButton');
+  else if(curpg==='settings')target=document.getElementById('mobileMoreButton');
+  else target=nav.querySelector('button[data-page="'+curpg+'"]');
+  if(target)target.classList.add('active');
+}
 function setMobileSheet(type){
   var more=document.getElementById('mobileMore'),clients=document.getElementById('mobileClients'),tasks=document.getElementById('mobileTasks'),backdrop=document.getElementById('mobileMoreBackdrop');
   if(more)more.classList.toggle('open',type==='more');if(clients)clients.classList.toggle('open',type==='clients');if(tasks)tasks.classList.toggle('open',type==='tasks');if(backdrop)backdrop.classList.toggle('open',!!type);
-  var clientsButton=document.getElementById('mobileClientsButton'),tasksButton=document.getElementById('mobileTasksButton'),moreButton=document.getElementById('mobileMoreButton');
-  if(clientsButton)clientsButton.classList.toggle('active',type==='clients'||['smm','web'].indexOf(curpg)>=0);if(tasksButton)tasksButton.classList.toggle('active',type==='tasks'||['tasks','work'].indexOf(curpg)>=0);if(moreButton)moreButton.classList.toggle('active',type==='more'||curpg==='settings');
+  syncMobileNavActive(type);
 }
 function toggleMobileMore(){setMobileSheet(document.getElementById('mobileMore').classList.contains('open')?'':'more');}
 function toggleMobileClients(){setMobileSheet(document.getElementById('mobileClients').classList.contains('open')?'':'clients');}
