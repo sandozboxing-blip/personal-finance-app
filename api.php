@@ -6,35 +6,47 @@ ini_set('session.use_strict_mode','1');
 ini_set('session.gc_maxlifetime','43200');
 session_name('digital_eight_session');
 session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>$isHttps,'httponly'=>true,'samesite'=>'Lax']);
-$sessionToken=(string)($_SERVER['HTTP_X_D8_SESSION']??'');
-if($sessionToken!==''&&preg_match('/^[a-zA-Z0-9,-]{22,256}$/',$sessionToken)) session_id($sessionToken);
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 $config=require __DIR__.'/config.php';
 $action=$_GET['action']??'';
-function body(): array { $raw=file_get_contents('php://input'); $data=json_decode($raw?:'{}',true); return is_array($data)?$data:[]; }
-function reply(array $data,int $code=200): void { http_response_code($code); echo json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES); exit; }
-function requireLogin(): void { if(empty($_SESSION['user'])) reply(['ok'=>false,'error'=>'Необходим е вход'],401); }
+
+function body(): array { $raw=file_get_contents('php://input');$data=json_decode($raw?:'{}',true);return is_array($data)?$data:[]; }
+function reply(array $data,int $code=200): void { http_response_code($code);echo json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);exit; }
+function b64url(string $value): string { return rtrim(strtr(base64_encode($value),'+/','-_'),'='); }
+function b64urldecode(string $value) { $pad=strlen($value)%4;if($pad)$value.=str_repeat('=',4-$pad);return base64_decode(strtr($value,'-_','+/'),true); }
+function authSecret(array $config): string { $seed=(string)($config['auth_secret']??json_encode($config['users']??[]));return hash('sha256',$seed.'|digital-eight-auth-v1'); }
+function issueAuthToken(string $user,array $config): string { $payload=b64url((string)json_encode(['u'=>$user,'e'=>time()+43200],JSON_UNESCAPED_UNICODE));return $payload.'.'.b64url(hash_hmac('sha256',$payload,authSecret($config),true)); }
+function tokenUser(array $config): ?string { $token=(string)($_SERVER['HTTP_X_D8_AUTH']??'');if($token==='')return null;$parts=explode('.',$token);if(count($parts)!==2)return null;$payload=$parts[0];$signature=$parts[1];$expected=b64url(hash_hmac('sha256',$payload,authSecret($config),true));if(!hash_equals($expected,$signature))return null;$decoded=b64urldecode($payload);$data=is_string($decoded)?json_decode($decoded,true):null;$user=is_array($data)?(string)($data['u']??''):'';$expires=is_array($data)?(int)($data['e']??0):0;$users=$config['users']??[];return $user!==''&&$expires>=time()&&isset($users[$user])?$user:null; }
+function currentUser(array $config): ?string { return tokenUser($config); }
+function requireLogin(array $config): string { $user=currentUser($config);if(!$user)reply(['ok'=>false,'error'=>'Необходим е вход'],401);return $user; }
 function dataFile(): string { return __DIR__.'/data/panel-data.php'; }
-function decodeState(string $raw): array { $json=preg_replace('/^<\?php exit; \?>\s*/','',$raw); $state=json_decode($json?:'{}',true); return is_array($state)?$state:[]; }
-function emptyState(): array { return ['version'=>3,'leads'=>[],'smm'=>[],'web'=>[],'tasks'=>[],'userData'=>[]]; }
+function decodeState(string $raw): array { $json=preg_replace('/^<\?php exit; \?>\s*/','',$raw);$state=json_decode($json?:'{}',true);return is_array($state)?$state:[]; }
+function emptyState(): array { return ['version'=>4,'leads'=>[],'smm'=>[],'web'=>[],'tasks'=>[],'userData'=>[]]; }
+
 if($action==='login'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $b=body();$u=trim((string)($b['username']??''));$p=(string)($b['password']??'');$users=$config['users']??[];
-  if(isset($users[$u])&&hash_equals((string)$users[$u],$p)){session_regenerate_id(true);$_SESSION['user']=$u;reply(['ok'=>true,'user'=>$u,'sessionToken'=>session_id()]);}
+  if(isset($users[$u])&&hash_equals((string)$users[$u],$p)){session_regenerate_id(true);$_SESSION['user']=$u;reply(['ok'=>true,'user'=>$u,'authToken'=>issueAuthToken($u,$config)]);}
   reply(['ok'=>false,'error'=>'Грешно име или парола'],401);
 }
-if($action==='logout'){$_SESSION=[];if(ini_get('session.use_cookies')){$x=session_get_cookie_params();setcookie(session_name(),'',time()-42000,$x['path'],$x['domain']??'',(bool)$x['secure'],(bool)$x['httponly']);}session_destroy();reply(['ok'=>true]);}
-if($action==='me'){reply(['ok'=>true,'authenticated'=>!empty($_SESSION['user']),'user'=>$_SESSION['user']??null]);}
-requireLogin();
+if($action==='logout'){
+  $_SESSION=[];
+  if(ini_get('session.use_cookies')){$x=session_get_cookie_params();setcookie(session_name(),'',time()-42000,$x['path'],$x['domain']??'',(bool)$x['secure'],(bool)$x['httponly']);}
+  session_destroy();reply(['ok'=>true]);
+}
+if($action==='me'){$user=currentUser($config);reply(['ok'=>true,'authenticated'=>$user!==null,'user'=>$user]);}
+$currentUser=requireLogin($config);
+
 if($action==='load'&&$_SERVER['REQUEST_METHOD']==='GET'){
-  $file=dataFile();$state=is_file($file)?decodeState((string)file_get_contents($file)):emptyState();$user=(string)$_SESSION['user'];$allUsers=is_array($state['userData']??null)?$state['userData']:[];$profile=is_array($allUsers[$user]??null)?$allUsers[$user]:[];
-  $legacyTasks=is_array($state['tasks']??null)?$state['tasks']:[];
-  reply(['ok'=>true,'state'=>['version'=>3,'updatedAt'=>$state['updatedAt']??null,'leads'=>is_array($state['leads']??null)?$state['leads']:[],'smm'=>is_array($state['smm']??null)?$state['smm']:[],'web'=>is_array($state['web']??null)?$state['web']:[],'tasks'=>is_array($profile['tasks']??null)?$profile['tasks']:($user==='Admin'?$legacyTasks:[]),'focusTasks'=>is_array($profile['focusTasks']??null)?$profile['focusTasks']:[],'focusInitialized'=>array_key_exists('focusTasks',$profile),'taskCategories'=>is_array($profile['taskCategories']??null)?$profile['taskCategories']:[],'settings'=>is_array($profile['settings']??null)?$profile['settings']:[]]]);
+  $file=dataFile();$state=is_file($file)?decodeState((string)file_get_contents($file)):emptyState();$user=$currentUser;$allUsers=is_array($state['userData']??null)?$state['userData']:[];$profile=is_array($allUsers[$user]??null)?$allUsers[$user]:[];$legacyTasks=is_array($state['tasks']??null)?$state['tasks']:[];
+  reply(['ok'=>true,'state'=>['version'=>4,'updatedAt'=>$state['updatedAt']??null,'leads'=>is_array($state['leads']??null)?$state['leads']:[],'smm'=>is_array($state['smm']??null)?$state['smm']:[],'web'=>is_array($state['web']??null)?$state['web']:[],'tasks'=>is_array($profile['tasks']??null)?$profile['tasks']:($user==='Admin'?$legacyTasks:[]),'focusTasks'=>is_array($profile['focusTasks']??null)?$profile['focusTasks']:[],'focusInitialized'=>array_key_exists('focusTasks',$profile),'taskCategories'=>is_array($profile['taskCategories']??null)?$profile['taskCategories']:[],'settings'=>is_array($profile['settings']??null)?$profile['settings']:[]]]);
 }
 if($action==='save'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $incoming=body();foreach(['leads','smm','web','tasks','focusTasks','taskCategories'] as $key){if(!isset($incoming[$key])||!is_array($incoming[$key]))$incoming[$key]=[];}if(!isset($incoming['settings'])||!is_array($incoming['settings']))$incoming['settings']=[];
-  $file=dataFile();$fh=fopen($file,'c+');if(!$fh)reply(['ok'=>false,'error'=>'Папка data няма права за запис'],500);flock($fh,LOCK_EX);rewind($fh);$existing=decodeState((string)stream_get_contents($fh));$userData=is_array($existing['userData']??null)?$existing['userData']:[];$user=(string)$_SESSION['user'];$userData[$user]=['tasks'=>$incoming['tasks'],'focusTasks'=>$incoming['focusTasks'],'taskCategories'=>$incoming['taskCategories'],'settings'=>$incoming['settings'],'updatedAt'=>gmdate('c')];
-  $state=['version'=>3,'updatedAt'=>gmdate('c'),'updatedBy'=>$user,'leads'=>$incoming['leads'],'smm'=>$incoming['smm'],'web'=>$incoming['web'],'tasks'=>[],'userData'=>$userData];$json=json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);if($json===false||strlen($json)>20*1024*1024){flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>false,'error'=>'Невалидни или твърде големи данни'],400);}ftruncate($fh,0);rewind($fh);fwrite($fh,"<?php exit; ?>\n".$json);fflush($fh);flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>true,'updatedAt'=>$state['updatedAt']]);
+  $file=dataFile();$dir=dirname($file);if(!is_dir($dir)&&!mkdir($dir,0775,true))reply(['ok'=>false,'error'=>'Папка data не може да бъде създадена'],500);$fh=fopen($file,'c+');if(!$fh)reply(['ok'=>false,'error'=>'Папка data няма права за запис'],500);if(!flock($fh,LOCK_EX)){fclose($fh);reply(['ok'=>false,'error'=>'Данните са временно заключени'],503);}rewind($fh);$existing=decodeState((string)stream_get_contents($fh));$userData=is_array($existing['userData']??null)?$existing['userData']:[];$user=$currentUser;$userData[$user]=['tasks'=>$incoming['tasks'],'focusTasks'=>$incoming['focusTasks'],'taskCategories'=>$incoming['taskCategories'],'settings'=>$incoming['settings'],'updatedAt'=>gmdate('c')];
+  $state=['version'=>4,'updatedAt'=>gmdate('c'),'updatedBy'=>$user,'leads'=>$incoming['leads'],'smm'=>$incoming['smm'],'web'=>$incoming['web'],'tasks'=>[],'userData'=>$userData];$json=json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+  if($json===false||strlen($json)>20*1024*1024){flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>false,'error'=>'Невалидни или твърде големи данни'],400);}
+  ftruncate($fh,0);rewind($fh);$written=fwrite($fh,"<?php exit; ?>\n".$json);fflush($fh);flock($fh,LOCK_UN);fclose($fh);if($written===false)reply(['ok'=>false,'error'=>'Грешка при запис'],500);reply(['ok'=>true,'updatedAt'=>$state['updatedAt'],'leadCount'=>count($state['leads'])]);
 }
 reply(['ok'=>false,'error'=>'Невалидна заявка'],404);
