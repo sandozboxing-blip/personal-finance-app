@@ -312,3 +312,11 @@ input[type="date"]::-webkit-date-and-time-value,input[type="time"]::-webkit-date
   .mobile-nav{left:6px!important;right:6px!important}.mobile-nav button{font-size:8.5px!important}
   .mobile-nav button>span:last-of-type{max-width:54px;overflow:hidden;text-overflow:ellipsis}
 }
+/* 2026-07-27: unified Digital Eight brand mark */
+.loginmark{width:54px;height:54px;flex:0 0 54px;padding:0;border:0;background:none;overflow:hidden;box-shadow:0 10px 28px rgba(97,46,190,.28)}
+.loginmark img,.loader-logo img,.sblogo img,.mobile-menu-brand img{display:block;width:100%;height:100%;object-fit:cover}
+.loader-mark.loader-logo{width:72px;height:72px;padding:0;border:0;border-radius:20px;background:none;overflow:hidden;box-shadow:0 13px 38px rgba(96,45,190,.32)}
+.loader-logo img{border-radius:20px}
+.sblogo{display:flex;align-items:center;gap:9px;min-width:0}.sblogo img{width:34px;height:34px;flex:0 0 34px;border-radius:10px;box-shadow:0 7px 18px rgba(90,39,179,.25)}.sblogo>span{overflow:hidden;color:var(--w0);font:500 14px var(--mono);text-overflow:ellipsis;white-space:nowrap}
+.mobile-menu-brand{display:flex;align-items:center;gap:10px;min-width:0}.mobile-menu-brand>img{width:38px;height:38px;flex:0 0 38px;border-radius:11px;box-shadow:0 7px 18px rgba(90,39,179,.28)}.mobile-menu-brand>div{min-width:0}
+@media(max-width:420px){.loginmark{width:48px;height:48px;flex-basis:48px}.loader-mark.loader-logo{width:64px;height:64px}.mobile-menu-brand>img{width:34px;height:34px;flex-basis:34px}}

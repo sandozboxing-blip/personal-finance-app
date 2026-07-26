@@ -1,21 +1,21 @@
 {
-  "name": "D8 PANEL",
-  "short_name": "D8PANEL",
+  "name": "Digital Eight Panel",
+  "short_name": "D8 Panel",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "icons": [
     {
-      "src": "/web-app-manifest-192x192.png",
+      "src": "/web-app-manifest-192x192.png?v=20260727-25",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
     },
     {
-      "src": "/web-app-manifest-512x512.png",
+      "src": "/web-app-manifest-512x512.png?v=20260727-25",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
     }
   ],
   "theme_color": "#07070a",
