@@ -55,9 +55,9 @@ function logout(){
 }
 
 // ── STATE + RELIABLE SYNC ────────────────────────────
-var leads=[],smm=[],web=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='';
+var leads=[],smm=[],web=[],workTasks=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='';
 var leadPage=1,leadPageSize=50,leadFilterKey='';var lftab='all',lbid=null,curpg='dash',editid=null,edittype=null;
-function localState(){return{leads:leads,smm:smm,web:web,tasks:sharedTasks,focusTasks:focusTasks,taskCategories:taskCategories,settings:userSettings};}
+function localState(){return{leads:leads,smm:smm,web:web,workTasks:workTasks,tasks:sharedTasks,focusTasks:focusTasks,taskCategories:taskCategories,settings:userSettings};}
 function setSyncState(state,text){
   var el=document.getElementById('syncStatus'),label=document.getElementById('settingsSyncLabel');
   if(el){el.dataset.state=state;var span=el.querySelector('span');if(span)span.textContent=text;}
@@ -72,7 +72,7 @@ function hideAppLoader(){
 function saveLocal(markDirty,scope){
   try{
     var k=currentUser||'guest';
-    localStorage.setItem('d8l',JSON.stringify(leads));localStorage.setItem('d8s2',JSON.stringify(smm));localStorage.setItem('d8w',JSON.stringify(web));
+    localStorage.setItem('d8l',JSON.stringify(leads));localStorage.setItem('d8s2',JSON.stringify(smm));localStorage.setItem('d8w',JSON.stringify(web));localStorage.setItem('d8work',JSON.stringify(workTasks));
     localStorage.setItem('d8tasks:'+k,JSON.stringify(sharedTasks));localStorage.setItem('d8focus:'+k,JSON.stringify(focusTasks));localStorage.setItem('d8taskcats:'+k,JSON.stringify(taskCategories));localStorage.setItem('d8settings:'+k,JSON.stringify(userSettings));
     if(markDirty!==false&&scope!=='profile'){localStorage.setItem('d8LocalUpdatedAt',new Date().toISOString());localStorage.setItem('d8SyncDirty','1');}
   }catch(e){setSyncState('error','Няма място');}
@@ -94,7 +94,7 @@ function flushSave(){
     .finally(function(){syncInFlight=false;if(syncPending&&document.visibilityState==='visible')syncTimer=setTimeout(flushSave,700);});
 }
 function normalizeData(){
-  if(!Array.isArray(leads))leads=[];
+  if(!Array.isArray(leads))leads=[];if(!Array.isArray(workTasks))workTasks=[];
   leads=leads.filter(function(l){return l&&typeof l==='object';});
   leads.forEach(function(l,i){
     if(Array.isArray(l.tags))l.tags=l.tags.filter(Boolean).map(String);
@@ -113,13 +113,13 @@ function normalizeData(){
 }
 function readLocalData(){
   var k=currentUser||'guest';
-  try{leads=JSON.parse(localStorage.getItem('d8l')||'[]');smm=JSON.parse(localStorage.getItem('d8s2')||'[]');web=JSON.parse(localStorage.getItem('d8w')||'[]');sharedTasks=JSON.parse(localStorage.getItem('d8tasks:'+k)||'[]');focusTasks=JSON.parse(localStorage.getItem('d8focus:'+k)||'[]');taskCategories=JSON.parse(localStorage.getItem('d8taskcats:'+k)||'[]');userSettings=JSON.parse(localStorage.getItem('d8settings:'+k)||'{}');}
-  catch(e){leads=[];smm=[];web=[];sharedTasks=[];focusTasks=[];taskCategories=[];userSettings={};}
+  try{leads=JSON.parse(localStorage.getItem('d8l')||'[]');smm=JSON.parse(localStorage.getItem('d8s2')||'[]');web=JSON.parse(localStorage.getItem('d8w')||'[]');workTasks=JSON.parse(localStorage.getItem('d8work')||'[]');sharedTasks=JSON.parse(localStorage.getItem('d8tasks:'+k)||'[]');focusTasks=JSON.parse(localStorage.getItem('d8focus:'+k)||'[]');taskCategories=JSON.parse(localStorage.getItem('d8taskcats:'+k)||'[]');userSettings=JSON.parse(localStorage.getItem('d8settings:'+k)||'{}');}
+  catch(e){leads=[];smm=[];web=[];workTasks=[];sharedTasks=[];focusTasks=[];taskCategories=[];userSettings={};}
   normalizeData();
 }
 function finishDataLoad(){
   dataLoaded=true;populateCats();renderLeadAddons();renderTaskCategories();applyProfileSettings();updateBadges();
-  renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();if(curpg==='tasks')renderTaskManager();
+  renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();if(curpg==='tasks')renderTaskManager();if(curpg==='work')renderWorkTaskManager();
   setTimeout(hideAppLoader,100);
 }
 function loadData(){
@@ -131,7 +131,7 @@ function loadData(){
       var state=d.state||{},localSharedCount=localSnapshot.leads.length+localSnapshot.smm.length+localSnapshot.web.length,serverSharedCount=(state.leads||[]).length+(state.smm||[]).length+(state.web||[]).length,localStamp=localStorage.getItem('d8LocalUpdatedAt')||'',localOnlyRecovery=localSharedCount>serverSharedCount&&(!state.updatedAt||localStamp>state.updatedAt),useLocal=hasUnsyncedLocal||localOnlyRecovery;
       if(useLocal){syncScope='shared';syncPending=true;setSyncState('saving','Възстановяване...');flushSave();}
       else{
-        leads=state.leads||[];smm=state.smm||[];web=state.web||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};
+        leads=state.leads||[];smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};
         if(!state.focusInitialized){var migratedFocus=sharedTasks.filter(function(t){return !t.due&&!t.category&&(t.repeat||'none')==='none';});if(migratedFocus.length){syncScope='profile';focusTasks=migratedFocus.map(function(t){return{id:t.id,text:t.text||'',done:!!t.done};});sharedTasks=sharedTasks.filter(function(t){return migratedFocus.indexOf(t)<0;});syncPending=true;}}
         normalizeData();saveLocal(false);lastServerUpdatedAt=state.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
       }
@@ -142,12 +142,12 @@ function loadData(){
 }
 function refreshServerData(){
   if(!currentUser||!dataLoaded||syncPending||syncInFlight||document.visibilityState==='hidden')return;
-  fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error('LOAD');return d;});}).then(function(d){var state=d.state||{},stamp=state.updatedAt||'';if(!stamp||stamp===lastServerUpdatedAt)return;leads=state.leads||[];smm=state.smm||[];web=state.web||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};lastServerUpdatedAt=stamp;normalizeData();saveLocal(false,'');finishDataLoad();setSyncState('saved','Синхронизирано');}).catch(function(e){if(e.message==='AUTH')showLogin('Сесията изтече. Влез отново.');});
+  fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error('LOAD');return d;});}).then(function(d){var state=d.state||{},stamp=state.updatedAt||'';if(!stamp||stamp===lastServerUpdatedAt)return;leads=state.leads||[];smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};lastServerUpdatedAt=stamp;normalizeData();saveLocal(false,'');finishDataLoad();setSyncState('saved','Синхронизирано');}).catch(function(e){if(e.message==='AUTH')showLogin('Сесията изтече. Влез отново.');});
 }
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&syncPending)flushSave();else if(document.visibilityState==='visible')refreshServerData();});
 setInterval(refreshServerData,15000);
 // ── NAVIGATION ─────────────────────────────────────────
-var PTITLES = {dash: 'Dashboard', tasks: 'Task Manager', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
+var PTITLES = {dash: 'Dashboard', tasks: 'Календар', work: 'Task Manager', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
 
 function goPage(id, el) {
   curpg = id;
@@ -156,7 +156,7 @@ function goPage(id, el) {
   document.querySelectorAll('.sbi').forEach(function(x) { x.classList.remove('active'); });
   document.querySelectorAll('.mobile-nav button[data-page]').forEach(function(x) { x.classList.toggle('active',x.dataset.page===id); });
   var clientsButton=document.getElementById('mobileClientsButton'),moreButton=document.getElementById('mobileMoreButton'),leadButton=document.getElementById('mobileLeadAdd');
-  if(clientsButton)clientsButton.classList.toggle('active',['smm','web'].indexOf(id)>=0);if(moreButton)moreButton.classList.toggle('active',id==='settings');if(leadButton)leadButton.classList.toggle('current',id==='leads');
+  if(clientsButton)clientsButton.classList.toggle('active',['smm','web'].indexOf(id)>=0);if(moreButton)moreButton.classList.toggle('active',id==='settings'||id==='work');if(leadButton)leadButton.classList.toggle('current',id==='leads');
   var pg = document.getElementById('pg' + id);
   if (pg) pg.classList.add('active');
   if (el) el.classList.add('active');
@@ -169,6 +169,7 @@ function goPage(id, el) {
   if (id === 'web') renderWeb();
   if (id === 'leads') renderLeads();
   if (id === 'tasks') renderTaskManager();
+  if (id === 'work') renderWorkTaskManager();
   updateBadges();
   closeSb();
 }
@@ -199,10 +200,10 @@ function updateBadges() {
   document.getElementById('bdg-dash').textContent = fmt(mon) + ' €/м';
   document.getElementById('bdg-smm').textContent = smm.length;
   document.getElementById('bdg-web').textContent = web.length;
-  document.getElementById('bdg-leads').textContent = leads.length; var taskBadge=document.getElementById('bdg-tasks');if(taskBadge)taskBadge.textContent=getTasks().filter(function(t){return !t.done;}).length;
-  var mobileLeads=document.getElementById('mbdg-leads'),mobileTasks=document.getElementById('mbdg-tasks');
+  document.getElementById('bdg-leads').textContent = leads.length; var taskBadge=document.getElementById('bdg-tasks'),workBadge=document.getElementById('bdg-work');if(taskBadge)taskBadge.textContent=getTasks().filter(function(t){return !t.done;}).length;if(workBadge)workBadge.textContent=workTasks.filter(function(t){return t.status!=='done';}).length;
+  var mobileLeads=document.getElementById('mbdg-leads'),mobileTasks=document.getElementById('mbdg-tasks'),mobileWork=document.getElementById('mbdg-work');
   if(mobileLeads)mobileLeads.textContent=leads.length>99?'99+':leads.length;
-  if(mobileTasks)mobileTasks.textContent=getTasks().filter(function(t){return !t.done;}).length;
+  if(mobileTasks)mobileTasks.textContent=getTasks().filter(function(t){return !t.done;}).length;if(mobileWork)mobileWork.textContent=workTasks.filter(function(t){return t.status!=='done';}).length;
 }
 
 // ── DASHBOARD ──────────────────────────────────────────
