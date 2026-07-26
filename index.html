@@ -7,7 +7,7 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=20260726-20">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-20">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-22">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -140,8 +140,8 @@
         </div>
         <div class="leadfilterpicker">
           <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
-          <div class="filtermenu filterpanel" id="leadFilterMenu">
-            <div class="filtermenuhead"><div><b>Всички филтри</b><span>Комбинирай няколко условия</span></div><button onclick="if(resetLeadFilters())toggleLeadFilterMenu(event)">Изчисти</button></div>
+          <div class="filtermenu filterpanel" id="leadFilterMenu" role="dialog" aria-modal="true" aria-labelledby="leadFilterTitle">
+            <div class="filtermenuhead"><div><b id="leadFilterTitle">Всички филтри</b><span>Настрой бизнес търсенето</span></div><div class="filterheadbuttons"><button onclick="if(resetLeadFilters())renderLeads()">Изчисти</button><button class="filterclose" onclick="closeLeadFilterMenu()" aria-label="Затвори">✕</button></div></div>
             <div class="filterfields">
               <label>Статус<select class="fi" id="lStatusF" onchange="setLeadStatusFromFilter(this.value)"><option value="all">Всички статуси</option><option value="prospect">Потенциални</option><option value="maybe">Може би</option><option value="not">Не</option></select></label>
               <label>Категория<select class="fi" id="lCatF" onchange="renderLeads()"><option value="">Всички категории</option></select></label>
@@ -152,7 +152,9 @@
             </div>
             <small class="filtertitle">БЪРЗ ИЗБОР</small><div class="quickfilters"><button onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button><button onclick="applyLeadQuickFilter('contact','phone')">С телефон</button><button onclick="applyLeadQuickFilter('contact','email')">С имейл</button><button onclick="applyLeadQuickFilter('rating','4')">4+ звезди</button><button onclick="applyLeadQuickFilter('followup','today')">Follow-up днес</button></div>
             <div class="filterdivider"></div><small class="filtertitle">ПОДРЕЖДАНЕ ПО ВАЖНОСТ</small><div class="prioritychoices"><button onclick="toggleLeadPriority('no_site')">Без сайт първо <span id="fp-no_site">＋</span></button><button onclick="toggleLeadPriority('low_reviews')">Малко ревюта <span id="fp-low_reviews">＋</span></button><button onclick="toggleLeadPriority('low_rating')">Ниска оценка <span id="fp-low_rating">＋</span></button><button onclick="toggleLeadPriority('has_phone')">С телефон <span id="fp-has_phone">＋</span></button><button onclick="toggleLeadPriority('has_email')">С имейл <span id="fp-has_email">＋</span></button></div>
+            <div class="filtermenufooter"><button class="btn btng" onclick="if(resetLeadFilters())renderLeads()">Нулирай</button><button class="btn btnp" onclick="closeLeadFilterMenu()">Покажи резултатите</button></div>
           </div>
+          <div class="leadfilterbackdrop" id="leadFilterBackdrop" onclick="closeLeadFilterMenu()"></div>
         </div>
         <div style="flex:1"></div>
 
@@ -334,9 +336,9 @@
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260726-20"></script>
 <script src="assets/clients.js?v=20260726-20"></script>
-<script src="assets/leads.js?v=20260726-20"></script>
+<script src="assets/leads.js?v=20260726-22"></script>
 <script src="assets/tasks.js?v=20260726-21"></script><script src="assets/worktasks.js?v=20260726-21"></script>
-<script src="assets/calendar-reminders.js?v=20260726-21"></script>
+<script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260726-21"></script>
 </body>
 </html>

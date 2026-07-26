@@ -29,11 +29,13 @@ function idempotency(string $seed):string{
   return substr($h,0,8).'-'.substr($h,8,4).'-4'.substr($h,13,3).'-a'.substr($h,17,3).'-'.substr($h,20,12);
 }
 function sendPush(string $appId,string $apiKey,string $user,array $task,string $occurrence,string $key):array{
-  $time=trim((string)($task['time']??''));$category=trim((string)($task['category']??''));$text=trim((string)($task['text']??'???????'));
-  $when=$time!==''?"???? ? {$time}":'????????? ? ????';$body=$category!==''?"{$when} ? {$category}":$when;
-  $payload=['app_id'=>$appId,'target_channel'=>'push','include_aliases'=>['external_id'=>[$user]],'headings'=>['en'=>$text],'contents'=>['en'=>$body],'url'=>'https://finance.management.digitaleight.bg/','data'=>['task_id'=>(string)($task['id']??''),'occurrence'=>$occurrence],'idempotency_key'=>idempotency($key)];
+  $time=trim((string)($task['time']??''));$category=trim((string)($task['category']??''));$text=trim((string)($task['text']??''));
+  $title=$category!==''?$category:'Digital Eight Calendar';
+  $body=$text!==''?$text:'Calendar event';
+  $body.=' · '.$occurrence.($time!==''?' · '.$time:'');
+  $payload=['app_id'=>$appId,'target_channel'=>'push','include_aliases'=>['external_id'=>[$user]],'headings'=>['bg'=>$title,'en'=>$title],'contents'=>['bg'=>$body,'en'=>$body],'url'=>'https://finance.management.digitaleight.bg/','data'=>['task_id'=>(string)($task['id']??''),'occurrence'=>$occurrence],'idempotency_key'=>idempotency($key)];
   $ch=curl_init('https://api.onesignal.com/notifications');
-  curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_TIMEOUT=>25,CURLOPT_HTTPHEADER=>['Authorization: Key '.$apiKey,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)]);
+  curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_TIMEOUT=>25,CURLOPT_HTTPHEADER=>['Authorization: Key '.$apiKey,'Content-Type: application/json; charset=utf-8'],CURLOPT_POSTFIELDS=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)]);
   $raw=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
   $response=is_string($raw)?json_decode($raw,true):null;
   return['ok'=>$status>=200&&$status<300&&is_array($response)&&!empty($response['id']),'status'=>$status,'response'=>$response,'error'=>$error];
