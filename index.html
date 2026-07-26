@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260726-6">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-6">
+<link rel="stylesheet" href="assets/styles.css?v=20260726-7">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-7">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -41,14 +41,14 @@
   </div>
   <nav class="sbnav">
     <div class="sbsec">Главно</div>
-    <button class="sbi active" onclick="goPage('dash',this)"><span class="ic">⌂</span> Dashboard <span class="sbdg" id="bdg-dash">—</span></button>
+    <button class="sbi active" onclick="goPage('dash',this)"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5M9 20v-6h6v6"/></svg></span> Dashboard <span class="sbdg" id="bdg-dash">—</span></button>
     <div class="sbsec">Клиенти</div>
-    <button class="sbi" onclick="goPage('smm',this)"><span class="ic" style="color:var(--pll)">◈</span> SMM Клиенти <span class="sbdg" id="bdg-smm">0</span></button>
-    <button class="sbi" onclick="goPage('web',this)"><span class="ic" style="color:var(--blue)">◈</span> Уеб Дизайн <span class="sbdg" id="bdg-web">0</span></button>
+    <button class="sbi" onclick="goPage('smm',this)"><span class="ic" style="color:var(--pll)"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3.5 20c.3-4 2.1-6 5.5-6s5.2 2 5.5 6M14 15c3.8-.6 6 1 6.5 4.5"/></svg></span> SMM Клиенти <span class="sbdg" id="bdg-smm">0</span></button>
+    <button class="sbi" onclick="goPage('web',this)"><span class="ic" style="color:var(--blue)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="15" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg></span> Уеб Дизайн <span class="sbdg" id="bdg-web">0</span></button>
     <div class="sbsec">Продажби</div>
-    <button class="sbi" onclick="goPage('leads',this)"><span class="ic" style="color:var(--green)">◈</span> Leads <span class="sbdg" id="bdg-leads">0</span></button>
-    <button class="sbi" onclick="goPage('tasks',this)"><span class="ic" style="color:var(--yellow)">▣</span> Task Manager <span class="sbdg" id="bdg-tasks">0</span></button>    <div class="sbdiv"></div>
-    <button class="sbi" onclick="goPage('settings',this)"><span class="ic">⚙</span> Настройки</button>
+    <button class="sbi" onclick="goPage('leads',this)"><span class="ic" style="color:var(--green)"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5M8 10.5h5M10.5 8v5"/></svg></span> Leads <span class="sbdg" id="bdg-leads">0</span></button>
+    <button class="sbi" onclick="goPage('tasks',this)"><span class="ic" style="color:var(--yellow)"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span> Task Manager <span class="sbdg" id="bdg-tasks">0</span></button>    <div class="sbdiv"></div>
+    <button class="sbi" onclick="goPage('settings',this)"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.08-1l2-1.55-2-3.46-2.4.97a7 7 0 0 0-1.72-1L14.45 3h-4.9L9.2 5.96a7 7 0 0 0-1.72 1l-2.4-.97-2 3.46 2 1.55A7 7 0 0 0 5 12c0 .34.03.67.08 1l-2 1.55 2 3.46 2.4-.97a7 7 0 0 0 1.72 1l.35 2.96h4.9l.35-2.96a7 7 0 0 0 1.72-1l2.4.97 2-3.46-2-1.55c.05-.33.08-.66.08-1z"/></svg></span> Настройки</button>
   </nav>
   <div class="sbfoot">
     <div class="sbuser" onclick="logout()">
@@ -231,46 +231,18 @@
       </div>
     </div>
     <div class="page" id="pgsettings">
-      <div class="setwrap">
-        <h2>Настройки</h2>
-        <p class="setsub">Digital Eight Management Panel</p>
-        <div class="fg" id="profileSettingsCard">
-          <label class="flbl">Настройки за текущия профил</label>
-          <div class="profilehint">Тези настройки са отделни за <strong id="settingsProfileName">профила</strong>.</div>
-          <div class="frow">
-            <div><label class="flbl">Приоритет по подразбиране</label><select class="fi" id="defaultTaskPriority" onchange="saveProfileSettings()"><option value="normal">Нормален</option><option value="high">Висок</option><option value="low">Нисък</option></select></div>
-            <div><label class="flbl">Повторение по подразбиране</label><select class="fi" id="defaultTaskRepeat" onchange="saveProfileSettings()"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select></div>
-          </div>
-        </div>
-        <div class="fdiv"></div>
-        <div class="fg">
-          <label class="flbl">OpenAI API ключ</label>
-          <input type="password" class="fi" id="openaiKeyInp" placeholder="sk-...">
-          <div class="fhint">Ключът се изпраща само до локалния сървър на твоя компютър и се пази временно в паметта. Изтрива се при затваряне на панела.</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <button class="btn btnp" onclick="saveOpenAIKey()">Свържи ChatGPT</button>
-          <span class="chip cgr" id="apiStatus">Не е свързан</span>
-        </div>
-        <div class="fdiv"></div>
-        <div class="fg">
-          <label class="flbl">Архив и прехвърляне на данни</label>
-          <div class="fhint" style="margin-bottom:10px">Пълният backup съдържа SMM клиенти, web проекти, leads и задачи. Използвай го за прехвърляне от localhost към онлайн панела.</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn btng" onclick="exportFullBackup()">↓ Свали пълен backup</button>
-            <button class="btn btnp" onclick="document.getElementById('backupFile').click()">↑ Възстанови backup</button>
-            <input type="file" id="backupFile" accept=".json,application/json" style="display:none" onchange="importFullBackup(event)">
-          </div>
-        </div>
-        <div class="fdiv"></div>
-        <div class="fg">
-          <label class="flbl">Опасна зона</label>
-          <div class="fhint" style="margin-bottom:10px">Изтрива всички данни без възможност за възстановяване.</div>
-          <button class="btn btnd" onclick="nukeAll()">⚠ Изчисти всички данни</button>
+      <div class="setwrap settings-shell">
+        <div class="settings-hero"><div><span class="settings-eyebrow">КОНТРОЛЕН ЦЕНТЪР</span><h2>Настройки</h2><p class="setsub">Персонализирай работния процес за <strong id="settingsProfileName">профила</strong>. Промените се пазят отделно за всеки акаунт.</p></div><div class="settings-status"><span class="sync-dot"></span><div><b>Общи бизнес данни</b><small id="settingsSyncLabel">Автоматично синхронизиране</small></div></div></div>
+        <div class="settings-grid">
+          <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">✓</span><div><h3>Задачи и календар</h3><p>Стойности при създаване на ново събитие.</p></div></div><div class="settings-fields"><label>Приоритет по подразбиране<select class="fi" id="defaultTaskPriority" onchange="saveProfileSettings()"><option value="normal">Нормален</option><option value="high">Висок</option><option value="low">Нисък</option></select></label><label>Повторение по подразбиране<select class="fi" id="defaultTaskRepeat" onchange="saveProfileSettings()"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select></label></div></section>
+          <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">⌕</span><div><h3>Leads</h3><p>Колко бизнеса да виждаш наведнъж.</p></div></div><div class="settings-fields"><label>Записи на страница<select class="fi" id="settingsLeadPageSize" onchange="saveProfileSettings()"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label></div><div class="settings-note">Тази настройка се запомня само за текущия профил.</div></section>
+          <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">◐</span><div><h3>Изглед</h3><p>Настрой плътността и движенията в интерфейса.</p></div></div><div class="settings-fields"><label>Плътност<select class="fi" id="settingsDensity" onchange="saveProfileSettings()"><option value="comfortable">Комфортна</option><option value="compact">Компактна</option></select></label><label class="setting-toggle"><span><b>Намалени анимации</b><small>Подходящо за по-слаби устройства</small></span><input type="checkbox" id="settingsReduceMotion" onchange="saveProfileSettings()"><i></i></label><label class="setting-toggle"><span><b>Компактни показатели</b><small>По-ниски карти на Dashboard</small></span><input type="checkbox" id="settingsCompactMetrics" onchange="saveProfileSettings()"><i></i></label></div></section>
+          <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">↻</span><div><h3>Синхронизация</h3><p>SMM, Web и Leads са общи за двата профила.</p></div></div><div class="settings-actions"><button class="btn btnp" onclick="manualDataSync()">Синхронизирай сега</button><button class="btn btng" onclick="exportFullBackup()">Свали backup</button><button class="btn btng" onclick="document.getElementById('backupFile').click()">Възстанови backup</button><input type="file" id="backupFile" accept=".json,application/json" hidden onchange="importFullBackup(event)"></div></section>
+          <section class="settings-card settings-card-wide"><div class="settings-card-head"><span class="settings-card-icon">✦</span><div><h3>ChatGPT скриптове</h3><p>API ключът остава само в текущата браузърна сесия и не се записва в общите данни.</p></div></div><div class="settings-inline"><input type="password" class="fi" id="openaiKeyInp" placeholder="sk-..."><button class="btn btnp" onclick="saveOpenAIKey()">Свържи ChatGPT</button><span class="chip cgr" id="apiStatus">Не е свързан</span></div></section>
+          <section class="settings-card settings-danger"><div class="settings-card-head"><span class="settings-card-icon">!</span><div><h3>Опасна зона</h3><p>Изтрива всички бизнес данни за двата профила.</p></div></div><button class="btn btnd" onclick="nukeAll()">Изчисти всички данни</button></section>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 </div>
@@ -356,10 +328,10 @@
   </div>
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
-<script src="assets/core.js?v=20260726-6"></script>
-<script src="assets/clients.js?v=20260726-6"></script>
-<script src="assets/leads.js?v=20260726-6"></script>
-<script src="assets/tasks.js?v=20260726-6"></script>
-<script src="assets/app.js?v=20260726-6"></script>
+<script src="assets/core.js?v=20260726-7"></script>
+<script src="assets/clients.js?v=20260726-7"></script>
+<script src="assets/leads.js?v=20260726-7"></script>
+<script src="assets/tasks.js?v=20260726-7"></script>
+<script src="assets/app.js?v=20260726-7"></script>
 </body>
 </html>

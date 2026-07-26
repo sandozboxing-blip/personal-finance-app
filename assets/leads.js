@@ -121,6 +121,7 @@ function renderMobileLeadCards(rows){
   }).join('');
 }
 function renderLeads() {
+  normalizeData();
   var q = (document.getElementById('srchQ').value || '').toLowerCase();
   var cat = document.getElementById('lCatF').value;
   var sort = document.getElementById('lSortF').value;
@@ -189,7 +190,7 @@ function renderLeads() {
   renderLeadPager(fil.length,pages);
 }
 function changeLeadPage(delta){leadPage=Math.max(1,leadPage+delta);renderLeads();document.getElementById('pgleads').scrollIntoView({behavior:'smooth'});}
-function changeLeadPageSize(value){leadPageSize=parseInt(value)||25;leadPage=1;renderLeads();}
+function changeLeadPageSize(value){leadPageSize=parseInt(value)||25;userSettings.leadPageSize=leadPageSize;saveData('profile');leadPage=1;renderLeads();}
 function resetLeadFilters(){document.getElementById('srchQ').value='';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='priority';setLFTab(document.querySelector('#lfTabs .btn'));}
 function deleteAllLeads(){if(!leads.length)return;if(!confirm('Изтрий всички '+leads.length+' leads? Това действие не може да се върне.'))return;leads=[];leadPage=1;saveData();renderLeads();populateCats();updateBadges();toast('Всички leads са изтрити','var(--red)');}
 function deleteAllWeb(){if(!web.length)return;if(!confirm('Изтрий всички '+web.length+' Web Design проекта? Това действие не може да се върне.'))return;web=[];saveData();renderWeb();updateBadges();toast('Всички Web Design проекти са изтрити','var(--red)');}
