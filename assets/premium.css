@@ -182,3 +182,19 @@ body[data-density="compact"] .tr,body[data-density="compact"] td{padding-top:8px
 /* Calendar composer desktop alignment */
 @media(min-width:769px){.taskcomposer{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr))!important;align-items:end!important;gap:10px!important}.taskcomposer #tmTitle{grid-column:span 5!important;height:44px}.taskcomposer[data-event-type="day"] #tmTitle{grid-column:span 6!important}.taskcomposer .eventtypepicker{grid-column:span 3!important;height:62px}.taskcomposer #tmDateField{grid-column:span 2!important}.taskcomposer[data-event-type="day"] #tmDateField{grid-column:span 3!important}.taskcomposer #tmEndDateField{grid-column:span 2!important}.taskcomposer #tmPriority{grid-column:span 3!important}.taskcomposer #tmCategory{grid-column:span 4!important}.taskcomposer #tmRepeat{grid-column:span 3!important}.taskcomposer>button{grid-column:span 2!important;height:44px}.taskcomposer .taskdatefield{display:grid;grid-template-rows:14px 44px;gap:4px;align-self:end}.taskcomposer .taskdatefield .fi{height:44px;margin:0}.taskcomposer>.fi{height:44px;margin:0}.eventtypepicker button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 @media(max-width:768px){.mobile-nav button.active>.nav-icon{padding:0!important;background:transparent!important;box-shadow:none!important}.mobile-nav .nav-icon-wrap{box-sizing:border-box;overflow:visible}.mobile-nav button.active .nav-icon-wrap{display:grid!important;place-items:center!important}.mobile-nav button.active .nav-icon{display:block!important;width:20px!important;height:20px!important;padding:0!important;opacity:1!important;visibility:visible!important}.eventtypepicker button{width:auto!important;min-width:0}.taskcomposer[data-event-type="day"] #tmEndDateField{display:none!important}}.taskcomposer[data-event-type="day"] #tmEndDateField{display:none!important}.taskcomposer[data-event-type="period"] #tmEndDateField{display:grid!important}
+/* Exclusive mobile navigation state + clean tap feedback */
+@media(max-width:768px){
+  .mobile-nav{-webkit-tap-highlight-color:transparent}
+  .mobile-nav button{transition:color .18s ease!important}
+  .mobile-nav button.active{background:transparent!important}
+  .mobile-nav .nav-icon-wrap{transition:transform .18s cubic-bezier(.2,.8,.2,1),background .18s ease,color .18s ease,box-shadow .18s ease!important}
+  .mobile-nav button:active .nav-icon-wrap{transform:scale(.84)}
+  .mobile-nav button.active .nav-icon-wrap{animation:d8NavPop .28s cubic-bezier(.2,1.35,.4,1)}
+  .mobile-nav button:focus-visible{outline:none}
+  .mobile-nav button:focus-visible .nav-icon-wrap{box-shadow:0 0 0 2px #09090d,0 0 0 4px rgba(167,139,250,.68),0 7px 18px rgba(124,58,237,.32)!important}
+  .mobile-client-options button,.mobile-more-grid button{transition:transform .16s ease,border-color .16s ease,background .16s ease!important;-webkit-tap-highlight-color:transparent}
+  .mobile-client-options button:active,.mobile-more-grid button:active{transform:scale(.975)}
+  .mobile-more-sheet.open,.mobile-client-sheet.open,.mobile-task-sheet.open{animation:d8SheetPop .26s cubic-bezier(.22,1,.36,1)}
+}
+@keyframes d8NavPop{0%{transform:scale(.82)}68%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes d8SheetPop{0%{transform:translateY(18px) scale(.985);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
