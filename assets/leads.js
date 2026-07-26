@@ -99,8 +99,9 @@ var SCL = {prospect:'cg', maybe:'cy', not:'cr', unset:'cgr'};
 function setLFTab(el) {
   document.querySelectorAll('#lfTabs .btn').forEach(function(b) { b.classList.remove('active'); b.classList.add('btng'); b.style.background = ''; b.style.color = ''; });
   el.classList.add('active'); el.classList.remove('btng'); el.style.background = 'var(--b4)'; el.style.color = 'var(--w0)';
-  lftab = el.dataset.f; renderLeads();
+  lftab = el.dataset.f; var status=document.getElementById('lStatusF');if(status)status.value=lftab;renderLeads();
 }
+function setLeadStatusFromFilter(value){lftab=value||'all';var tab=document.querySelector('#lfTabs .btn[data-f="'+lftab+'"]');if(tab)setLFTab(tab);else renderLeads();}
 function populateCats() {
   var cats = []; leads.forEach(function(l) { if (l.category && cats.indexOf(l.category) < 0) cats.push(l.category); }); cats.sort();
   var sel = document.getElementById('lCatF'); var cur = sel.value;
@@ -203,7 +204,7 @@ function renderActiveLeadFilters(){
 }
 function clearLeadFilter(key){var ids={category:'lCatF',contact:'lContactF',rating:'lRatingF',followup:'lFollowF'};if(key==='search')document.getElementById('srchQ').value='';else if(key==='status')lftab='all';else if(ids[key])document.getElementById(ids[key]).value='';if(key==='status'){var first=document.querySelector('#lfTabs .btn');if(first)setLFTab(first);else renderLeads();}else renderLeads();}
 function applyLeadQuickFilter(key,value){var ids={category:'lCatF',contact:'lContactF',rating:'lRatingF',followup:'lFollowF'},id=ids[key],el=document.getElementById(id);if(!el)return;if(leadAddons.indexOf(key)<0)leadAddons.push(key);localStorage.setItem('d8LeadAddons',JSON.stringify(leadAddons));el.value=value;renderLeadAddons();document.getElementById('leadFilterMenu').classList.remove('open');renderLeads();}
-function resetLeadFilters(){document.getElementById('srchQ').value='';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='priority';lftab='all';setLFTab(document.querySelector('#lfTabs .btn'));}
+function resetLeadFilters(){document.getElementById('srchQ').value='';var status=document.getElementById('lStatusF');if(status)status.value='all';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='priority';lftab='all';setLFTab(document.querySelector('#lfTabs .btn'));}
 function deleteAllLeads(){if(!leads.length)return;if(!confirm('Изтрий всички '+leads.length+' leads? Това действие не може да се върне.'))return;leads=[];leadPage=1;saveData();renderLeads();populateCats();updateBadges();toast('Всички leads са изтрити','var(--red)');}
 function deleteAllWeb(){if(!web.length)return;if(!confirm('Изтрий всички '+web.length+' Web Design проекта? Това действие не може да се върне.'))return;web=[];saveData();renderWeb();updateBadges();toast('Всички Web Design проекти са изтрити','var(--red)');}
 function lCS(id) { var l = leads.find(function(x) { return x.id === id; }); if (!l) return; l.status = SC[l.status] || 'unset'; saveData(); renderLeads(); }

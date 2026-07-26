@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260726-9">
-<link rel="stylesheet" href="assets/premium.css?v=20260726-9">
+<link rel="stylesheet" href="assets/styles.css?v=20260726-10">
+<link rel="stylesheet" href="assets/premium.css?v=20260726-10">
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -32,7 +32,7 @@
 </div>
 
 <div class="app" id="app">
-<div class="app-loader" id="appLoader"><div class="loader-glow"></div><div class="loader-mark">D8</div><strong id="loaderWelcome">Подготвяме панела</strong><div class="loader-line"><i></i></div><span>Данните ти са защитени и синхронизирани</span></div>
+<div class="app-loader" id="appLoader"><div class="loader-glow"></div><div class="loader-mark loader-logo"><img src="favicon.svg" alt="Digital Eight"></div><strong id="loaderWelcome">Подготвяме панела</strong><div class="loader-line"><i></i></div><span>Данните ти са защитени и синхронизирани</span></div>
 <div class="sbd" id="sbbd" onclick="closeSb()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sbr">
@@ -138,34 +138,20 @@
         </div>
         <div class="leadfilterpicker">
           <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
-          <div class="filtermenu" id="leadFilterMenu"><div class="filtermenuhead"><div><b>Филтри</b><span>Покажи най-подходящите бизнеси</span></div><button onclick="resetLeadFilters();toggleLeadFilterMenu(event)">Изчисти</button></div><small class="filtertitle">БЪРЗ ИЗБОР</small><div class="quickfilters"><button onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button><button onclick="applyLeadQuickFilter('contact','phone')">С телефон</button><button onclick="applyLeadQuickFilter('contact','email')">С имейл</button><button onclick="applyLeadQuickFilter('rating','4')">4+ звезди</button><button onclick="applyLeadQuickFilter('followup','today')">Follow-up днес</button></div><div class="filterdivider"></div><small class="filtertitle">ДОПЪЛНИТЕЛНИ ПОЛЕТА</small>
-            <button onclick="toggleLeadAddon('category')">Категория <span id="fa-category">＋</span></button>
-            <button onclick="toggleLeadAddon('contact')">Контакт <span id="fa-contact">＋</span></button>
-            <button onclick="toggleLeadAddon('rating')">Минимална оценка <span id="fa-rating">＋</span></button>
-            <button onclick="toggleLeadAddon('followup')">Follow-up <span id="fa-followup">＋</span></button><div class="filterdivider"></div><small class="filtertitle">ПРАВИЛА ЗА ПРИОРИТЕТ</small><button onclick="toggleLeadPriority('no_site')">Без сайт първо <span id="fp-no_site">＋</span></button><button onclick="toggleLeadPriority('low_reviews')">Малко ревюта първо <span id="fp-low_reviews">＋</span></button><button onclick="toggleLeadPriority('low_rating')">Ниска оценка първо <span id="fp-low_rating">＋</span></button><button onclick="toggleLeadPriority('has_phone')">С телефон първо <span id="fp-has_phone">＋</span></button><button onclick="toggleLeadPriority('has_email')">С имейл първо <span id="fp-has_email">＋</span></button>
+          <div class="filtermenu filterpanel" id="leadFilterMenu">
+            <div class="filtermenuhead"><div><b>Всички филтри</b><span>Комбинирай няколко условия</span></div><button onclick="resetLeadFilters();toggleLeadFilterMenu(event)">Изчисти</button></div>
+            <div class="filterfields">
+              <label>Статус<select class="fi" id="lStatusF" onchange="setLeadStatusFromFilter(this.value)"><option value="all">Всички статуси</option><option value="prospect">Потенциални</option><option value="maybe">Може би</option><option value="not">Не</option></select></label>
+              <label>Категория<select class="fi" id="lCatF" onchange="renderLeads()"><option value="">Всички категории</option></select></label>
+              <label>Контакт и сайт<select class="fi" id="lContactF" onchange="renderLeads()"><option value="">Всички контакти</option><option value="phone">С телефон</option><option value="email">С имейл</option><option value="website">С уебсайт</option><option value="no_website">Без уебсайт</option><option value="missing">Без телефон и имейл</option></select></label>
+              <label>Минимална оценка<select class="fi" id="lRatingF" onchange="renderLeads()"><option value="">Всяка оценка</option><option value="4.5">4.5+ звезди</option><option value="4">4+ звезди</option><option value="3">3+ звезди</option></select></label>
+              <label>Follow-up<select class="fi" id="lFollowF" onchange="renderLeads()"><option value="">Всеки follow-up</option><option value="today">Днес / просрочен</option><option value="week">Следващите 7 дни</option><option value="none">Без follow-up</option></select></label>
+              <label>Подреждане<select class="fi" id="lSortF" onchange="renderLeads()"><option value="priority">Моят приоритет</option><option value="quality">Най-добри първо</option><option value="stars_desc">Оценка: висока → ниска</option><option value="stars_asc">Оценка: ниска → висока</option><option value="name_asc">Име: А → Я</option><option value="name_desc">Име: Я → А</option><option value="category">Категория</option><option value="status">Статус</option><option value="contacts">Най-много контакти</option><option value="followup">Следващ follow-up</option><option value="newest">Последно добавени</option></select></label>
+            </div>
+            <small class="filtertitle">БЪРЗ ИЗБОР</small><div class="quickfilters"><button onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button><button onclick="applyLeadQuickFilter('contact','phone')">С телефон</button><button onclick="applyLeadQuickFilter('contact','email')">С имейл</button><button onclick="applyLeadQuickFilter('rating','4')">4+ звезди</button><button onclick="applyLeadQuickFilter('followup','today')">Follow-up днес</button></div>
+            <div class="filterdivider"></div><small class="filtertitle">ПОДРЕЖДАНЕ ПО ВАЖНОСТ</small><div class="prioritychoices"><button onclick="toggleLeadPriority('no_site')">Без сайт първо <span id="fp-no_site">＋</span></button><button onclick="toggleLeadPriority('low_reviews')">Малко ревюта <span id="fp-low_reviews">＋</span></button><button onclick="toggleLeadPriority('low_rating')">Ниска оценка <span id="fp-low_rating">＋</span></button><button onclick="toggleLeadPriority('has_phone')">С телефон <span id="fp-has_phone">＋</span></button><button onclick="toggleLeadPriority('has_email')">С имейл <span id="fp-has_email">＋</span></button></div>
           </div>
-        </div>        <select class="btn btng btnsm lead-addon" data-addon="category" id="lCatF" onchange="renderLeads()" style="cursor:pointer"><option value="">Всички категории</option></select>
-        <select class="btn btng btnsm lead-addon" data-addon="contact" id="lContactF" onchange="renderLeads()" style="cursor:pointer">
-          <option value="">Всички контакти</option>
-          <option value="phone">С телефон</option>
-          <option value="email">С имейл</option>
-          <option value="website">С уебсайт</option><option value="no_website">Без уебсайт</option>
-          <option value="missing">Без телефон и имейл</option>
-        </select>
-        <select class="btn btng btnsm lead-addon" data-addon="rating" id="lRatingF" onchange="renderLeads()"><option value="">Всяка оценка</option><option value="4.5">4.5+ звезди</option><option value="4">4+ звезди</option><option value="3">3+ звезди</option></select>
-        <select class="btn btng btnsm lead-addon" data-addon="followup" id="lFollowF" onchange="renderLeads()"><option value="">Всеки follow-up</option><option value="today">Днес / просрочен</option><option value="week">Следващите 7 дни</option><option value="none">Без follow-up</option></select>
-        <select class="btn btng btnsm" id="lSortF" onchange="renderLeads()" style="cursor:pointer">
-          <option value="priority">Моят приоритет</option><option value="quality">Най-добри първо</option>
-          <option value="stars_desc">Оценка: висока → ниска</option>
-          <option value="stars_asc">Оценка: ниска → висока</option>
-          <option value="name_asc">Име: А → Я</option>
-          <option value="name_desc">Име: Я → А</option>
-          <option value="category">Категория</option>
-          <option value="status">Статус</option>
-          <option value="contacts">Най-много контакти</option>
-          <option value="followup">Следващ follow-up</option>
-          <option value="newest">Последно добавени</option>
-        </select>
+        </div>
         <div style="flex:1"></div>
         <div class="leadpriorityrules" id="leadPriorityRules"></div>
 
@@ -329,10 +315,10 @@
   </div>
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
-<script src="assets/core.js?v=20260726-9"></script>
-<script src="assets/clients.js?v=20260726-9"></script>
-<script src="assets/leads.js?v=20260726-9"></script>
-<script src="assets/tasks.js?v=20260726-9"></script>
-<script src="assets/app.js?v=20260726-9"></script>
+<script src="assets/core.js?v=20260726-10"></script>
+<script src="assets/clients.js?v=20260726-10"></script>
+<script src="assets/leads.js?v=20260726-10"></script>
+<script src="assets/tasks.js?v=20260726-10"></script>
+<script src="assets/app.js?v=20260726-10"></script>
 </body>
 </html>
