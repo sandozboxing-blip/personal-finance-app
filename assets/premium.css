@@ -249,3 +249,12 @@ body[data-density="compact"] .tr,body[data-density="compact"] td{padding-top:8px
 @media(min-width:769px) and (max-width:1200px){.calday{min-height:82px!important}.tasklayout{grid-template-columns:1fr!important}}
 @media(max-width:768px){.calday{min-height:68px!important;padding:5px!important}.calgrid{gap:4px!important}.calday em{left:3px!important;right:3px;bottom:4px!important;gap:2px!important}.calday em i{height:14px!important;padding:1px 3px!important;border-radius:4px!important}.calday em i span{font-size:7px;line-height:10px}}
 @media(max-width:380px){.calday{min-height:62px!important}.calday em i:nth-child(n+2){display:none!important}}
+/* OneSignal phone notification settings */
+.pushsettings{border-color:rgba(139,92,246,.2)}
+#pushStatus[data-state="ready"]{border-color:rgba(74,222,128,.25);background:var(--gd);color:var(--green)}
+#pushStatus[data-state="loading"]{border-color:rgba(251,191,36,.22);background:var(--yd);color:var(--yellow)}
+#pushStatus[data-state="error"]{border-color:rgba(248,113,113,.25);background:var(--rd);color:var(--red)}
+.onesignalverify{z-index:950}
+.onesignalverifybox{max-width:470px;border-color:rgba(167,139,250,.28);box-shadow:0 30px 90px rgba(0,0,0,.72)}
+.onesignalverifybox .mbody p{color:var(--w2);font-size:14px;line-height:1.65}
+@media(max-width:768px){.onesignalverifybox{margin:auto 0 0;border-radius:20px 20px 0 0}.pushsettings .settings-actions{display:grid}.pushsettings .settings-actions>*{width:100%;justify-content:center}}
