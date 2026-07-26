@@ -25,7 +25,7 @@ function importFullBackup(event) {
       if (!state || !Array.isArray(state.leads) || !Array.isArray(state.smm) || !Array.isArray(state.web)) throw new Error();
       if (!confirm('Това ще замени текущите данни с backup файла. Продължи?')) return;
       leads = state.leads; smm = state.smm; web = state.web; sharedTasks = Array.isArray(state.tasks) ? state.tasks : []; focusTasks=Array.isArray(state.focusTasks)?state.focusTasks:[]; taskCategories=Array.isArray(state.taskCategories)?state.taskCategories:[];userSettings=state.settings&&typeof state.settings==='object'?state.settings:{};
-      normalizeData(); saveData(); populateCats(); updateBadges(); renderDash(); renderSmm(); renderWeb(); renderLeads(); renderTasks();
+      normalizeData(); saveData('all'); populateCats(); updateBadges(); renderDash(); renderSmm(); renderWeb(); renderLeads(); renderTasks();
       toast('Backup-ът е възстановен и записан', 'var(--green)');
     } catch (e) { toast('Невалиден backup файл', 'var(--red)'); }
     finally { input.value = ''; }

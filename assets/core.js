@@ -52,7 +52,7 @@ function logout(){
 }
 
 // ── STATE + RELIABLE SYNC ────────────────────────────
-var leads=[],smm=[],web=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,dataLoaded=false;
+var leads=[],smm=[],web=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='';
 var leadPage=1,leadPageSize=50,leadFilterKey='';var lftab='all',lbid=null,curpg='dash',editid=null,edittype=null;
 function localState(){return{leads:leads,smm:smm,web:web,tasks:sharedTasks,focusTasks:focusTasks,taskCategories:taskCategories,settings:userSettings};}
 function setSyncState(state,text){
@@ -63,27 +63,28 @@ function hideAppLoader(){
   var loader=document.getElementById('appLoader');
   if(loader)loader.classList.add('done');
 }
-function saveLocal(markDirty){
+function saveLocal(markDirty,scope){
   try{
     var k=currentUser||'guest';
     localStorage.setItem('d8l',JSON.stringify(leads));localStorage.setItem('d8s2',JSON.stringify(smm));localStorage.setItem('d8w',JSON.stringify(web));
     localStorage.setItem('d8tasks:'+k,JSON.stringify(sharedTasks));localStorage.setItem('d8focus:'+k,JSON.stringify(focusTasks));localStorage.setItem('d8taskcats:'+k,JSON.stringify(taskCategories));localStorage.setItem('d8settings:'+k,JSON.stringify(userSettings));
-    if(markDirty!==false){localStorage.setItem('d8LocalUpdatedAt',new Date().toISOString());localStorage.setItem('d8SyncDirty','1');}
+    if(markDirty!==false&&scope!=='profile'){localStorage.setItem('d8LocalUpdatedAt',new Date().toISOString());localStorage.setItem('d8SyncDirty','1');}
   }catch(e){setSyncState('error','Няма място');}
 }
-function saveData(){
-  saveLocal(true);syncPending=true;setSyncState('saving','Записване...');
+function saveData(scope){
+  scope=scope||'shared';syncScope=syncPending&&syncScope&&syncScope!==scope?'all':scope;
+  saveLocal(true,scope);syncPending=true;setSyncState('saving','Записване...');
   clearTimeout(syncTimer);syncTimer=setTimeout(flushSave,120);
 }
 function flushSave(){
   clearTimeout(syncTimer);
   if(syncInFlight||!syncPending||!currentUser)return;
-  syncPending=false;syncInFlight=true;setSyncState('saving','Записване...');
-  var payload=JSON.stringify(localState());
+  var scope=syncScope||'all';syncScope='';syncPending=false;syncInFlight=true;setSyncState('saving','Записване...');
+  var payload=JSON.stringify(Object.assign(localState(),{saveScope:scope}));
   fetch('api.php?action=save',{method:'POST',credentials:'same-origin',keepalive:true,headers:{'Content-Type':'application/json'},body:payload})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error(d.error||'SAVE');return d;});})
-    .then(function(d){localStorage.setItem('d8LastServerAt',d.updatedAt||new Date().toISOString());localStorage.removeItem('d8SyncDirty');setSyncState('saved','Всичко е запазено');})
-    .catch(function(e){if(e.message==='AUTH'){showLogin('Сесията изтече. Влез отново.');return;}syncPending=true;setSyncState('error','Не е записано');toast('Промените са запазени на устройството, но сървърът не отговори.','var(--yellow)');})
+    .then(function(d){lastServerUpdatedAt=d.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);if(scope!=='profile')localStorage.removeItem('d8SyncDirty');setSyncState('saved','Всичко е запазено');})
+    .catch(function(e){if(e.message==='AUTH'){showLogin('Сесията изтече. Влез отново.');return;}syncScope=syncScope&&syncScope!==scope?'all':scope;syncPending=true;setSyncState('error','Не е записано');toast('Промените са запазени на устройството, но сървърът не отговори.','var(--yellow)');})
     .finally(function(){syncInFlight=false;if(syncPending&&document.visibilityState==='visible')syncTimer=setTimeout(flushSave,700);});
 }
 function normalizeData(){leads.forEach(function(l){l.tags=l.tags||[];l.extra=l.extra||{};l.aiPhone=l.aiPhone||'';l.aiEmail=l.aiEmail||'';});smm.forEach(function(c){c.cost=c.cost||'';});web.forEach(function(c){c.cost=c.cost||'';c.duration=c.duration||c.months||'';c.paymentType=c.paymentType||(c.total?'one_time':'monthly');c.oneTime=c.oneTime||c.total||'';c.initial=c.initial||'';if(!c.monthly){var n=Math.max(1,parseInt(c.months)||1);c.monthly=c.total?String((parseFloat(c.total)||0)/n):'';}});}
@@ -104,19 +105,24 @@ function loadData(){
   fetch('api.php?action=load',{credentials:'same-origin'})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error(d.error||'LOAD');return d;});})
     .then(function(d){
-      var state=d.state||{},localOnlyRecovery=localSnapshot.leads.length&&!(state.leads||[]).length&&!localStorage.getItem('d8ServerInitialized'),useLocal=hasUnsyncedLocal||localOnlyRecovery;
-      if(useLocal){syncPending=true;setSyncState('saving','Възстановяване...');flushSave();}
+      var state=d.state||{},localSharedCount=localSnapshot.leads.length+localSnapshot.smm.length+localSnapshot.web.length,serverSharedCount=(state.leads||[]).length+(state.smm||[]).length+(state.web||[]).length,localStamp=localStorage.getItem('d8LocalUpdatedAt')||'',localOnlyRecovery=localSharedCount>serverSharedCount&&(!state.updatedAt||localStamp>state.updatedAt),useLocal=hasUnsyncedLocal||localOnlyRecovery;
+      if(useLocal){syncScope='shared';syncPending=true;setSyncState('saving','Възстановяване...');flushSave();}
       else{
         leads=state.leads||[];smm=state.smm||[];web=state.web||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};
-        if(!state.focusInitialized){var migratedFocus=sharedTasks.filter(function(t){return !t.due&&!t.category&&(t.repeat||'none')==='none';});if(migratedFocus.length){focusTasks=migratedFocus.map(function(t){return{id:t.id,text:t.text||'',done:!!t.done};});sharedTasks=sharedTasks.filter(function(t){return migratedFocus.indexOf(t)<0;});syncPending=true;}}
-        normalizeData();saveLocal(false);localStorage.setItem('d8LastServerAt',state.updatedAt||new Date().toISOString());setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
+        if(!state.focusInitialized){var migratedFocus=sharedTasks.filter(function(t){return !t.due&&!t.category&&(t.repeat||'none')==='none';});if(migratedFocus.length){syncScope='profile';focusTasks=migratedFocus.map(function(t){return{id:t.id,text:t.text||'',done:!!t.done};});sharedTasks=sharedTasks.filter(function(t){return migratedFocus.indexOf(t)<0;});syncPending=true;}}
+        normalizeData();saveLocal(false);lastServerUpdatedAt=state.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
       }
       localStorage.setItem('d8ServerInitialized','1');
       finishDataLoad();
     })
     .catch(function(e){if(e.message==='AUTH'){showLogin('Сесията изтече. Влез отново.');return;}setSyncState('error','Офлайн режим');toast('Работиш офлайн — локалните данни са заредени.','var(--yellow)');finishDataLoad();});
 }
-document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&syncPending)flushSave();});
+function refreshServerData(){
+  if(!currentUser||!dataLoaded||syncPending||syncInFlight||document.visibilityState==='hidden')return;
+  fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error('LOAD');return d;});}).then(function(d){var state=d.state||{},stamp=state.updatedAt||'';if(!stamp||stamp===lastServerUpdatedAt)return;leads=state.leads||[];smm=state.smm||[];web=state.web||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};lastServerUpdatedAt=stamp;normalizeData();saveLocal(false,'');finishDataLoad();setSyncState('saved','Синхронизирано');}).catch(function(e){if(e.message==='AUTH')showLogin('Сесията изтече. Влез отново.');});
+}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&syncPending)flushSave();else if(document.visibilityState==='visible')refreshServerData();});
+setInterval(refreshServerData,15000);
 // ── NAVIGATION ─────────────────────────────────────────
 var PTITLES = {dash: 'Dashboard', tasks: 'Task Manager', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
 
@@ -194,10 +200,10 @@ function renderDash(){
 function pipeRow(label,value,max){return '<div class="piperow"><div class="pipelabel">'+label+'</div><div class="pipetrack"><div class="pipefill" style="width:'+Math.round(value/max*100)+'%"></div></div><div class="pipeval">'+fmt(value)+' €</div></div>';}
 function jumpPage(id){var btn=Array.prototype.find.call(document.querySelectorAll('.sbi'),function(x){return(x.getAttribute('onclick')||'').indexOf("'"+id+"'")>=0;});goPage(id,btn);}
 function getTasks(){return sharedTasks;}
-function saveTasks(tasks){sharedTasks=tasks;saveData();}
-function addTask(){var input=document.getElementById('taskInp'),value=input.value.trim();if(!value)return;focusTasks.unshift({id:'f'+Date.now().toString(36),text:value,done:false,createdAt:new Date().toISOString()});saveData();input.value='';renderTasks();}
-function toggleFocusTask(id){focusTasks.forEach(function(t){if(t.id===id)t.done=!t.done;});saveData();renderTasks();}
-function deleteFocusTask(id){focusTasks=focusTasks.filter(function(t){return t.id!==id;});saveData();renderTasks();}
+function saveTasks(tasks){sharedTasks=tasks;saveData('profile');}
+function addTask(){var input=document.getElementById('taskInp'),value=input.value.trim();if(!value)return;focusTasks.unshift({id:'f'+Date.now().toString(36),text:value,done:false,createdAt:new Date().toISOString()});saveData('profile');input.value='';renderTasks();}
+function toggleFocusTask(id){focusTasks.forEach(function(t){if(t.id===id)t.done=!t.done;});saveData('profile');renderTasks();}
+function deleteFocusTask(id){focusTasks=focusTasks.filter(function(t){return t.id!==id;});saveData('profile');renderTasks();}
 function toggleTask(id,occurrenceIso){var tasks=getTasks(),day=occurrenceIso||taskSelectedDate||taskIso(new Date());tasks.forEach(function(t){if(t.id!==id)return;if((t.repeat||'none')!=='none'){t.completedDates=Array.isArray(t.completedDates)?t.completedDates:[];var i=t.completedDates.indexOf(day);if(i>=0)t.completedDates.splice(i,1);else t.completedDates.push(day);t.done=false;}else{t.done=!t.done;t.completedAtDate=t.done?day:'';}});saveTasks(tasks);renderTaskManager();}
 function deleteTask(id){saveTasks(getTasks().filter(function(t){return t.id!==id;}));renderTaskManager();}
 function renderTasks(){var el=document.getElementById('taskList');if(!el)return;el.innerHTML=focusTasks.length?focusTasks.map(function(t){return'<label class="task '+(t.done?'done':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleFocusTask(\''+t.id+'\')"><span>'+esc(t.text)+'</span><button type="button" aria-label="Изтрий задача" onclick="event.preventDefault();deleteFocusTask(\''+t.id+'\')">×</button></label>';}).join(''):'<div class="emptymini">Добави кратка задача само за твоя профил.</div>';}

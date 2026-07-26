@@ -23,7 +23,7 @@ function currentUser(array $config): ?string { return tokenUser($config); }
 function requireLogin(array $config): string { $user=currentUser($config);if(!$user)reply(['ok'=>false,'error'=>'Необходим е вход'],401);return $user; }
 function dataFile(): string { return __DIR__.'/data/panel-data.php'; }
 function decodeState(string $raw): array { $json=preg_replace('/^<\?php exit; \?>\s*/','',$raw);$state=json_decode($json?:'{}',true);return is_array($state)?$state:[]; }
-function emptyState(): array { return ['version'=>4,'leads'=>[],'smm'=>[],'web'=>[],'tasks'=>[],'userData'=>[]]; }
+function emptyState(): array { return ['version'=>5,'leads'=>[],'smm'=>[],'web'=>[],'tasks'=>[],'userData'=>[]]; }
 
 if($action==='login'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $b=body();$u=trim((string)($b['username']??''));$p=(string)($b['password']??'');$users=$config['users']??[];
@@ -40,13 +40,17 @@ $currentUser=requireLogin($config);
 
 if($action==='load'&&$_SERVER['REQUEST_METHOD']==='GET'){
   $file=dataFile();$state=is_file($file)?decodeState((string)file_get_contents($file)):emptyState();$user=$currentUser;$allUsers=is_array($state['userData']??null)?$state['userData']:[];$profile=is_array($allUsers[$user]??null)?$allUsers[$user]:[];$legacyTasks=is_array($state['tasks']??null)?$state['tasks']:[];
-  reply(['ok'=>true,'state'=>['version'=>4,'updatedAt'=>$state['updatedAt']??null,'leads'=>is_array($state['leads']??null)?$state['leads']:[],'smm'=>is_array($state['smm']??null)?$state['smm']:[],'web'=>is_array($state['web']??null)?$state['web']:[],'tasks'=>is_array($profile['tasks']??null)?$profile['tasks']:($user==='Admin'?$legacyTasks:[]),'focusTasks'=>is_array($profile['focusTasks']??null)?$profile['focusTasks']:[],'focusInitialized'=>array_key_exists('focusTasks',$profile),'taskCategories'=>is_array($profile['taskCategories']??null)?$profile['taskCategories']:[],'settings'=>is_array($profile['settings']??null)?$profile['settings']:[]]]);
+  reply(['ok'=>true,'state'=>['version'=>5,'updatedAt'=>$state['updatedAt']??null,'leads'=>is_array($state['leads']??null)?$state['leads']:[],'smm'=>is_array($state['smm']??null)?$state['smm']:[],'web'=>is_array($state['web']??null)?$state['web']:[],'tasks'=>is_array($profile['tasks']??null)?$profile['tasks']:($user==='Admin'?$legacyTasks:[]),'focusTasks'=>is_array($profile['focusTasks']??null)?$profile['focusTasks']:[],'focusInitialized'=>array_key_exists('focusTasks',$profile),'taskCategories'=>is_array($profile['taskCategories']??null)?$profile['taskCategories']:[],'settings'=>is_array($profile['settings']??null)?$profile['settings']:[]]]);
 }
 if($action==='save'&&$_SERVER['REQUEST_METHOD']==='POST'){
-  $incoming=body();foreach(['leads','smm','web','tasks','focusTasks','taskCategories'] as $key){if(!isset($incoming[$key])||!is_array($incoming[$key]))$incoming[$key]=[];}if(!isset($incoming['settings'])||!is_array($incoming['settings']))$incoming['settings']=[];
-  $file=dataFile();$dir=dirname($file);if(!is_dir($dir)&&!mkdir($dir,0775,true))reply(['ok'=>false,'error'=>'Папка data не може да бъде създадена'],500);$fh=fopen($file,'c+');if(!$fh)reply(['ok'=>false,'error'=>'Папка data няма права за запис'],500);if(!flock($fh,LOCK_EX)){fclose($fh);reply(['ok'=>false,'error'=>'Данните са временно заключени'],503);}rewind($fh);$existing=decodeState((string)stream_get_contents($fh));$userData=is_array($existing['userData']??null)?$existing['userData']:[];$user=$currentUser;$userData[$user]=['tasks'=>$incoming['tasks'],'focusTasks'=>$incoming['focusTasks'],'taskCategories'=>$incoming['taskCategories'],'settings'=>$incoming['settings'],'updatedAt'=>gmdate('c')];
-  $state=['version'=>4,'updatedAt'=>gmdate('c'),'updatedBy'=>$user,'leads'=>$incoming['leads'],'smm'=>$incoming['smm'],'web'=>$incoming['web'],'tasks'=>[],'userData'=>$userData];$json=json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+  $incoming=body();$scope=(string)($incoming['saveScope']??'all');if(!in_array($scope,['shared','profile','all'],true))$scope='all';
+  foreach(['leads','smm','web','tasks','focusTasks','taskCategories'] as $key){if(!isset($incoming[$key])||!is_array($incoming[$key]))$incoming[$key]=[];}if(!isset($incoming['settings'])||!is_array($incoming['settings']))$incoming['settings']=[];
+  $file=dataFile();$dir=dirname($file);if(!is_dir($dir)&&!mkdir($dir,0775,true))reply(['ok'=>false,'error'=>'Папка data не може да бъде създадена'],500);$fh=fopen($file,'c+');if(!$fh)reply(['ok'=>false,'error'=>'Папка data няма права за запис'],500);if(!flock($fh,LOCK_EX)){fclose($fh);reply(['ok'=>false,'error'=>'Данните са временно заключени'],503);}
+  rewind($fh);$existing=decodeState((string)stream_get_contents($fh));$userData=is_array($existing['userData']??null)?$existing['userData']:[];$user=$currentUser;
+  if($scope!=='shared')$userData[$user]=['tasks'=>$incoming['tasks'],'focusTasks'=>$incoming['focusTasks'],'taskCategories'=>$incoming['taskCategories'],'settings'=>$incoming['settings'],'updatedAt'=>gmdate('c')];
+  $preserveShared=$scope==='profile';
+  $state=['version'=>5,'updatedAt'=>gmdate('c'),'updatedBy'=>$user,'leads'=>$preserveShared?(is_array($existing['leads']??null)?$existing['leads']:[]):$incoming['leads'],'smm'=>$preserveShared?(is_array($existing['smm']??null)?$existing['smm']:[]):$incoming['smm'],'web'=>$preserveShared?(is_array($existing['web']??null)?$existing['web']:[]):$incoming['web'],'tasks'=>[],'userData'=>$userData];$json=json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
   if($json===false||strlen($json)>20*1024*1024){flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>false,'error'=>'Невалидни или твърде големи данни'],400);}
-  ftruncate($fh,0);rewind($fh);$written=fwrite($fh,"<?php exit; ?>\n".$json);fflush($fh);flock($fh,LOCK_UN);fclose($fh);if($written===false)reply(['ok'=>false,'error'=>'Грешка при запис'],500);reply(['ok'=>true,'updatedAt'=>$state['updatedAt'],'leadCount'=>count($state['leads'])]);
+  ftruncate($fh,0);rewind($fh);$written=fwrite($fh,"<?php exit; ?>\n".$json);fflush($fh);flock($fh,LOCK_UN);fclose($fh);if($written===false)reply(['ok'=>false,'error'=>'Грешка при запис'],500);reply(['ok'=>true,'updatedAt'=>$state['updatedAt'],'scope'=>$scope,'leadCount'=>count($state['leads'])]);
 }
 reply(['ok'=>false,'error'=>'Невалидна заявка'],404);
