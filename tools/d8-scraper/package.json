@@ -1,0 +1,8 @@
+{
+  "name": "digital-eight-google-maps-scraper",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local Google Maps lead collector for Digital Eight Panel",
+  "scripts": {"start": "node scraper.js"},
+  "dependencies": {"playwright": "^1.55.0"}
+}

@@ -7,7 +7,7 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=20260726-20">
-<link rel="stylesheet" href="assets/premium.css?v=20260908-27">
+<link rel="stylesheet" href="assets/premium.css?v=20260727-26">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/d8-apple-touch-v2.png" />
@@ -159,7 +159,7 @@
 
         <button class="btn btng btnsm" onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
         <button class="btn btnd btnsm" onclick="deleteAllLeads()">⌫ Изтрий всички</button>
-        <button class="btn btng btnsm" onclick="doExport()">↓ CSV</button><button class="btn btnp btnsm" onclick="openBusinessScraper()">⌁ Google Business Scraper</button>
+        <button class="btn btng btnsm" onclick="doExport()">↓ CSV</button>
         <button class="btn btnp btnsm" onclick="document.getElementById('fi').click()">↑ Импортирай файл</button>
         <input type="file" id="fi" accept=".csv,.json,text/csv,application/json" style="display:none" onchange="handleFile(event)">
       </div>
@@ -332,11 +332,10 @@
   </div>
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
-<div class="scraper-overlay" id="businessScraperOverlay" aria-hidden="true" onclick="if(event.target===this)closeBusinessScraper()"><section class="scraper-dialog" role="dialog" aria-modal="true"><header><div><span>LEAD DISCOVERY</span><h2>Google Business Scraper</h2><p>Ниша + локация или Google Maps URL</p></div><button onclick="closeBusinessScraper()">×</button></header><div class="scraper-body"><label>Какво да търсим?<textarea id="scraperQuery" class="fi" rows="3" placeholder="Пример: стоматолози, София, България или Google Maps URL"></textarea></label><div class="scraper-options"><label>Максимум бизнеси<select id="scraperLimit" class="fi"><option>50</option><option selected>100</option><option>250</option><option>500</option><option>1000</option></select></label><div class="scraper-feature"><b>Автоматично обогатяване</b><span>Телефон · имейл · сайт · социални мрежи</span></div></div><div class="scraper-notice">Търсенето може да отнеме няколко минути. Резултатите се добавят автоматично без дубликати.</div><div class="scraper-progress" id="scraperProgress" hidden><div><i id="scraperProgressBar"></i></div><strong id="scraperProgressTitle">Подготвям търсенето…</strong><span id="scraperProgressText"></span></div></div><footer><button class="btn btng" onclick="closeBusinessScraper()">Затвори</button><button class="btn btnp" id="scraperStartBtn" onclick="startBusinessScraper()">Започни търсенето</button></footer></section></div>
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260727-24"></script>
 <script src="assets/clients.js?v=20260726-20"></script>
-<script src="assets/leads.js?v=20260727-23"></script><script src="assets/scraper.js?v=20260908-1"></script>
+<script src="assets/leads.js?v=20260727-23"></script>
 <script src="assets/tasks.js?v=20260726-21"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260726-21"></script>
