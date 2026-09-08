@@ -24,6 +24,8 @@ function requireLogin(array $config): string { $user=currentUser($config);if(!$u
 function dataFile(): string { return __DIR__.'/data/panel-data.php'; }
 function decodeState(string $raw): array { $json=preg_replace('/^<\?php exit; \?>\s*/','',$raw);$state=json_decode($json?:'{}',true);return is_array($state)?$state:[]; }
 function emptyState(): array { return ['version'=>6,'leads'=>[],'smm'=>[],'web'=>[],'workTasks'=>[],'tasks'=>[],'userData'=>[]]; }
+function upstreamJson(string $url,string $apiKey): array {if(!function_exists('curl_init'))reply(['ok'=>false,'error'=>'cURL не е активиран на хостинга'],500);$ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>45,CURLOPT_HTTPHEADER=>['X-API-KEY: '.$apiKey,'Accept: application/json'],CURLOPT_USERAGENT=>'DigitalEightPanel/1.0']);$raw=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);if($raw===false||$err!=='')reply(['ok'=>false,'error'=>'Scraper услугата не отговори: '.$err],502);$data=json_decode((string)$raw,true);if(!is_array($data))reply(['ok'=>false,'error'=>'Scraper услугата върна невалиден отговор'],502);if($status>=400){$message=(string)($data['errorMessage']??$data['message']??$data['error']??'Грешка от scraper услугата');reply(['ok'=>false,'error'=>$message],$status===401?400:502);}return $data;}
+function outscraperKey(array $config): string {$key=trim((string)($config['outscraper']['api_key']??''));if($key===''||str_contains($key,'PASTE-YOUR'))reply(['ok'=>false,'error'=>'Липсва Outscraper API ключ в config.php'],400);return $key;}
 
 if($action==='login'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $b=body();$u=trim((string)($b['username']??''));$p=(string)($b['password']??'');$users=$config['users']??[];
@@ -37,6 +39,9 @@ if($action==='logout'){
 }
 if($action==='me'){$user=currentUser($config);reply(['ok'=>true,'authenticated'=>$user!==null,'user'=>$user]);}
 $currentUser=requireLogin($config);
+if($action==='scraper-status'&&$_SERVER['REQUEST_METHOD']==='GET'){$key=trim((string)($config['outscraper']['api_key']??''));reply(['ok'=>true,'configured'=>$key!==''&&!str_contains($key,'PASTE-YOUR')]);}
+if($action==='scraper-start'&&$_SERVER['REQUEST_METHOD']==='POST'){$b=body();$query=trim((string)($b['query']??''));$limit=max(1,min(1000,(int)($b['limit']??100)));if(mb_strlen($query)<3||mb_strlen($query)>1000)reply(['ok'=>false,'error'=>'Въведи ниша + град или Google Maps линк'],400);$params=http_build_query(['query'=>$query,'limit'=>$limit,'language'=>'bg','region'=>'BG','enrichment'=>'contacts_n_leads','async'=>'true']);$data=upstreamJson('https://api.outscraper.com/maps/search?'.$params,outscraperKey($config));reply(['ok'=>true,'request'=>$data]);}
+if($action==='scraper-result'&&$_SERVER['REQUEST_METHOD']==='GET'){$id=trim((string)($_GET['id']??''));if(!preg_match('/^[A-Za-z0-9_-]{8,160}$/',$id))reply(['ok'=>false,'error'=>'Невалиден scraper request ID'],400);$data=upstreamJson('https://api.outscraper.com/requests/'.rawurlencode($id),outscraperKey($config));reply(['ok'=>true,'request'=>$data]);}
 
 if($action==='load'&&$_SERVER['REQUEST_METHOD']==='GET'){
   $file=dataFile();$state=is_file($file)?decodeState((string)file_get_contents($file)):emptyState();$user=$currentUser;$allUsers=is_array($state['userData']??null)?$state['userData']:[];$profile=is_array($allUsers[$user]??null)?$allUsers[$user]:[];$legacyTasks=is_array($state['tasks']??null)?$state['tasks']:[];

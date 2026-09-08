@@ -10,5 +10,9 @@ return [
   'onesignal' => [
     'app_id' => '258501b4-c99d-4ed1-92d3-3ce01d5c6242',
     'app_api_key' => 'PASTE-YOUR-ONESIGNAL-APP-API-KEY-HERE'
+  ],
+  // Google Maps lead extraction. Keep the key only in server config.php.
+  'outscraper' => [
+    'api_key' => 'PASTE-YOUR-OUTSCRAPER-API-KEY-HERE'
   ]
 ];
