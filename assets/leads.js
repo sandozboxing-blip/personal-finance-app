@@ -73,7 +73,7 @@ function importLeads(raw) {
     if (!n) continue;
     var sourceUrl = pick(r, ['url','link','googleMapsUrl','mapsUrl']);
     if (sourceUrl) extra['Google Maps / source URL'] = sourceUrl;
-    imported.push({id: now + i, name: n, website: pick(r, ['website','site','web','homepage','mre4xd href']), phone: pick(r, ['phone','tel','telephone','phone_number','mobile']), email: pick(r, ['email','email_address','contact_email','mail']), category: cleanGoogle(pick(r, ['category','categories','categoryName','type','niche','industry','business_category','rllt__details'])), address: pick(r, ['address','location','place','full_address','rllt__details 3']) || [pick(r,['street']),pick(r,['city']),pick(r,['state']),pick(r,['country','countryCode'])].filter(Boolean).join(', '), stars: pickN(r, ['rating','stars','score','rate','totalScore','yi40hd']), reviews: pick(r,['reviews','review_count','reviewsCount','rdapee']), price: pick(r,['price','price_range','rllt__details 2']), image: pick(r,['image','image_url','wA1Bge src','wa1bge src']), status: 'unset', pipeline: 'new', note: '', followup: '', tags: [], extra: extra, aiPhone: '', aiEmail: ''});
+    imported.push({id: now + i, name: n, website: pick(r, ['website','site','web','homepage','mre4xd href']), phone: pick(r, ['phone','tel','telephone','phone_number','mobile']), email: pick(r, ['email','email_address','contact_email','mail']), category: cleanGoogle(pick(r, ['category','categories','categoryName','type','niche','industry','business_category','rllt__details'])), address: pick(r, ['address','location','place','full_address','rllt__details 3']) || [pick(r,['street']),pick(r,['city']),pick(r,['state']),pick(r,['country','countryCode'])].filter(Boolean).join(', '), stars: pickN(r, ['rating','stars','score','rate','totalScore','yi40hd']), reviews: pick(r,['reviews','review_count','reviewsCount','rdapee']), price: pick(r,['price','price_range','rllt__details 2']), image: pick(r,['image','image_url','wA1Bge src','wa1bge src']), status: 'unset', pipeline: 'new', folder: getSelectedLeadFolder(), note: '', followup: '', tags: [], extra: extra, aiPhone: '', aiEmail: ''});
   }
   if (!imported.length) { toast('⚠ Не намерих записи с наименование. Провери файла.', 'var(--yellow)'); return; }
   leads = leads.concat(imported);
@@ -108,7 +108,12 @@ function populateCats() {
   sel.innerHTML = '<option value="">Всички категории</option>' + cats.map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
   if (cur) sel.value = cur;
 }
-function parseReviewCount(v){var x=String(v||'').replace(/[()\s,]/g,'').toUpperCase(),m=parseFloat(x)||0;return x.indexOf('K')>=0?m*1000:x.indexOf('M')>=0?m*1000000:m;}
+function getLeadFolderNames(){var names=(leadFolders||[]).slice();leads.forEach(function(l){if(l.folder&&names.indexOf(l.folder)<0)names.push(l.folder);});return names.filter(Boolean).sort(function(a,b){return a.localeCompare(b,'bg');});}
+function getSelectedLeadFolder(){var el=document.getElementById('lFolderF');return el&&el.value?el.value:'';}
+function leadFolderOptions(selected,includeNone){var first=includeNone?'<option value="">Без папка</option>':'';return first+getLeadFolderNames().map(function(name){return'<option value="'+esc(name)+'"'+(name===selected?' selected':'')+'>'+esc(name)+'</option>';}).join('');}
+function renderLeadFolders(){var sel=document.getElementById('lFolderF');if(!sel)return;var cur=sel.value;sel.innerHTML='<option value="">Всички папки</option>'+leadFolderOptions(cur,false);if(cur&&getLeadFolderNames().indexOf(cur)>=0)sel.value=cur;}
+function createLeadFolder(){var name=prompt('Име на новата папка (например: Зъболекари — София):');if(!name)return;name=name.trim().replace(/\s+/g,' ');if(!name)return;if(leadFolders.some(function(x){return x.toLowerCase()===name.toLowerCase();})){toast('Тази папка вече съществува','var(--yellow)');return;}leadFolders.push(name);saveData();renderLeadFolders();document.getElementById('lFolderF').value=name;renderLeads();toast('✓ Създадена папка: '+name,'var(--green)');}
+function setLeadFolder(value){var l=getLB();if(!l)return;l.folder=value;saveData();renderLeadFolders();renderLeads();}function parseReviewCount(v){var x=String(v||'').replace(/[()\s,]/g,'').toUpperCase(),m=parseFloat(x)||0;return x.indexOf('K')>=0?m*1000:x.indexOf('M')>=0?m*1000000:m;}
 function renderLeadPager(total,pages){
   var pager=document.getElementById('leadPager');if(!pager)return;
   if(!total){pager.style.display='none';pager.innerHTML='';return;}
@@ -118,13 +123,14 @@ function renderMobileLeadCards(rows){
   var list=document.getElementById('leadMobileList');if(!list)return;
   list.innerHTML=rows.map(function(l){
     var phone=l.phone?'<a href="tel:'+esc(l.phone)+'" onclick="event.stopPropagation()">Обади се</a>':'',email=l.email?'<a href="mailto:'+esc(l.email)+'" onclick="event.stopPropagation()">Имейл</a>':'';
-    return '<article class="lead-mobile-card" onclick="openLB('+JSON.stringify(l.id)+')"><div class="lmc-head"><div class="lmc-title"><strong>'+esc(l.name)+'</strong><span>'+esc(l.category||l.address||'Без категория')+'</span></div><div class="lmc-score">'+(l.stars?Number(l.stars).toFixed(1)+' ★':'Няма ★')+'</div></div><div class="lmc-meta">'+(l.phone?'<span class="lmc-chip good">Телефон</span>':'<span class="lmc-chip">Без телефон</span>')+(l.email?'<span class="lmc-chip good">Имейл</span>':'')+(l.website?'<span class="lmc-chip">Има сайт</span>':'<span class="lmc-chip good">Без сайт</span>')+(l.followup?'<span class="lmc-chip">Follow-up '+fmtD(l.followup)+'</span>':'')+'</div><div class="lmc-actions"><button class="primary" onclick="event.stopPropagation();openLB('+JSON.stringify(l.id)+')">Отвори профила</button>'+(phone||email||'<button disabled>Няма контакт</button>')+'</div></article>';
+    return '<article class="lead-mobile-card" onclick="openLB('+JSON.stringify(l.id)+')"><div class="lmc-head"><div class="lmc-title"><strong>'+esc(l.name)+'</strong><span>'+esc((l.folder?l.folder+' · ':'')+(l.category||l.address||'Без категория'))+'</span></div><div class="lmc-score">'+(l.stars?Number(l.stars).toFixed(1)+' ★':'Няма ★')+'</div></div><div class="lmc-meta">'+(l.phone?'<span class="lmc-chip good">Телефон</span>':'<span class="lmc-chip">Без телефон</span>')+(l.email?'<span class="lmc-chip good">Имейл</span>':'')+(l.website?'<span class="lmc-chip">Има сайт</span>':'<span class="lmc-chip good">Без сайт</span>')+(l.followup?'<span class="lmc-chip">Follow-up '+fmtD(l.followup)+'</span>':'')+'</div><div class="lmc-actions"><button class="primary" onclick="event.stopPropagation();openLB('+JSON.stringify(l.id)+')">Отвори профила</button>'+(phone||email||'<button disabled>Няма контакт</button>')+'</div></article>';
   }).join('');
 }
 function renderLeads() {
   normalizeData();ensureLeadPriorities();
   var q = (document.getElementById('srchQ').value || '').toLowerCase();
   var cat = document.getElementById('lCatF').value;
+  var folder = getSelectedLeadFolder();
   var sort = document.getElementById('lSortF').value;
   var contact = (document.getElementById('lContactF') || {}).value || '';
   var rating = parseFloat((document.getElementById('lRatingF') || {}).value) || 0;
@@ -133,12 +139,13 @@ function renderLeads() {
   var fil = leads.filter(function(l) {
     var mQ = !q || [l.name,l.website,l.phone,l.email,l.category,l.address,l.note,l.reviews,l.price,(l.tags||[]).join(' ')].join(' ').toLowerCase().indexOf(q) >= 0;
     var mC = !cat || l.category === cat;
+    var mFolder = !folder || l.folder === folder;
     var mF = lftab === 'all' || l.status === lftab;
     var mContact = !contact || (contact==='phone'&&l.phone) || (contact==='email'&&l.email) || (contact==='website'&&l.website) || (contact==='no_website'&&!l.website) || (contact==='missing'&&!l.phone&&!l.email);
     var mRating = !rating || (parseFloat(l.stars)||0) >= rating;
     var now=new Date();now.setHours(0,0,0,0);var fu=l.followup?new Date(l.followup):null;if(fu)fu.setHours(0,0,0,0);var week=new Date(now);week.setDate(week.getDate()+7);
     var mFollow=!follow||(follow==='none'&&!fu)||(follow==='today'&&fu&&fu<=now)||(follow==='week'&&fu&&fu>=now&&fu<=week);
-    return mQ && mC && mF && mContact && mRating && mFollow;
+    return mQ && mC && mFolder && mF && mContact && mRating && mFollow;
   });
   fil.sort(function(a,b){
     var contactScore=function(x){return (x.phone?3:0)+(x.email?2:0)+(x.website?1:0);};
@@ -155,7 +162,7 @@ function renderLeads() {
     if(sort==='newest') return String(b.id).localeCompare(String(a.id));
     return b.stars-a.stars;
   });
-  var filterKey=[q,cat,sort,contact,rating,follow,lftab,leadPriorityRules.join(',')].join('|');if(filterKey!==leadFilterKey){leadFilterKey=filterKey;leadPage=1;}
+  var filterKey=[q,cat,folder,sort,contact,rating,follow,lftab,leadPriorityRules.join(',')].join('|');if(filterKey!==leadFilterKey){leadFilterKey=filterKey;leadPage=1;}
   var pages=Math.max(1,Math.ceil(fil.length/leadPageSize));leadPage=Math.min(leadPage,pages);
   var rowStart=(leadPage-1)*leadPageSize,rows=fil.slice(rowStart,rowStart+leadPageSize);
   var has = leads.length > 0;
@@ -177,6 +184,8 @@ function renderLeads() {
     var tags = (l.tags || []).slice(0, 2).map(function(t) { return '<span class="tagp">' + esc(t) + '</span>'; }).join('');
     return '<tr onclick="openLB(' + l.id + ')">' +
       '<td><div class="tdn">' + esc(l.name) + '</div><div class="tds">' + (l.website ? '<a href="' + (l.website.indexOf('http') === 0 ? l.website : 'https://' + l.website) + '" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue)">' + esc(l.website) + '</a>' : esc(l.phone || '')) + '</div>' + (tags ? '<div style="display:flex;gap:4px;margin-top:5px">' + tags + '</div>' : '') + '</td>' +
+      '<td><span class="leadfolderpill">' + esc(l.folder || 'Без папка') + '</span></td>' +
+      '<td>' + (l.website?'<div class="webstate yes">● Има</div><a class="leadweblink" href="'+(l.website.indexOf('http')===0?l.website:'https://'+l.website)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+esc(l.website)+'</a>':'<span class="webstate no">○ Няма</span>') + '</td>' +
       '<td><div class="stars">' + stars + '</div></td>' +
       '<td><button class="chip ' + SCL[l.status] + '" onclick="event.stopPropagation();lCS(' + l.id + ')">' + SL[l.status] + '</button></td>' +
       '<td style="font-size:14px;color:var(--w2)">' + esc(l.category || '—') + '</td>' +
@@ -197,7 +206,7 @@ function leadFilterLabel(id,value){var el=document.getElementById(id);if(!el||!v
 function renderActiveLeadFilters(){
   var box=document.getElementById('activeLeadFilters'),count=document.getElementById('leadFilterCount');if(!box)return;
   ensureLeadPriorities();
-  var filters=[],q=(document.getElementById('srchQ').value||'').trim(),pairs=[['category','lCatF'],['contact','lContactF'],['rating','lRatingF'],['followup','lFollowF']];
+  var filters=[],q=(document.getElementById('srchQ').value||'').trim(),pairs=[['folder','lFolderF'],['category','lCatF'],['contact','lContactF'],['rating','lRatingF'],['followup','lFollowF']];
   if(q)filters.push({key:'search',label:'Търсене: '+q});
   if(lftab!=='all')filters.push({key:'status',label:{prospect:'Потенциални',maybe:'Може би',not:'Не'}[lftab]||lftab});
   pairs.forEach(function(x){var value=document.getElementById(x[1]).value;if(value)filters.push({key:x[0],label:leadFilterLabel(x[1],value)});});
@@ -207,13 +216,13 @@ function renderActiveLeadFilters(){
   box.innerHTML=filters.length?filters.map(function(f){var action=f.priority?'removeLeadPriority(\''+f.key.slice(9)+'\')':'clearLeadFilter(\''+f.key+'\')';return'<button class="'+(f.priority?'priorityselected':'')+'" onclick="'+action+'">'+esc(f.label)+' <b>×</b></button>';}).join('')+(filters.length>1?'<button class="clearall" onclick="resetLeadFilters()">Изчисти всички</button>':''):'';
 }
 function clearLeadFilter(key){
-  var ids={category:'lCatF',contact:'lContactF',rating:'lRatingF',followup:'lFollowF'};
+  var ids={folder:'lFolderF',category:'lCatF',contact:'lContactF',rating:'lRatingF',followup:'lFollowF'};
   if(!confirm('Премахни избрания филтър?'))return;
   if(key==='search')document.getElementById('srchQ').value='';else if(key==='status')lftab='all';else if(key==='sort')document.getElementById('lSortF').value='priority';else if(ids[key])document.getElementById(ids[key]).value='';
   if(key==='status'){var first=document.querySelector('#lfTabs .btn');if(first)setLFTab(first);else renderLeads();}else renderLeads();
 }
 function applyLeadQuickFilter(key,value){var ids={category:'lCatF',contact:'lContactF',rating:'lRatingF',followup:'lFollowF'},id=ids[key],el=document.getElementById(id);if(!el)return;if(leadAddons.indexOf(key)<0)leadAddons.push(key);localStorage.setItem('d8LeadAddons',JSON.stringify(leadAddons));el.value=value;renderLeadAddons();closeLeadFilterMenu();renderLeads();}
-function resetLeadFilters(){if(!confirm('Изчисти всички избрани филтри и правила за приоритет?'))return false;document.getElementById('srchQ').value='';var status=document.getElementById('lStatusF');if(status)status.value='all';document.getElementById('lCatF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='priority';lftab='all';ensureLeadPriorities();leadPriorityRules=[];localStorage.setItem('d8LeadPriority:'+(currentUser||'guest'),'[]');userSettings.leadPriorityRules=[];saveData('profile');renderLeadPriorityRules();setLFTab(document.querySelector('#lfTabs .btn'));return true;}
+function resetLeadFilters(){if(!confirm('Изчисти всички избрани филтри и правила за приоритет?'))return false;document.getElementById('srchQ').value='';var status=document.getElementById('lStatusF');if(status)status.value='all';document.getElementById('lCatF').value='';document.getElementById('lFolderF').value='';document.getElementById('lContactF').value='';document.getElementById('lRatingF').value='';document.getElementById('lFollowF').value='';document.getElementById('lSortF').value='priority';lftab='all';ensureLeadPriorities();leadPriorityRules=[];localStorage.setItem('d8LeadPriority:'+(currentUser||'guest'),'[]');userSettings.leadPriorityRules=[];saveData('profile');renderLeadPriorityRules();setLFTab(document.querySelector('#lfTabs .btn'));return true;}
 function deleteAllLeads(){if(!leads.length)return;if(!confirm('Изтрий всички '+leads.length+' leads? Това действие не може да се върне.'))return;leads=[];leadPage=1;saveData();renderLeads();populateCats();updateBadges();toast('Всички leads са изтрити','var(--red)');}
 function deleteAllWeb(){if(!web.length)return;if(!confirm('Изтрий всички '+web.length+' Web Design проекта? Това действие не може да се върне.'))return;web=[];saveData();renderWeb();updateBadges();toast('Всички Web Design проекти са изтрити','var(--red)');}
 function lCS(id) { var l = leads.find(function(x) { return x.id === id; }); if (!l) return; l.status = SC[l.status] || 'unset'; saveData(); renderLeads(); }
@@ -229,7 +238,7 @@ function openLB(id) {
     '<div class="lbav">' + esc(init) + '</div>' +
     '<div class="lbidentity"><div class="lbeyebrow">LEAD ПРОФИЛ</div><div class="lbname">' + esc(l.name) + '</div>' +
     '<div class="lbmeta">' + (l.category ? '<span>' + esc(l.category) + '</span>' : '') + (l.address ? '<span>' + esc(l.address) + '</span>' : '') + '</div>' +
-    (l.website ? '<div class="lburl"><a href="' + (l.website.indexOf('http') === 0 ? l.website : 'https://' + l.website) + '" target="_blank">' + esc(l.website) + '</a></div>' : '') +
+    '<div class="lbwebline"><span class="lbwebstatus '+(l.website?'has':'missing')+'">'+(l.website?'● Има уебсайт':'○ Няма уебсайт')+'</span>'+(l.website?'<a class="lburl" href="'+(l.website.indexOf('http')===0?l.website:'https://'+l.website)+'" target="_blank" rel="noopener">'+esc(l.website)+'</a>':'<span class="lburl empty">Добави адрес от полето по-долу</span>')+'</div>' +
     '<div class="lbchips" id="lbchips"><button class="chip ' + SCL[l.status] + '" onclick="lbCS()">' + SL[l.status] + '</button><div class="lbstars">' + stars + '</div>' +
     (l.email ? '<a href="mailto:' + esc(l.email) + '" class="chip cgr">✉ ' + esc(l.email) + '</a>' : '') +
     (l.phone ? '<a href="tel:' + esc(l.phone) + '" class="chip cgr">✆ ' + esc(l.phone) + '</a>' : '') +
@@ -237,6 +246,8 @@ function openLB(id) {
 
   document.getElementById('lbinfo').innerHTML =
     '<div class="lbsec">Информация</div>' +
+    '<div class="fg"><label class="flbl">Папка</label><select class="fsel" onchange="setLeadFolder(this.value)">' + leadFolderOptions(l.folder,true) + '</select></div>' +
+    '<div class="fg"><label class="flbl">Уебсайт <span class="fieldstate '+(l.website?'yes':'no')+'">'+(l.website?'Има':'Няма')+'</span></label><input class="fi" value="' + esc(l.website || '') + '" placeholder="https://example.bg" onchange="lbSet(\'website\',this.value.trim());renderLeads()"></div>' +
     '<div class="fg"><label class="flbl">Телефон</label><input class="fi" value="' + esc(l.phone || '') + '" placeholder="—" onchange="lbSet(\'phone\',this.value)"></div>' +
     '<div class="fg"><label class="flbl">Имейл</label><input class="fi" value="' + esc(l.email || '') + '" placeholder="—" onchange="lbSet(\'email\',this.value)"></div>' +
     '<div class="fg"><label class="flbl">Адрес</label><input class="fi" value="' + esc(l.address || '') + '" placeholder="—" onchange="lbSet(\'address\',this.value)"></div>' +

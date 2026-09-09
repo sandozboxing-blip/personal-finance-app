@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260909-1">
+<link rel="stylesheet" href="assets/styles.css?v=20260909-2">
 <link rel="stylesheet" href="assets/premium.css?v=20260727-26">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
@@ -137,6 +137,10 @@
           <button class="btn btng btnsm" data-f="maybe" onclick="setLFTab(this)">? Може би</button>
           <button class="btn btng btnsm" data-f="not" onclick="setLFTab(this)">✗ Не</button>
         </div>
+        <div class="leadfolderbar">
+          <select class="btn btng btnsm" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select>
+          <button class="btn btng btnsm" onclick="createLeadFolder()">＋ Нова папка</button>
+        </div>
         <div class="leadfilterpicker">
           <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
           <div class="filtermenu filterpanel" id="leadFilterMenu" role="dialog" aria-modal="true" aria-labelledby="leadFilterTitle">
@@ -179,7 +183,7 @@
         </div>
         <table id="ltable" style="display:none">
           <thead><tr>
-            <th>Наименование</th><th>Оценка</th><th>Статус</th><th>Категория</th><th>Контакти</th><th>Follow-up</th><th style="min-width:130px">Действия</th>
+            <th>Наименование</th><th>Папка</th><th>Уебсайт</th><th>Оценка</th><th>Статус</th><th>Категория</th><th>Контакти</th><th>Follow-up</th><th style="min-width:130px">Действия</th>
           </tr></thead>
           <tbody id="ltbody"></tbody>
         </table>
@@ -333,9 +337,9 @@
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
 <script src="assets/onesignal.js?v=20260726-20"></script>
-<script src="assets/core.js?v=20260727-24"></script>
+<script src="assets/core.js?v=20260909-2"></script>
 <script src="assets/clients.js?v=20260726-20"></script>
-<script src="assets/leads.js?v=20260909-1"></script>
+<script src="assets/leads.js?v=20260909-2"></script>
 <script src="assets/tasks.js?v=20260726-21"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260726-21"></script>
