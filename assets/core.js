@@ -98,6 +98,7 @@ function flushSave(){
 function normalizeData(){
   if(!Array.isArray(leads))leads=[];if(!Array.isArray(leadFolders))leadFolders=[];if(!Array.isArray(workTasks))workTasks=[];leadFolders=leadFolders.map(String).map(function(x){return x.trim();}).filter(function(x,i,a){return x&&a.indexOf(x)===i;});
   leads=leads.filter(function(l){return l&&typeof l==='object';});
+  if(leads.length&&!leadFolders.length&&leads.every(function(l){return !l.folder;})){leadFolders=['Зъболекари — София'];leads.forEach(function(l){l.folder='Зъболекари — София';});}
   leads.forEach(function(l,i){
     if(Array.isArray(l.tags))l.tags=l.tags.filter(Boolean).map(String);
     else if(typeof l.tags==='string')l.tags=l.tags.split(/[,;|]/).map(function(t){return t.trim();}).filter(Boolean);
@@ -133,9 +134,10 @@ function loadData(){
       var state=d.state||{},localSharedCount=localSnapshot.leads.length+localSnapshot.smm.length+localSnapshot.web.length,serverSharedCount=(state.leads||[]).length+(state.smm||[]).length+(state.web||[]).length,localStamp=localStorage.getItem('d8LocalUpdatedAt')||'',localOnlyRecovery=localSharedCount>serverSharedCount&&(!state.updatedAt||localStamp>state.updatedAt),useLocal=hasUnsyncedLocal||localOnlyRecovery;
       if(useLocal){syncScope='shared';syncPending=true;setSyncState('saving','Възстановяване...');flushSave();}
       else{
+        var migrateLeadFolders=(state.leads||[]).length&&!(state.leadFolders||[]).length&&(state.leads||[]).every(function(l){return !l.folder;});
         leads=state.leads||[];leadFolders=state.leadFolders||[];smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};
         if(!state.focusInitialized){var migratedFocus=sharedTasks.filter(function(t){return !t.due&&!t.category&&(t.repeat||'none')==='none';});if(migratedFocus.length){syncScope='profile';focusTasks=migratedFocus.map(function(t){return{id:t.id,text:t.text||'',done:!!t.done};});sharedTasks=sharedTasks.filter(function(t){return migratedFocus.indexOf(t)<0;});syncPending=true;}}
-        normalizeData();saveLocal(false);lastServerUpdatedAt=state.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
+        normalizeData();if(migrateLeadFolders){syncScope='shared';syncPending=true;}saveLocal(false);lastServerUpdatedAt=state.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
       }
       localStorage.setItem('d8ServerInitialized','1');
       finishDataLoad();
