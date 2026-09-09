@@ -57,7 +57,7 @@ function logout(){
 }
 
 // ── STATE + RELIABLE SYNC ────────────────────────────
-var leads=[],leadFolders=[],smm=[],web=[],workTasks=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='';
+var leads=[],leadFolders=[],smm=[],web=[],workTasks=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='',syncWarningShown=false;
 var leadPage=1,leadPageSize=50,leadFilterKey='';var lftab='all',lbid=null,curpg='dash',editid=null,edittype=null;
 function localState(){return{leads:leads,leadFolders:leadFolders,smm:smm,web:web,workTasks:workTasks,tasks:sharedTasks,focusTasks:focusTasks,taskCategories:taskCategories,settings:userSettings};}
 function setSyncState(state,text){
@@ -91,9 +91,9 @@ function flushSave(){
   var payload=JSON.stringify(Object.assign(localState(),{saveScope:scope}));
   fetch('api.php?action=save',{method:'POST',credentials:'same-origin',keepalive:true,headers:{'Content-Type':'application/json'},body:payload})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error(d.error||'SAVE');return d;});})
-    .then(function(d){lastServerUpdatedAt=d.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);if(scope!=='profile')localStorage.removeItem('d8SyncDirty');setSyncState('saved','Всичко е запазено');})
-    .catch(function(e){if(e.message==='AUTH'){showLogin('Сесията изтече. Влез отново.');return;}syncScope=syncScope&&syncScope!==scope?'all':scope;syncPending=true;setSyncState('error','Не е записано');toast('Промените са запазени на устройството, но сървърът не отговори.','var(--yellow)');})
-    .finally(function(){syncInFlight=false;if(syncPending&&document.visibilityState==='visible')syncTimer=setTimeout(flushSave,700);});
+    .then(function(d){syncWarningShown=false;lastServerUpdatedAt=d.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);if(scope!=='profile')localStorage.removeItem('d8SyncDirty');setSyncState('saved','Всичко е запазено');})
+    .catch(function(e){if(e.message==='AUTH'){showLogin('Сесията изтече. Влез отново.');return;}syncScope=syncScope&&syncScope!==scope?'all':scope;syncPending=true;setSyncState('error','Не е записано');if(!syncWarningShown){syncWarningShown=true;toast('Промените са запазени на устройството, но сървърът не отговори. Ще опитаме отново автоматично.','var(--yellow)');}})
+    .finally(function(){syncInFlight=false;if(syncPending&&document.visibilityState==='visible')syncTimer=setTimeout(flushSave,5000);});
 }
 function normalizeData(){
   if(!Array.isArray(leads))leads=[];if(!Array.isArray(leadFolders))leadFolders=[];if(!Array.isArray(workTasks))workTasks=[];leadFolders=leadFolders.map(String).map(function(x){return x.trim();}).filter(function(x,i,a){return x&&a.indexOf(x)===i;});
