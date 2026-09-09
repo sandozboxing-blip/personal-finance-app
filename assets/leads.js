@@ -227,7 +227,8 @@ function openLB(id) {
   var stars = ''; for (var s = 1; s <= 5; s++) stars += '<span class="lbstar' + (s <= l.stars ? ' on' : '') + '" onclick="lbStar(' + s + ')">★</span>';
   document.getElementById('lbhdr').innerHTML =
     '<div class="lbav">' + esc(init) + '</div>' +
-    '<div style="flex:1"><div class="lbname">' + esc(l.name) + '</div>' +
+    '<div class="lbidentity"><div class="lbeyebrow">LEAD ПРОФИЛ</div><div class="lbname">' + esc(l.name) + '</div>' +
+    '<div class="lbmeta">' + (l.category ? '<span>' + esc(l.category) + '</span>' : '') + (l.address ? '<span>' + esc(l.address) + '</span>' : '') + '</div>' +
     (l.website ? '<div class="lburl"><a href="' + (l.website.indexOf('http') === 0 ? l.website : 'https://' + l.website) + '" target="_blank">' + esc(l.website) + '</a></div>' : '') +
     '<div class="lbchips" id="lbchips"><button class="chip ' + SCL[l.status] + '" onclick="lbCS()">' + SL[l.status] + '</button><div class="lbstars">' + stars + '</div>' +
     (l.email ? '<a href="mailto:' + esc(l.email) + '" class="chip cgr">✉ ' + esc(l.email) + '</a>' : '') +
@@ -392,5 +393,5 @@ function moveLeadPriority(key,delta){ensureLeadPriorities();var i=leadPriorityRu
 function removeLeadPriority(key){ensureLeadPriorities();if(!confirm('Премахни това правило за приоритет?'))return;leadPriorityRules=leadPriorityRules.filter(function(x){return x!==key;});saveLeadPriorities();}
 function renderLeadPriorityRules(){ensureLeadPriorities();Object.keys(LEAD_PRIORITY_LABELS).forEach(function(key){var mark=document.getElementById('fp-'+key);if(mark)mark.textContent=leadPriorityRules.indexOf(key)>=0?'✓':'＋';});renderActiveLeadFilters();}
 function leadPriorityCompare(a,b){ensureLeadPriorities();for(var i=0;i<leadPriorityRules.length;i++){var key=leadPriorityRules[i],d=0;if(key==='no_site')d=(a.website?1:0)-(b.website?1:0);else if(key==='low_reviews')d=parseReviewCount(a.reviews)-parseReviewCount(b.reviews);else if(key==='low_rating')d=(parseFloat(a.stars)||0)-(parseFloat(b.stars)||0);else if(key==='has_phone')d=(b.phone?1:0)-(a.phone?1:0);else if(key==='has_email')d=(b.email?1:0)-(a.email?1:0);if(d)return d;}return a.name.localeCompare(b.name,'bg');}
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLeadFilterMenu();});
+document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(document.getElementById('lbOv').classList.contains('open'))closeLB();else closeLeadFilterMenu();});
 
