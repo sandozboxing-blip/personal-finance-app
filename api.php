@@ -58,6 +58,12 @@ if($action==='sendOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
   }catch(Throwable $e){$reason=preg_replace('/[^A-Za-z0-9 _.-]/','',(string)$e->getMessage());reply(['ok'=>false,'error'=>'Mail: '.($reason?:'неизвестна грешка')],502);}
 }
 
+if($action==='syncOutreachReplies'&&$_SERVER['REQUEST_METHOD']==='POST'){
+  require_once __DIR__.'/lib/d8-imap.php';
+  try{$replies=d8FetchReplyHeaders($config);$file=dataFile();$fh=fopen($file,'c+');if(!$fh||!flock($fh,LOCK_EX))throw new RuntimeException('Данните са заключени');rewind($fh);$state=decodeState((string)stream_get_contents($fh));$updated=d8ApplyReplies($state,$replies);if($updated){$state['updatedAt']=gmdate('c');rewind($fh);ftruncate($fh,0);fwrite($fh,"<?php exit; ?>
+".json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));fflush($fh);}flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>true,'updated'=>$updated,'checked'=>count($replies),'updatedAt'=>$state['updatedAt']??null]);}
+  catch(Throwable $e){reply(['ok'=>false,'error'=>$e->getMessage()],502);}
+}
 if($action==='load'&&$_SERVER['REQUEST_METHOD']==='GET'){
   $file=dataFile();$state=is_file($file)?decodeState((string)file_get_contents($file)):emptyState();$user=$currentUser;$allUsers=is_array($state['userData']??null)?$state['userData']:[];$profile=is_array($allUsers[$user]??null)?$allUsers[$user]:[];$legacyTasks=is_array($state['tasks']??null)?$state['tasks']:[];
   reply(['ok'=>true,'state'=>['version'=>8,'updatedAt'=>$state['updatedAt']??null,'leads'=>is_array($state['leads']??null)?$state['leads']:[],'leadFolders'=>is_array($state['leadFolders']??null)?$state['leadFolders']:[],'leadFolderMeta'=>is_array($state['leadFolderMeta']??null)?$state['leadFolderMeta']:[],'smm'=>is_array($state['smm']??null)?$state['smm']:[],'web'=>is_array($state['web']??null)?$state['web']:[],'workTasks'=>is_array($state['workTasks']??null)?$state['workTasks']:[],'tasks'=>is_array($profile['tasks']??null)?$profile['tasks']:($user==='Admin'?$legacyTasks:[]),'focusTasks'=>is_array($profile['focusTasks']??null)?$profile['focusTasks']:[],'focusInitialized'=>array_key_exists('focusTasks',$profile),'taskCategories'=>is_array($profile['taskCategories']??null)?$profile['taskCategories']:[],'settings'=>is_array($profile['settings']??null)?$profile['settings']:[]]]);
