@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260915-1">
+<link rel="stylesheet" href="assets/styles.css?v=20260915-2">
 <link rel="stylesheet" href="assets/premium.css?v=20260727-26">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
@@ -142,6 +142,7 @@
           <select class="btn btng btnsm" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select>
           <button class="btn btng btnsm" onclick="createLeadFolder()">＋ Нова папка</button>
         </div>
+        <button class="btn btnp btnsm" id="leadOutreachBtn" onclick="openLeadOutreach()">Outreach</button>
         <div class="leadfilterpicker">
           <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
           <div class="filtermenu filterpanel" id="leadFilterMenu" role="dialog" aria-modal="true" aria-labelledby="leadFilterTitle">
@@ -249,6 +250,18 @@
 </div>
 </div>
 
+<div class="ov outreachov" id="leadOutreachOv" role="dialog" aria-modal="true" aria-labelledby="leadOutreachTitle" onclick="if(event.target===this)closeLeadOutreach()">
+  <div class="modal outreachmodal">
+    <div class="mhdr"><div><span class="modaleyebrow">DIGITAL EIGHT · SAFE OUTREACH</span><h3 id="leadOutreachTitle">Outreach</h3></div><button class="mclose" onclick="closeLeadOutreach()" aria-label="Затвори">✕</button></div>
+    <div class="outreachbody">
+      <aside class="outreachqueue">
+        <div class="outreachsegments" id="outreachSegments"></div>
+        <div class="outreachlist" id="outreachList"></div>
+      </aside>
+      <section class="outreachcomposer" id="outreachComposer"></section>
+    </div>
+  </div>
+</div>
 <div class="ov foldereditorov" id="folderEditorOv" role="dialog" aria-modal="true" aria-labelledby="folderEditorTitle" onclick="if(event.target===this)closeLeadFolderEditor()">
   <div class="modal foldereditor">
     <div class="mhdr"><div><span class="modaleyebrow">LEADS БИБЛИОТЕКА</span><h3 id="folderEditorTitle">Създай папка</h3></div><button class="mclose" onclick="closeLeadFolderEditor()" aria-label="Затвори">✕</button></div>
@@ -347,7 +360,7 @@
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260915-1"></script>
 <script src="assets/clients.js?v=20260726-20"></script>
-<script src="assets/leads.js?v=20260915-1"></script>
+<script src="assets/leads.js?v=20260915-2"></script>
 <script src="assets/tasks.js?v=20260726-21"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260726-21"></script>
