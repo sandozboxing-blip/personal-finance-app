@@ -35,3 +35,13 @@ function d8SendSmtp(array $smtp,string $to,string $subject,string $body): void {
     d8SmtpCommand($socket,$payload,[250]);d8SmtpCommand($socket,'QUIT',[221]);
   }finally{fclose($socket);}
 }
+function d8SendLocalMail(array $smtp,string $to,string $subject,string $body): void {
+  $from=(string)($smtp['from_email']??$smtp['username']??'');$fromName=(string)($smtp['from_name']??'Digital Eight');$crlf=chr(13).chr(10);
+  if(!filter_var($from,FILTER_VALIDATE_EMAIL)||!filter_var($to,FILTER_VALIDATE_EMAIL))throw new RuntimeException('local mail configuration');
+  $safeSubject=str_replace([chr(13),chr(10)],' ',trim($subject));$encodedSubject=function_exists('mb_encode_mimeheader')?mb_encode_mimeheader($safeSubject,'UTF-8','B',$crlf):$safeSubject;
+  $encodedName=function_exists('mb_encode_mimeheader')?mb_encode_mimeheader($fromName,'UTF-8','B',$crlf):$fromName;
+  $plain=str_replace([chr(13).chr(10),chr(13)],chr(10),$body);$plain=str_replace(chr(10),$crlf,$plain);
+  $headers=['From: '.$encodedName.' <'.$from.'>','Reply-To: '.$from,'MIME-Version: 1.0','Content-Type: text/plain; charset=UTF-8','Content-Transfer-Encoding: quoted-printable','X-Mailer: Digital Eight Outreach'];
+  $sent=@mail($to,$encodedSubject,quoted_printable_encode($plain),implode($crlf,$headers),'-f'.$from);
+  if(!$sent)throw new RuntimeException('local mail failed');
+}

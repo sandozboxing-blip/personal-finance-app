@@ -8,6 +8,7 @@ return [
   ],
   // App API Key is private. Add it only to config.php on the server.
   'smtp' => [
+    'transport' => 'local',
     'host' => 'mail.digitaleight.bg',
     'port' => 465,
     'username' => 'kiril@digitaleight.bg',
