@@ -386,3 +386,10 @@ input[type="date"]::-webkit-date-and-time-value,input[type="time"]::-webkit-date
   #pgleads>.leads-toolbar{grid-template-columns:1fr auto!important;grid-template-areas:"copy more" "campaign campaign" "history add" "quick quick" "category filters"!important;padding:12px!important}
   .leads-toolbar-copy{display:block}.campaign-cta{width:100%;justify-content:center;min-height:48px;font-size:14px}.add-leads-cta{width:auto!important;grid-column:auto!important;order:initial!important}.lead-category-picker{width:100%}.lead-category-picker .fi{width:100%}.leadfilterpicker{justify-self:end}.lead-quick-tabs{width:100%;justify-self:stretch}
 }
+/* Combined filter states and safe row actions */
+.lead-quick-tabs [data-quick].active{border-color:rgba(167,139,250,.4);background:var(--pdim);color:var(--pll)}
+#pgleads th:nth-child(9){width:128px}
+#pgleads td.lead-actions-cell{padding:7px 6px;overflow:visible}
+.lead-row-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px;white-space:nowrap}
+.lead-row-actions .btn{display:grid;width:32px;height:32px;min-width:32px;padding:0;place-items:center}
+@media(max-width:1280px) and (min-width:769px){#pgleads th:nth-child(9){width:116px}.lead-row-actions{gap:3px}.lead-row-actions .btn{width:30px;height:30px;min-width:30px}}
