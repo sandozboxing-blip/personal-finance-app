@@ -7,7 +7,7 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=20260915-5">
-<link rel="stylesheet" href="assets/premium.css?v=20260727-26">
+<link rel="stylesheet" href="assets/premium.css?v=20260915-27">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/d8-apple-touch-v2.png" />
@@ -131,18 +131,13 @@
     <div class="page" id="pgleads">
       <div class="leadfolderview" id="leadFolderView"></div>
       <div class="leadsummary" id="leadSummary"></div>
-      <div class="ptbar" style="gap:8px;flex-wrap:wrap">
-        <div style="display:flex;gap:3px;background:var(--b2);border:1px solid var(--line);border-radius:var(--r);padding:3px" id="lfTabs">
+      <div class="ptbar leads-toolbar">
+        <div class="lead-quick-tabs" id="lfTabs" aria-label="Бързи филтри">
           <button class="btn btnsm active" data-f="all" onclick="setLFTab(this)" style="background:var(--b4);color:var(--w0)">Всички</button>
-          <button class="btn btng btnsm" data-f="prospect" onclick="setLFTab(this)">✓ Потенциални</button>
-          <button class="btn btng btnsm" data-f="maybe" onclick="setLFTab(this)">? Може би</button>
-          <button class="btn btng btnsm" data-f="not" onclick="setLFTab(this)">✗ Не</button>
+          <button class="btn btng btnsm" onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button>
+          <button class="btn btng btnsm" onclick="applyLeadQuickFilter('contact','email')">С имейл</button>
+          <button class="btn btng btnsm" data-f="prospect" onclick="setLFTab(this)">Потенциални</button>
         </div>
-        <div class="leadfolderbar">
-          <select class="btn btng btnsm" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select>
-          <button class="btn btng btnsm" onclick="createLeadFolder()">＋ Нова папка</button>
-        </div>
-        <button class="btn btnp btnsm" id="leadOutreachBtn" onclick="openLeadOutreach()">Outreach</button>
         <div class="leadfilterpicker">
           <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
           <div class="filtermenu filterpanel" id="leadFilterMenu" role="dialog" aria-modal="true" aria-labelledby="leadFilterTitle">
@@ -161,12 +156,19 @@
           </div>
           <div class="leadfilterbackdrop" id="leadFilterBackdrop" onclick="closeLeadFilterMenu()"></div>
         </div>
-        <div style="flex:1"></div>
-
-        <button class="btn btng btnsm" onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
-        <button class="btn btnd btnsm" onclick="deleteAllLeads()">⌫ Изтрий всички</button>
-        <button class="btn btng btnsm" onclick="doExport()">↓ CSV</button>
-        <button class="btn btnp btnsm" onclick="document.getElementById('fi').click()">↑ Импортирай файл</button>
+        <div class="leads-toolbar-spacer"></div>
+        <button class="btn btng btnsm" id="leadOutreachBtn" onclick="openLeadOutreach()">Кампания</button>
+        <button class="btn btnp btnsm" onclick="document.getElementById('fi').click()">＋ Добави leads</button>
+        <details class="lead-more">
+          <summary class="btn btng btnsm" aria-label="Още действия">•••</summary>
+          <div class="lead-more-menu">
+            <label><span>Смени папката</span><select class="fi" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select></label>
+            <button onclick="createLeadFolder()">＋ Нова папка</button>
+            <button onclick="doExport()">↓ Експорт в CSV</button>
+            <button onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
+            <button class="danger" onclick="deleteAllLeads()">⌫ Изтрий всички leads</button>
+          </div>
+        </details>
         <input type="file" id="fi" accept=".csv,.json,text/csv,application/json" style="display:none" onchange="handleFile(event)">
       </div>
       <div class="activeleadfilters" id="activeLeadFilters"></div>
@@ -252,7 +254,7 @@
 
 <div class="ov outreachov" id="leadOutreachOv" role="dialog" aria-modal="true" aria-labelledby="leadOutreachTitle" onclick="if(event.target===this)closeLeadOutreach()">
   <div class="modal outreachmodal">
-    <div class="mhdr"><div><span class="modaleyebrow">DIGITAL EIGHT · SAFE OUTREACH</span><h3 id="leadOutreachTitle">Outreach</h3></div><div class="outreachheadactions"><button class="btn btng btnsm" id="outreachSyncBtn" onclick="syncOutreachReplies(true)">Провери отговори</button><button class="btn btng btnsm" id="outreachApproveAllBtn" onclick="approveOutreachSegment()">Одобри сегмента</button><button class="btn btnp btnsm" id="outreachSendAllBtn" onclick="sendApprovedOutreachBatch()">Изпрати одобрените</button><button class="mclose" onclick="closeLeadOutreach()" aria-label="Затвори">✕</button></div></div>
+    <div class="mhdr outreach-simple-head"><div><span class="modaleyebrow">КАМПАНИЯ</span><h3 id="leadOutreachTitle">Имейл кампания</h3><small>1. Избери → 2. Прегледай → 3. Изпрати</small></div><div class="outreachheadactions"><button class="btn btnp btnsm" id="outreachSendAllBtn" onclick="sendApprovedOutreachBatch()">Изпрати одобрените</button><details class="lead-more outreach-more"><summary class="btn btng btnsm" aria-label="Още действия">•••</summary><div class="lead-more-menu"><button id="outreachSyncBtn" onclick="syncOutreachReplies(true)">Провери отговори</button><button id="outreachApproveAllBtn" onclick="approveOutreachSegment()">Одобри целия сегмент</button></div></details><button class="mclose" onclick="closeLeadOutreach()" aria-label="Затвори">✕</button></div></div>
     <div class="outreachbody">
       <aside class="outreachqueue">
         <div class="outreachsegments" id="outreachSegments"></div>
@@ -361,7 +363,7 @@
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260915-1"></script>
 <script src="assets/clients.js?v=20260726-20"></script>
-<script src="assets/leads.js?v=20260915-6"></script>
+<script src="assets/leads.js?v=20260915-7"></script>
 <script src="assets/tasks.js?v=20260726-21"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260726-21"></script>
