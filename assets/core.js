@@ -57,9 +57,9 @@ function logout(){
 }
 
 // ── STATE + RELIABLE SYNC ────────────────────────────
-var leads=[],leadFolders=[],smm=[],web=[],workTasks=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='',syncWarningShown=false;
+var leads=[],leadFolders=[],leadFolderMeta={},smm=[],web=[],workTasks=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='',syncWarningShown=false;
 var leadPage=1,leadPageSize=50,leadFilterKey='';var lftab='all',lbid=null,curpg='dash',editid=null,edittype=null;
-function localState(){return{leads:leads,leadFolders:leadFolders,smm:smm,web:web,workTasks:workTasks,tasks:sharedTasks,focusTasks:focusTasks,taskCategories:taskCategories,settings:userSettings};}
+function localState(){return{leads:leads,leadFolders:leadFolders,leadFolderMeta:leadFolderMeta,smm:smm,web:web,workTasks:workTasks,tasks:sharedTasks,focusTasks:focusTasks,taskCategories:taskCategories,settings:userSettings};}
 function setSyncState(state,text){
   var el=document.getElementById('syncStatus'),label=document.getElementById('settingsSyncLabel');
   if(el){el.dataset.state=state;var span=el.querySelector('span');if(span)span.textContent=text;}
@@ -74,7 +74,7 @@ function hideAppLoader(){
 function saveLocal(markDirty,scope){
   try{
     var k=currentUser||'guest';
-    localStorage.setItem('d8l',JSON.stringify(leads));localStorage.setItem('d8LeadFolders',JSON.stringify(leadFolders));localStorage.setItem('d8s2',JSON.stringify(smm));localStorage.setItem('d8w',JSON.stringify(web));localStorage.setItem('d8work',JSON.stringify(workTasks));
+    localStorage.setItem('d8l',JSON.stringify(leads));localStorage.setItem('d8LeadFolders',JSON.stringify(leadFolders));localStorage.setItem('d8LeadFolderMeta',JSON.stringify(leadFolderMeta));localStorage.setItem('d8s2',JSON.stringify(smm));localStorage.setItem('d8w',JSON.stringify(web));localStorage.setItem('d8work',JSON.stringify(workTasks));
     localStorage.setItem('d8tasks:'+k,JSON.stringify(sharedTasks));localStorage.setItem('d8focus:'+k,JSON.stringify(focusTasks));localStorage.setItem('d8taskcats:'+k,JSON.stringify(taskCategories));localStorage.setItem('d8settings:'+k,JSON.stringify(userSettings));
     if(markDirty!==false&&scope!=='profile'){localStorage.setItem('d8LocalUpdatedAt',new Date().toISOString());localStorage.setItem('d8SyncDirty','1');}
   }catch(e){setSyncState('error','Няма място');}
@@ -96,7 +96,7 @@ function flushSave(){
     .finally(function(){syncInFlight=false;if(syncPending&&document.visibilityState==='visible')syncTimer=setTimeout(flushSave,5000);});
 }
 function normalizeData(){
-  if(!Array.isArray(leads))leads=[];if(!Array.isArray(leadFolders))leadFolders=[];if(!Array.isArray(workTasks))workTasks=[];leadFolders=leadFolders.map(String).map(function(x){return x.trim();}).filter(function(x,i,a){return x&&a.indexOf(x)===i;});
+  if(!Array.isArray(leads))leads=[];if(!Array.isArray(leadFolders))leadFolders=[];if(!leadFolderMeta||typeof leadFolderMeta!=='object'||Array.isArray(leadFolderMeta))leadFolderMeta={};if(!Array.isArray(workTasks))workTasks=[];leadFolders=leadFolders.map(String).map(function(x){return x.trim();}).filter(function(x,i,a){return x&&a.indexOf(x)===i;});
   leads=leads.filter(function(l){return l&&typeof l==='object';});
   if(leads.length&&!leadFolders.length&&leads.every(function(l){return !l.folder;})){leadFolders=['Зъболекари — София'];leads.forEach(function(l){l.folder='Зъболекари — София';});}
   leads.forEach(function(l,i){
@@ -116,8 +116,8 @@ function normalizeData(){
 }
 function readLocalData(){
   var k=currentUser||'guest';
-  try{leads=JSON.parse(localStorage.getItem('d8l')||'[]');leadFolders=JSON.parse(localStorage.getItem('d8LeadFolders')||'[]');smm=JSON.parse(localStorage.getItem('d8s2')||'[]');web=JSON.parse(localStorage.getItem('d8w')||'[]');workTasks=JSON.parse(localStorage.getItem('d8work')||'[]');sharedTasks=JSON.parse(localStorage.getItem('d8tasks:'+k)||'[]');focusTasks=JSON.parse(localStorage.getItem('d8focus:'+k)||'[]');taskCategories=JSON.parse(localStorage.getItem('d8taskcats:'+k)||'[]');userSettings=JSON.parse(localStorage.getItem('d8settings:'+k)||'{}');}
-  catch(e){leads=[];leadFolders=[];smm=[];web=[];workTasks=[];sharedTasks=[];focusTasks=[];taskCategories=[];userSettings={};}
+  try{leads=JSON.parse(localStorage.getItem('d8l')||'[]');leadFolders=JSON.parse(localStorage.getItem('d8LeadFolders')||'[]');leadFolderMeta=JSON.parse(localStorage.getItem('d8LeadFolderMeta')||'{}');smm=JSON.parse(localStorage.getItem('d8s2')||'[]');web=JSON.parse(localStorage.getItem('d8w')||'[]');workTasks=JSON.parse(localStorage.getItem('d8work')||'[]');sharedTasks=JSON.parse(localStorage.getItem('d8tasks:'+k)||'[]');focusTasks=JSON.parse(localStorage.getItem('d8focus:'+k)||'[]');taskCategories=JSON.parse(localStorage.getItem('d8taskcats:'+k)||'[]');userSettings=JSON.parse(localStorage.getItem('d8settings:'+k)||'{}');}
+  catch(e){leads=[];leadFolders=[];leadFolderMeta={};smm=[];web=[];workTasks=[];sharedTasks=[];focusTasks=[];taskCategories=[];userSettings={};}
   normalizeData();
 }
 function finishDataLoad(){
@@ -135,7 +135,7 @@ function loadData(){
       if(useLocal){syncScope='shared';syncPending=true;setSyncState('saving','Възстановяване...');flushSave();}
       else{
         var migrateLeadFolders=(state.leads||[]).length&&!(state.leadFolders||[]).length&&(state.leads||[]).every(function(l){return !l.folder;});
-        leads=state.leads||[];leadFolders=state.leadFolders||[];smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};
+        leads=state.leads||[];leadFolders=state.leadFolders||[];leadFolderMeta=state.leadFolderMeta||{};smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};
         if(!state.focusInitialized){var migratedFocus=sharedTasks.filter(function(t){return !t.due&&!t.category&&(t.repeat||'none')==='none';});if(migratedFocus.length){syncScope='profile';focusTasks=migratedFocus.map(function(t){return{id:t.id,text:t.text||'',done:!!t.done};});sharedTasks=sharedTasks.filter(function(t){return migratedFocus.indexOf(t)<0;});syncPending=true;}}
         normalizeData();if(migrateLeadFolders){syncScope='shared';syncPending=true;}saveLocal(false);lastServerUpdatedAt=state.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
       }
@@ -146,7 +146,7 @@ function loadData(){
 }
 function refreshServerData(){
   if(!currentUser||!dataLoaded||syncPending||syncInFlight||document.visibilityState==='hidden')return;
-  fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error('LOAD');return d;});}).then(function(d){var state=d.state||{},stamp=state.updatedAt||'';if(!stamp||stamp===lastServerUpdatedAt)return;leads=state.leads||[];leadFolders=state.leadFolders||[];smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};lastServerUpdatedAt=stamp;normalizeData();saveLocal(false,'');finishDataLoad();setSyncState('saved','Синхронизирано');}).catch(function(e){if(e.message==='AUTH')showLogin('Сесията изтече. Влез отново.');});
+  fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error('LOAD');return d;});}).then(function(d){var state=d.state||{},stamp=state.updatedAt||'';if(!stamp||stamp===lastServerUpdatedAt)return;leads=state.leads||[];leadFolders=state.leadFolders||[];leadFolderMeta=state.leadFolderMeta||{};smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};lastServerUpdatedAt=stamp;normalizeData();saveLocal(false,'');finishDataLoad();setSyncState('saved','Синхронизирано');}).catch(function(e){if(e.message==='AUTH')showLogin('Сесията изтече. Влез отново.');});
 }
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&syncPending)flushSave();else if(document.visibilityState==='visible')refreshServerData();});
 setInterval(refreshServerData,15000);

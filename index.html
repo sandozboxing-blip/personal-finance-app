@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#07070a">
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=20260909-3">
+<link rel="stylesheet" href="assets/styles.css?v=20260915-1">
 <link rel="stylesheet" href="assets/premium.css?v=20260727-26">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
@@ -249,6 +249,13 @@
 </div>
 </div>
 
+<div class="ov foldereditorov" id="folderEditorOv" role="dialog" aria-modal="true" aria-labelledby="folderEditorTitle" onclick="if(event.target===this)closeLeadFolderEditor()">
+  <div class="modal foldereditor">
+    <div class="mhdr"><div><span class="modaleyebrow">LEADS БИБЛИОТЕКА</span><h3 id="folderEditorTitle">Създай папка</h3></div><button class="mclose" onclick="closeLeadFolderEditor()" aria-label="Затвори">✕</button></div>
+    <div class="foldereditorbody" id="folderEditorBody"></div>
+    <div class="mfoot"><button class="btn btng" onclick="closeLeadFolderEditor()">Отказ</button><button class="btn btnp" id="folderEditorSave" onclick="saveLeadFolderEditor()">Създай папка</button></div>
+  </div>
+</div>
 <div class="ov" id="lbOv" role="dialog" aria-modal="true" aria-label="Lead профил" onclick="if(event.target===this)closeLB()">
   <div class="modal lbm">
     <div class="lbhdr" id="lbhdr"></div>
@@ -338,9 +345,9 @@
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
 <script src="assets/onesignal.js?v=20260726-20"></script>
-<script src="assets/core.js?v=20260909-4"></script>
+<script src="assets/core.js?v=20260915-1"></script>
 <script src="assets/clients.js?v=20260726-20"></script>
-<script src="assets/leads.js?v=20260909-3"></script>
+<script src="assets/leads.js?v=20260915-1"></script>
 <script src="assets/tasks.js?v=20260726-21"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260726-21"></script>
