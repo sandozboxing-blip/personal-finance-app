@@ -7,6 +7,14 @@ return [
     'Partner' => 'CHANGE-ME-TO-A-DIFFERENT-STRONG-PASSWORD'
   ],
   // App API Key is private. Add it only to config.php on the server.
+  'smtp' => [
+    'host' => 'mail.digitaleight.bg',
+    'port' => 465,
+    'username' => 'kiril@digitaleight.bg',
+    'password' => 'CHANGE-ME-SMTP-PASSWORD',
+    'from_email' => 'kiril@digitaleight.bg',
+    'from_name' => 'Кирил | Digital Eight'
+  ],
   'onesignal' => [
     'app_id' => '258501b4-c99d-4ed1-92d3-3ce01d5c6242',
     'app_api_key' => 'PASTE-YOUR-ONESIGNAL-APP-API-KEY-HERE'
