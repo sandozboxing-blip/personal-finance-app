@@ -21,7 +21,7 @@ function d8SendSmtp(array $smtp,string $to,string $subject,string $body): void {
   if(!$host||!$user||!$pass||!filter_var($from,FILTER_VALIDATE_EMAIL)||!filter_var($to,FILTER_VALIDATE_EMAIL))throw new RuntimeException('SMTP configuration');
   $context=stream_context_create(['ssl'=>['verify_peer'=>true,'verify_peer_name'=>true,'allow_self_signed'=>false]]);
   $socket=@stream_socket_client('ssl://'.$host.':'.$port,$errno,$errstr,20,STREAM_CLIENT_CONNECT,$context);
-  if(!$socket)throw new RuntimeException('SMTP connection');
+  if(!$socket)throw new RuntimeException('connection '.(string)$errno);
   stream_set_timeout($socket,20);
   try{
     d8SmtpCommand($socket,'',[220]);d8SmtpCommand($socket,'EHLO digitaleight.bg',[250]);

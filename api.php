@@ -50,7 +50,7 @@ if($action==='sendOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $extra=is_array($target['extra']??null)?$target['extra']:[];$social=false;foreach($extra as $k=>$v){if(preg_match('/facebook|instagram|linkedin|youtube|tiktok|twitter|x[.]com/i',(string)$k.' '.(string)$v)){$social=true;break;}}
   if(!filter_var($email,FILTER_VALIDATE_EMAIL)||trim((string)($target['website']??''))!==''||$social)reply(['ok'=>false,'error'=>'Lead не отговаря на сегмента'],400);
   $smtp=is_array($config['smtp']??null)?$config['smtp']:[];if(empty($smtp['password'])||strpos((string)$smtp['password'],'CHANGE-ME')!==false)reply(['ok'=>false,'error'=>'SMTP не е настроен'],503);
-  try{d8SendSmtp($smtp,$email,$subject,$message);reply(['ok'=>true,'leadId'=>$leadId,'email'=>$email]);}catch(Throwable $e){reply(['ok'=>false,'error'=>'SMTP изпращането не успя'],502);}
+  try{d8SendSmtp($smtp,$email,$subject,$message);reply(['ok'=>true,'leadId'=>$leadId,'email'=>$email]);}catch(Throwable $e){$reason=preg_replace('/[^A-Za-z0-9 _.-]/','',(string)$e->getMessage());reply(['ok'=>false,'error'=>'SMTP: '.($reason?:'неизвестна грешка')],502);}
 }
 
 if($action==='load'&&$_SERVER['REQUEST_METHOD']==='GET'){
