@@ -7,7 +7,7 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=20260915-5">
-<link rel="stylesheet" href="assets/premium.css?v=20260915-27">
+<link rel="stylesheet" href="assets/premium.css?v=20260915-28">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/d8-apple-touch-v2.png" />
@@ -132,6 +132,7 @@
       <div class="leadfolderview" id="leadFolderView"></div>
       <div class="leadsummary" id="leadSummary"></div>
       <div class="ptbar leads-toolbar">
+        <div class="leads-toolbar-copy"><span>РАБОТНО ПРОСТРАНСТВО</span><strong>Потенциални клиенти</strong><small>Филтрирай списъка или стартирай кампания.</small></div>
         <div class="lead-quick-tabs" id="lfTabs" aria-label="Бързи филтри">
           <button class="btn btnsm active" data-f="all" onclick="setLFTab(this)" style="background:var(--b4);color:var(--w0)">Всички</button>
           <button class="btn btng btnsm" onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button>
@@ -157,8 +158,8 @@
           <div class="leadfilterbackdrop" id="leadFilterBackdrop" onclick="closeLeadFilterMenu()"></div>
         </div>
         <div class="leads-toolbar-spacer"></div>
-        <button class="btn btng btnsm" id="leadOutreachBtn" onclick="openLeadOutreach()">Кампания</button>
-        <button class="btn btnp btnsm" onclick="document.getElementById('fi').click()">＋ Добави leads</button>
+        <button class="btn btnp btnsm campaign-cta" id="leadOutreachBtn" onclick="openLeadOutreach()">✉ Стартирай кампания</button>
+        <button class="btn btng btnsm add-leads-cta" onclick="document.getElementById('fi').click()">＋ Добави leads</button>
         <details class="lead-more">
           <summary class="btn btng btnsm" aria-label="Още действия">•••</summary>
           <div class="lead-more-menu">
