@@ -7,7 +7,7 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=20260915-5">
-<link rel="stylesheet" href="assets/premium.css?v=20260915-28">
+<link rel="stylesheet" href="assets/premium.css?v=20260915-29">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/d8-apple-touch-v2.png" />
@@ -134,18 +134,20 @@
       <div class="ptbar leads-toolbar">
         <div class="leads-toolbar-copy"><span>РАБОТНО ПРОСТРАНСТВО</span><strong>Потенциални клиенти</strong><small>Филтрирай списъка или стартирай кампания.</small></div>
         <div class="lead-quick-tabs" id="lfTabs" aria-label="Бързи филтри">
-          <button class="btn btnsm active" data-f="all" onclick="setLFTab(this)" style="background:var(--b4);color:var(--w0)">Всички</button>
-          <button class="btn btng btnsm" onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button>
-          <button class="btn btng btnsm" onclick="applyLeadQuickFilter('contact','email')">С имейл</button>
+          <button class="btn btnsm active" data-f="all" onclick="clearLeadQuickFilters(this)" style="background:var(--b4);color:var(--w0)">Всички</button>
+          <button class="btn btng btnsm" data-quick="noWebsite" onclick="toggleLeadQuick('noWebsite',this)">Без сайт</button>
+          <button class="btn btng btnsm" data-quick="hasEmail" onclick="toggleLeadQuick('hasEmail',this)">С имейл</button>
+          <button class="btn btng btnsm" data-quick="noSocial" onclick="toggleLeadQuick('noSocial',this)">Без социални мрежи</button>
           <button class="btn btng btnsm" data-f="prospect" onclick="setLFTab(this)">Потенциални</button>
         </div>
+        <label class="lead-category-picker"><span>Категория</span><select class="fi" id="lCatF" onchange="renderLeads()"><option value="">Всички категории</option></select></label>
         <div class="leadfilterpicker">
           <button class="btn btng btnsm" id="leadFilterAddBtn" onclick="toggleLeadFilterMenu(event)">Филтри <span id="leadFilterCount"></span></button>
           <div class="filtermenu filterpanel" id="leadFilterMenu" role="dialog" aria-modal="true" aria-labelledby="leadFilterTitle">
             <div class="filtermenuhead"><div><b id="leadFilterTitle">Всички филтри</b><span>Настрой бизнес търсенето</span></div><div class="filterheadbuttons"><button onclick="if(resetLeadFilters())renderLeads()">Изчисти</button><button class="filterclose" onclick="closeLeadFilterMenu()" aria-label="Затвори">✕</button></div></div>
             <div class="filterfields">
               <label>Статус<select class="fi" id="lStatusF" onchange="setLeadStatusFromFilter(this.value)"><option value="all">Всички статуси</option><option value="prospect">Потенциални</option><option value="maybe">Може би</option><option value="not">Не</option></select></label>
-              <label>Категория<select class="fi" id="lCatF" onchange="renderLeads()"><option value="">Всички категории</option></select></label>
+
               <label>Контакт и сайт<select class="fi" id="lContactF" onchange="renderLeads()"><option value="">Всички контакти</option><option value="phone">С телефон</option><option value="email">С имейл</option><option value="website">С уебсайт</option><option value="no_website">Без уебсайт</option><option value="missing">Без телефон и имейл</option></select></label>
               <label>Минимална оценка<select class="fi" id="lRatingF" onchange="renderLeads()"><option value="">Всяка оценка</option><option value="4.5">4.5+ звезди</option><option value="4">4+ звезди</option><option value="3">3+ звезди</option></select></label>
               <label>Follow-up<select class="fi" id="lFollowF" onchange="renderLeads()"><option value="">Всеки follow-up</option><option value="today">Днес / просрочен</option><option value="week">Следващите 7 дни</option><option value="none">Без follow-up</option></select></label>
@@ -158,6 +160,7 @@
           <div class="leadfilterbackdrop" id="leadFilterBackdrop" onclick="closeLeadFilterMenu()"></div>
         </div>
         <div class="leads-toolbar-spacer"></div>
+        <button class="btn btng btnsm campaign-history-cta" id="leadCampaignsBtn" onclick="openLeadCampaignHistory()">Кампании</button>
         <button class="btn btnp btnsm campaign-cta" id="leadOutreachBtn" onclick="openLeadOutreach()">✉ Стартирай кампания</button>
         <button class="btn btng btnsm add-leads-cta" onclick="document.getElementById('fi').click()">＋ Добави leads</button>
         <details class="lead-more">
@@ -364,7 +367,7 @@
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260915-1"></script>
 <script src="assets/clients.js?v=20260726-20"></script>
-<script src="assets/leads.js?v=20260915-7"></script>
+<script src="assets/leads.js?v=20260915-8"></script>
 <script src="assets/tasks.js?v=20260726-21"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260726-21"></script>
