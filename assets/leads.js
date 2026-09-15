@@ -253,6 +253,12 @@ function lStar(id, n) { var l = leads.find(function(x) { return x.id === id; });
 function delLead(id) { if (!confirm('Изтрий?')) return; leads = leads.filter(function(l) { return l.id !== id; }); saveData(); renderLeads(); updateBadges(); toast('⌫ Изтрит', 'var(--red)'); }
 
 // ── LIGHTBOX ───────────────────────────────────────────
+function renderLeadScraperData(l){
+  var extra=l.extra&&typeof l.extra==='object'?l.extra:{},source=String(extra['Google Maps / source URL']||''),safeSource=/^https:\/\/(www\.)?google\.[^/]+\/maps\//i.test(source)||/^https:\/\/maps\.app\.goo\.gl\//i.test(source);
+  var hidden={'Google Maps / source URL':1,'Source':1,'Email source':1},rows=Object.entries(extra).filter(function(e){return !hidden[e[0]]&&String(e[1]||'').trim();}).slice(0,10);
+  if(!safeSource&&!rows.length)return'';
+  return'<div class="fdiv"></div><div class="lbsec">Бизнес профил и контакти</div><div class="scraper-profile-card">'+(safeSource?'<a class="google-business-btn" href="'+esc(source)+'" target="_blank" rel="noopener noreferrer"><span>G</span><div><strong>Google Business Profile</strong><small>Отвори профила на бизнеса ↗</small></div></a>':'')+(rows.length?'<div class="scraper-extra-list">'+rows.map(function(e){var value=String(e[1]||''),isUrl=/^https?:\/\//i.test(value);return'<div><span>'+esc(e[0])+'</span>'+(isUrl?'<a href="'+esc(value)+'" target="_blank" rel="noopener noreferrer">Отвори ↗</a>':'<b>'+esc(value)+'</b>')+'</div>';}).join('')+'</div>':'')+'</div>';
+}
 function openLB(id) {
   lbid = id; var l = leads.find(function(x) { return x.id === id; }); if (!l) return;
   var init = (l.name || '?').split(' ').slice(0, 2).map(function(w) { return w[0]; }).join('').toUpperCase();
@@ -279,7 +285,7 @@ function openLB(id) {
     '<div class="fg"><label class="flbl">Followup дата</label><input type="date" class="fi" value="' + esc(l.followup || '') + '" onchange="lbSet(\'followup\',this.value);renderLeads()"></div>' +
     '<div class="fg"><label class="flbl">Статус</label><select class="fsel" onchange="lbSet(\'status\',this.value);lbRefresh();renderLeads()">' +
     Object.keys(SL).map(function(v) { return '<option value="' + v + '"' + (l.status === v ? ' selected' : '') + '>' + SL[v] + '</option>'; }).join('') + '</select></div>' +
-    (Object.keys(l.extra || {}).length ? '<div class="fdiv"></div><div class="lbsec">Данни от скрейпъра</div><div style="background:var(--b2);border:1px solid var(--line);border-radius:var(--r);padding:10px;font-family:var(--mono);font-size:12px;color:var(--w2);line-height:1.8;max-height:130px;overflow-y:auto">' + Object.entries(l.extra).slice(0, 12).map(function(e) { return '<span style="color:var(--w4)">' + esc(e[0]) + ':</span> ' + esc(e[1]) + '<br>'; }).join('') + '</div>' : '');
+    renderLeadScraperData(l);
 
   document.getElementById('lbnotes').innerHTML =
     '<div class="lbsec">Бележки</div>' +

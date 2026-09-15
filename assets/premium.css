@@ -393,3 +393,11 @@ input[type="date"]::-webkit-date-and-time-value,input[type="time"]::-webkit-date
 .lead-row-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px;white-space:nowrap}
 .lead-row-actions .btn{display:grid;width:32px;height:32px;min-width:32px;padding:0;place-items:center}
 @media(max-width:1280px) and (min-width:769px){#pgleads th:nth-child(9){width:116px}.lead-row-actions{gap:3px}.lead-row-actions .btn{width:30px;height:30px;min-width:30px}}
+/* Google Business profile action */
+.scraper-profile-card{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:var(--b2)}
+.google-business-btn{display:flex;align-items:center;gap:11px;padding:12px;color:var(--w1);transition:background .15s,border-color .15s}
+.google-business-btn:hover{background:rgba(139,92,246,.1)}
+.google-business-btn>span{display:grid;width:36px;height:36px;flex:0 0 auto;place-items:center;border:1px solid rgba(96,165,250,.25);border-radius:10px;background:rgba(96,165,250,.1);color:var(--blue);font:700 15px var(--sans)}
+.google-business-btn strong,.google-business-btn small{display:block}.google-business-btn strong{font-size:12px}.google-business-btn small{margin-top:2px;color:var(--w4);font-size:9px}
+.scraper-extra-list{padding:4px 11px 9px;border-top:1px solid var(--line)}
+.scraper-extra-list>div{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.045);font-size:10px}.scraper-extra-list>div:last-child{border-bottom:0}.scraper-extra-list span{color:var(--w4)}.scraper-extra-list b{max-width:60%;color:var(--w2);font-weight:500;text-align:right;overflow-wrap:anywhere}.scraper-extra-list a{color:var(--blue)}
