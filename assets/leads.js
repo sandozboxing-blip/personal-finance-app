@@ -73,7 +73,7 @@ function importLeads(raw) {
     if (!n) continue;
     var sourceUrl = pick(r, ['url','link','googleMapsUrl','mapsUrl']);
     if (sourceUrl) extra['Google Maps / source URL'] = sourceUrl;
-    imported.push({id: now + i, name: n, website: pick(r, ['website','site','web','homepage','mre4xd href']), phone: pick(r, ['phone','tel','telephone','phone_number','mobile']), email: pick(r, ['email','email_address','contact_email','mail']), category: cleanGoogle(pick(r, ['category','categories','categoryName','type','niche','industry','business_category','rllt__details'])), address: pick(r, ['address','location','place','full_address','rllt__details 3']) || [pick(r,['street']),pick(r,['city']),pick(r,['state']),pick(r,['country','countryCode'])].filter(Boolean).join(', '), stars: pickN(r, ['rating','stars','score','rate','totalScore','yi40hd']), reviews: pick(r,['reviews','review_count','reviewsCount','rdapee']), price: pick(r,['price','price_range','rllt__details 2']), image: pick(r,['image','image_url','wA1Bge src','wa1bge src']), status: 'unset', pipeline: 'new', folder: getSelectedLeadFolder(), note: '', followup: '', tags: [], extra: extra, aiPhone: '', aiEmail: ''});
+    imported.push({id: now + i, name: n, website: pick(r, ['website','site','web','homepage','mre4xd href']), phone: pick(r, ['phone','tel','telephone','phone_number','mobile']), email: pick(r, ['email','email_address','contact_email','mail']), category: cleanGoogle(pick(r, ['category','categories','categoryName','type','niche','industry','business_category','rllt__details'])), address: pick(r, ['address','location','place','full_address','rllt__details 3']) || [pick(r,['street']),pick(r,['city']),pick(r,['state']),pick(r,['country','countryCode'])].filter(Boolean).join(', '), stars: pickN(r, ['rating','stars','score','rate','totalScore','yi40hd']), reviews: pick(r,['reviews','review_count','reviewsCount','rdapee']), price: pick(r,['price','price_range','rllt__details 2']), image: pick(r,['image','image_url','wA1Bge src','wa1bge src']), status: 'unset', pipeline: 'new', folder: getSelectedLeadFolder(), note: '', followup: '', tags: [], extra: extra});
   }
   if (!imported.length) { toast('⚠ Не намерих записи с наименование. Провери файла.', 'var(--yellow)'); return; }
   leads = leads.concat(imported);
@@ -263,7 +263,7 @@ function renderLeadCommunication(l){
   var o=l.outreach&&typeof l.outreach==='object'?l.outreach:{},status=o.status||'new',sent=!!o.sentAt,replied=status==='replied',ready=status==='ready'||status==='draft',statusText=replied?'Получен отговор':sent?'Имейлът е изпратен':ready?'Подготвен, но не е изпратен':'Не е изпращан имейл',statusClass=replied?'replied':sent?'sent':ready?'ready':'new',date=function(v){return v?new Date(v).toLocaleString('bg-BG'):'—';},messages=Array.isArray(o.replyMessages)?o.replyMessages.slice().reverse():[];
   if(replied&&!messages.length)messages=[{subject:o.replySubject||'Без тема',date:o.replyAt||'',body:''}];
   var replies=messages.length?'<div class="lbreplylist"><div class="lbreplytitle"><span>ПОЛУЧЕНИ СЪОБЩЕНИЯ</span><b>'+messages.length+'</b></div>'+messages.map(function(m){return'<article class="lbreplymessage"><header><div><strong>'+esc(m.subject||'Без тема')+'</strong><small>'+date(m.date)+' · '+esc(l.email)+'</small></div><i>Получен</i></header><div class="lbreplybody">'+(m.body?esc(m.body):'<em>Натисни „Провери за отговор“, за да се изтегли текстът на това съобщение.</em>')+'</div></article>';}).join('')+'</div>':'';
-  return'<section class="lbcommunication '+statusClass+'"><div class="lbcommhead"><div><span>ИМЕЙЛ КОМУНИКАЦИЯ</span><h3>'+statusText+'</h3></div><i>'+outreachStatusLabel(l)+'</i></div><div class="lbcommsteps"><div class="done"><b>1</b><span>Lead добавен</span></div><div class="'+(sent?'done':'')+'"><b>2</b><span>'+(sent?'Изпратен '+date(o.sentAt):'Няма изпращане')+'</span></div><div class="'+(replied?'done reply':'')+'"><b>3</b><span>'+(replied?messages.length+' получени съобщения':'Няма отговор')+'</span></div></div>'+replies+'<div class="lbcommdetails"><div><span>Получател</span><strong>'+esc(l.email||'Няма имейл')+'</strong></div>'+(o.subject?'<div><span>Изпратена тема</span><strong>'+esc(o.subject)+'</strong></div>':'')+(o.body?'<details><summary>Виж изпратеното съобщение</summary><p>'+esc(o.body).replace(/\n/g,'<br>')+'</p></details>':'')+(o.sendError?'<div class="lbcommerror"><span>Грешка при изпращане</span><strong>'+esc(o.sendError)+'</strong></div>':'')+(l.followup?'<div><span>Следващ follow-up</span><strong>'+fmtD(l.followup)+'</strong></div>':'')+'</div><div class="lbcommactions">'+(l.email?'<a class="btn btng btnsm" href="mailto:'+esc(l.email)+'">Отговори по имейл</a>':'')+'<button class="btn btnp btnsm" onclick="syncOutreachReplies(true)">Провери за отговор</button></div></section>';
+  return'<section class="lbcommunication '+statusClass+'"><div class="lbcommhead"><div><span>ИМЕЙЛ КОМУНИКАЦИЯ</span><h3>'+statusText+'</h3></div><i>'+outreachStatusLabel(l)+'</i></div>'+replies+'<div class="lbcommdetails">'+(o.subject?'<div><span>Изпратена тема</span><strong>'+esc(o.subject)+'</strong></div>':'')+(o.body?'<details><summary>Виж изпратеното съобщение</summary><p>'+esc(o.body).replace(/\n/g,'<br>')+'</p></details>':'')+(o.sendError?'<div class="lbcommerror"><span>Грешка при изпращане</span><strong>'+esc(o.sendError)+'</strong></div>':'')+(l.followup?'<div><span>Следващ follow-up</span><strong>'+fmtD(l.followup)+'</strong></div>':'')+'</div><div class="lbcommactions">'+(l.email?'<a class="btn btng btnsm" href="mailto:'+esc(l.email)+'">Отговори по имейл</a>':'')+'<button class="btn btnp btnsm" onclick="syncOutreachReplies(true)">Провери за отговор</button></div></section>';
 }
 function openLB(id) {
   lbid = id; var l = leads.find(function(x) { return x.id === id; }); if (!l) return;
@@ -302,14 +302,6 @@ function openLB(id) {
     '<div class="tagsbox" id="lbTagsBox"></div>';
   lbRenderTags();
 
-  document.getElementById('lbai').innerHTML =
-    '<div class="lbsec">Безплатен Sales Assistant</div>' +
-    '<div class="aitabs"><button class="aitab active" onclick="aiTab(\'phone\',this)">📞 Телефонен скрипт</button><button class="aitab" onclick="aiTab(\'email\',this)">✉ Имейл / съобщение</button></div>' +
-    '<div class="aitc active" id="aitcPhone"><button class="aibtn" id="aiBtnP" onclick="genAI(\'phone\')">✦ Създай безплатен телефонен скрипт</button>' +
-    '<div class="aibox" id="aiBoxP">' + (l.aiPhone || '<div class="aiph"><div class="ico">📞</div><p>Работи офлайн и без API — opener, въпроси, възражения и затваряне.</p></div>') + '</div></div>' +
-    '<div class="aitc" id="aitcEmail"><button class="aibtn" id="aiBtnE" onclick="genAI(\'email\')">✦ Създай безплатен имейл / съобщение</button>' +
-    '<div class="aibox" id="aiBoxE">' + (l.aiEmail || '<div class="aiph"><div class="ico">✉</div><p>Работи офлайн и без API — готов персонализиран първи контакт и follow-up.</p></div>') + '</div></div>';
-
   document.getElementById('lbOv').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -330,79 +322,6 @@ function lbRenderTags() {
 function lbAddTag(e) { if (e.key !== 'Enter' && e.key !== ',') return; e.preventDefault(); var v = e.target.value.trim(); if (!v) return; var l = getLB(); if (!l) return; if (l.tags.indexOf(v) < 0) l.tags.push(v); saveData(); lbRenderTags(); }
 function lbRmTag(t) { var l = getLB(); if (!l) return; l.tags = l.tags.filter(function(x) { return x !== t; }); saveData(); lbRenderTags(); }
 function lbDel() { if (!confirm('Изтрий?')) return; var id = lbid; closeLB(); leads = leads.filter(function(l) { return l.id !== id; }); saveData(); renderLeads(); updateBadges(); toast('⌫ Изтрит', 'var(--red)'); }
-function aiTab(t, el) {
-  document.querySelectorAll('.aitab').forEach(function(x) { x.classList.remove('active'); });
-  document.querySelectorAll('.aitc').forEach(function(x) { x.classList.remove('active'); });
-  el.classList.add('active');
-  document.getElementById('aitc' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
-}
-
-function saveOpenAIKey(){
-  var input=document.getElementById('openaiKeyInp'),status=document.getElementById('apiStatus');
-  var key=(input||{}).value||'';
-  if(!key.startsWith('sk-')){toast('⚠ Ключът трябва да започва с sk-','var(--yellow)');return;}
-  fetch('/api/key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key})})
-    .then(function(resp){return resp.json().then(function(data){if(!resp.ok)throw new Error(data.error||'Грешка');return data;});})
-    .then(function(){input.value='';status.textContent='Свързан';status.className='chip cg';toast('✓ ChatGPT е свързан','var(--green)');})
-    .catch(function(err){status.textContent='Грешка';status.className='chip cr';toast('⚠ '+err.message,'var(--red)');});
-}
-function refreshApiStatus(){
-  fetch('/api/status').then(function(r){return r.json();}).then(function(data){
-    var status=document.getElementById('apiStatus');if(!status)return;
-    status.textContent=data.connected?'Свързан':'Не е свързан';status.className='chip '+(data.connected?'cg':'cgr');
-  }).catch(function(){});
-}
-
-// ── AI ADVICE ──────────────────────────────────────────
-function salesAngle(l){
-  var c=String(l.category||'').toLowerCase();
-  if(/restaurant|ресторант|cafe|кафе|food|bar|bakery|пекар/.test(c)) return 'повече резервации, по-силно локално присъствие и съдържание, което показва атмосферата и менюто';
-  if(/hotel|хотел|travel|туриз/.test(c)) return 'повече директни резервации, по-добро представяне на преживяването и по-малка зависимост от платформи';
-  if(/beauty|salon|красот|spa|фризьор|nail/.test(c)) return 'повече записани часове, силно портфолио преди/след и редовно връщане на клиентите';
-  if(/fitness|gym|фитнес|sport|спорт/.test(c)) return 'повече запитвания за членство, показване на резултати и изграждане на активна общност';
-  if(/clinic|doctor|medical|dental|health|клиника|лекар|дент|здрав/.test(c)) return 'повече качествени запитвания, ясно представяне на услугите и по-високо доверие';
-  if(/shop|store|retail|магазин|fashion|мода/.test(c)) return 'повече продажби, по-добро представяне на продуктите и кампании към точната аудитория';
-  if(/real estate|имот|property/.test(c)) return 'повече качествени запитвания и по-силно визуално представяне на офертите';
-  if(/law|legal|адвокат|account|счетов/.test(c)) return 'повече доверие, ясно обяснени услуги и постоянен поток от подходящи запитвания';
-  return 'повече качествени запитвания, по-силно онлайн присъствие и по-ясно представяне на услугите';
-}
-function freePhoneScript(l){
-  var name=l.name||'фирмата',category=l.category||'вашия бизнес',angle=salesAngle(l);
-  var site=l.website?'Разгледах сайта ви '+l.website+' и':'Попаднах на '+name+' и';
-  return '**ПОДГОТОВКА**\nЦел: кратък разговор от 2–3 минути и уговаряне на следваща стъпка.\n\n**НАЧАЛО**\n„Здравейте, обаждам се от Digital Eight. '+site+' ми направи впечатление начинът, по който представяте '+category+'. Удобно ли е да ви отнема 30 секунди, за да кажа защо се обаждам?“\n\n**ПРИЧИНА ЗА ОБАЖДАНЕТО**\n„Помагаме на бизнеси като '+name+' да постигат '+angle+'. Имам две конкретни идеи за вас и исках първо да разбера как работите в момента.“\n\n**КВАЛИФИКАЦИОННИ ВЪПРОСИ**\n1. „Откъде идват повечето ви нови клиенти в момента?“\n2. „Кое искате да подобрите най-много през следващите 3 месеца — повече запитвания, продажби или разпознаваемост?“\n3. „Имате ли човек, който редовно следи сайта, социалните мрежи и рекламите?“\n\n**ПРЕДЛОЖЕНИЕ**\n„На база това бих започнал с кратък анализ и 2–3 бързи подобрения, които могат да дадат видим резултат без да променяте всичко наведнъж.“\n\n**АКО КАЖАТ „НЕ МЕ ИНТЕРЕСУВА“**\n„Разбирам напълно. Мога ли само да ви изпратя две конкретни идеи за '+name+'? Ако не са полезни, няма нужда да продължаваме.“\n\n**ЗАТВАРЯНЕ**\n„Кое е по-удобно — кратък 15-минутен разговор утре или да ви изпратя идеите по имейл/WhatsApp?“\n\n**БЕЛЕЖКА СЛЕД РАЗГОВОРА**\nЗапиши нуждата, възражението и точната следваща дата за контакт.';
-}
-function freeEmailScript(l){
-  var name=l.name||'вашия бизнес',category=l.category||'вашата сфера',angle=salesAngle(l);
-  var observation=l.website?'Разгледах '+l.website+' и виждам добра основа, върху която може да се надгради.':'Попаднах на '+name+' и ми направи впечатление начинът, по който представяте бизнеса си.';
-  return '**ТЕМА**\n2 конкретни идеи за '+name+'\n\n**ИМЕЙЛ**\nЗдравейте,\n\n'+observation+'\n\nВ Digital Eight помагаме на бизнеси в сферата на '+category+' да постигат '+angle+'. За '+name+' виждам няколко практични възможности, които могат да се приложат без голяма промяна наведнъж.\n\nМога да ви изпратя кратък безплатен анализ с 2–3 конкретни идеи. Ако ви бъдат полезни, можем да направим 15-минутен разговор и да обсъдим следващите стъпки.\n\nУдобно ли е да ви го изпратя?\n\nПоздрави,\nDigital Eight\n\n**КРАТЪК FOLLOW-UP СЛЕД 3 ДНИ**\n„Здравейте, пиша във връзка с идеите за '+name+'. Мога да ги изпратя в кратък вид тук — без ангажимент. Кое е по-важно за вас в момента: повече запитвания или по-силно онлайн представяне?“\n\n**СЪВЕТ**\nДобави името на конкретен човек, ако го знаеш, и спомени едно реално наблюдение от сайта или профила им.';
-}
-function genAI(type){
-  var l=getLB();if(!l)return;var isP=type==='phone';
-  var btn=document.getElementById(isP?'aiBtnP':'aiBtnE'),box=document.getElementById(isP?'aiBoxP':'aiBoxE');
-  btn.disabled=true;btn.textContent='Създава...';
-  var text=isP?freePhoneScript(l):freeEmailScript(l),html=fmtAI(text);
-  setTimeout(function(){
-    box.innerHTML=html;if(isP)l.aiPhone=html;else l.aiEmail=html;saveData();
-    btn.disabled=false;btn.textContent=isP?'↻ Създай нов телефонен скрипт':'↻ Създай нов имейл';
-    toast('✓ Безплатният скрипт е готов','var(--green)');
-  },180);
-}
-
-function fmtAI(text) {
-  var h = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^## (.+)$/gm, '<h4>$1</h4>')
-    .replace(/^# (.+)$/gm, '<h4>$1</h4>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>');
-  return '<div class="air"><p>' + h + '</p><button class="aircopy" onclick="cpAI(this)">⎘ Копирай текста</button></div>';
-}
-function cpAI(btn) {
-  var t = btn.closest('.air').innerText.replace('⎘ Копирай текста', '').trim();
-  navigator.clipboard.writeText(t).then(function() { toast('⎘ Копирано', 'var(--green)'); }).catch(function() { toast('⚠ Грешка при копиране', 'var(--red)'); });
-}
-
 // ── EXPORT ─────────────────────────────────────────────
 function doExport() {
   if (!leads.length) { toast('Няма данни за експорт', 'var(--yellow)'); return; }
