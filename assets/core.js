@@ -64,7 +64,7 @@ function mergeRecords(remote,local){var merged=[],positions={};(Array.isArray(re
 function mergeExternalShared(state,local){leads=mergeRecords(state.leads,local.leads);leadFolders=[].concat(state.leadFolders||[],local.leadFolders||[]).filter(function(name,index,all){return name&&all.indexOf(name)===index;});leadFolderMeta=Object.assign({},state.leadFolderMeta||{},local.leadFolderMeta||{});smm=mergeRecords(state.smm,local.smm);web=mergeRecords(state.web,local.web);workTasks=mergeRecords(state.workTasks,local.workTasks);}
 function setSyncState(state,text){
   var el=document.getElementById('syncStatus'),label=document.getElementById('settingsSyncLabel');
-  if(el){el.dataset.state=state;var span=el.querySelector('span');if(span)span.textContent=text;}
+  if(el){el.dataset.state=state;el.disabled=state==='saving'||state==='loading';el.setAttribute('aria-busy',state==='saving'||state==='loading'?'true':'false');el.title=state==='error'?'Синхронизацията не успя — натисни за нов опит':'Натисни за синхронизация';var span=el.querySelector('span');if(span)span.textContent=text;}
   if(label)label.textContent=text;
 }
 function hideAppLoader(){
@@ -153,7 +153,7 @@ function refreshServerData(){
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&syncPending)flushSave();else if(document.visibilityState==='visible')refreshServerData();});
 setInterval(refreshServerData,15000);
 // ── NAVIGATION ─────────────────────────────────────────
-var PTITLES = {dash: 'Dashboard', tasks: 'Календар', work: 'Task Manager', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
+var PTITLES = {dash: 'Табло', tasks: 'Календар', work: 'Работни задачи', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
 
 function goPage(id, el) {
   curpg = id;

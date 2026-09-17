@@ -401,3 +401,10 @@ input[type="date"]::-webkit-date-and-time-value,input[type="time"]::-webkit-date
 .google-business-btn strong,.google-business-btn small{display:block}.google-business-btn strong{font-size:12px}.google-business-btn small{margin-top:2px;color:var(--w4);font-size:9px}
 .scraper-extra-list{padding:4px 11px 9px;border-top:1px solid var(--line)}
 .scraper-extra-list>div{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.045);font-size:10px}.scraper-extra-list>div:last-child{border-bottom:0}.scraper-extra-list span{color:var(--w4)}.scraper-extra-list b{max-width:60%;color:var(--w2);font-weight:500;text-align:right;overflow-wrap:anywhere}.scraper-extra-list a{color:var(--blue)}
+
+/* 2026-09-17 usability polish */
+.skip-link{position:fixed;left:16px;top:-60px;z-index:9999;padding:10px 14px;border-radius:9px;background:#fff;color:#09090d;font-weight:700;transition:top .18s}.skip-link:focus{top:12px}
+button.syncstate{font:9px var(--mono);cursor:pointer;background:rgba(255,255,255,.025);transition:border-color .18s,background .18s,color .18s}button.syncstate:hover:not(:disabled){border-color:currentColor;background:rgba(255,255,255,.055)}button.syncstate:disabled{cursor:progress;opacity:1}.syncstate[data-state=error]{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
+.btn:disabled,button:disabled{cursor:not-allowed;opacity:.48}.btnp{box-shadow:0 8px 24px rgba(124,58,237,.18)}.btnp:hover{box-shadow:0 10px 28px rgba(124,58,237,.28)}
+.leadfoldercard .folderopen{font-weight:600}.leadfoldercard:hover .folderopen{color:var(--folder-accent,var(--pll))}
+@media(max-width:768px){.skip-link{display:none}.syncstate{min-width:34px}}
