@@ -3,10 +3,28 @@ declare(strict_types=1);
 
 function d8DecodeMime(string $value): string {
   if(function_exists('imap_mime_header_decode')){$parts=imap_mime_header_decode($value);$out='';foreach($parts as $part){$charset=strtoupper((string)$part->charset);$text=(string)$part->text;if($charset&&$charset!=='DEFAULT'&&$charset!=='UTF-8'&&function_exists('iconv'))$text=(string)@iconv($charset,'UTF-8//IGNORE',$text);$out.=$text;}return $out;}
+  if(function_exists('iconv_mime_decode')){$decoded=@iconv_mime_decode($value,0,'UTF-8');if(is_string($decoded))return $decoded;}
   return $value;
 }
+function d8Pop3Line($conn): string {
+  $line=fgets($conn,8192);if($line===false)throw new RuntimeException('POP3 връзката беше прекъсната');return rtrim($line,"\r\n");
+}
+function d8Pop3Command($conn,string $command,bool $multi=false): string {
+  if(fwrite($conn,$command."\r\n")===false)throw new RuntimeException('POP3 командата не беше изпратена');$first=d8Pop3Line($conn);if(strncmp($first,'+OK',3)!==0)throw new RuntimeException('POP3: '.$first);if(!$multi)return $first;$lines=[];while(true){$line=d8Pop3Line($conn);if($line==='.')break;if(strncmp($line,'..',2)===0)$line=substr($line,1);$lines[]=$line;}return implode("\r\n",$lines);
+}
+function d8ParseMailHeaders(string $raw): array {
+  $raw=preg_replace("/\r?\n[ \t]+/",' ',$raw)??$raw;$headers=[];foreach(preg_split("/\r?\n/",$raw)?:[] as $line){$pos=strpos($line,':');if($pos===false)continue;$headers[strtolower(trim(substr($line,0,$pos)))]=trim(substr($line,$pos+1));}return $headers;
+}
+function d8HeaderEmail(string $value): string {
+  if(preg_match('/<([^>]+)>/',$value,$m))$value=$m[1];elseif(preg_match('/[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/i',$value,$m))$value=$m[0];return strtolower(trim($value," \t\r\n\"'"));
+}
+function d8FetchReplyHeadersPop3(array $config): array {
+  $smtp=is_array($config['smtp']??null)?$config['smtp']:[];$imap=is_array($config['imap']??null)?$config['imap']:[];$host=(string)($imap['host']??$smtp['host']??'mail.digitaleight.bg');$port=(int)($imap['pop3_port']??995);$user=(string)($imap['username']??$smtp['username']??'');$pass=(string)($imap['password']??$smtp['password']??'');if(!$user||!$pass)throw new RuntimeException('POP3 не е настроен');
+  $errno=0;$error='';$conn=@stream_socket_client('ssl://'.$host.':'.$port,$errno,$error,15,STREAM_CLIENT_CONNECT);if(!$conn)throw new RuntimeException('POP3 връзката не успя: '.($error?:$errno));stream_set_timeout($conn,15);
+  try{$hello=d8Pop3Line($conn);if(strncmp($hello,'+OK',3)!==0)throw new RuntimeException('POP3: '.$hello);d8Pop3Command($conn,'USER '.$user);d8Pop3Command($conn,'PASS '.$pass);$stat=d8Pop3Command($conn,'STAT');if(!preg_match('/^\+OK\s+(\d+)/',$stat,$m))return[];$count=(int)$m[1];$start=max(1,$count-299);$replies=[];$since=time()-45*86400;for($id=$start;$id<=$count;$id++){$raw=d8Pop3Command($conn,'TOP '.$id.' 0',true);$h=d8ParseMailHeaders($raw);$email=d8HeaderEmail((string)($h['from']??''));if(!filter_var($email,FILTER_VALIDATE_EMAIL)||$email===strtolower($user))continue;$ts=strtotime((string)($h['date']??''))?:time();if($ts<$since)continue;$messageId=trim((string)($h['message-id']??('pop3-'.$id)));$replies[]=['email'=>$email,'subject'=>d8DecodeMime((string)($h['subject']??'')),'date'=>gmdate('c',$ts),'messageId'=>$messageId,'mailbox'=>'INBOX (POP3)'];}return $replies;}finally{@fwrite($conn,"QUIT\r\n");@fclose($conn);}
+}
 function d8FetchReplyHeaders(array $config): array {
-  if(!function_exists('imap_open'))throw new RuntimeException('PHP IMAP extension липсва');
+  if(!function_exists('imap_open'))return d8FetchReplyHeadersPop3($config);
   $smtp=is_array($config['smtp']??null)?$config['smtp']:[];$imap=is_array($config['imap']??null)?$config['imap']:[];
   $host=(string)($imap['host']??$smtp['host']??'mail.digitaleight.bg');$port=(int)($imap['port']??993);$user=(string)($imap['username']??$smtp['username']??'');$pass=(string)($imap['password']??$smtp['password']??'');
   if(!$user||!$pass)throw new RuntimeException('IMAP не е настроен');
