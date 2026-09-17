@@ -464,3 +464,5 @@ button.syncstate{font:9px var(--mono);cursor:pointer;background:rgba(255,255,255
   .dashwrap,.taskmgr,.workmgr{gap:14px}
   .report-kpis,.reports-grid{gap:10px}
 }
+
+.payment-confirm{display:grid;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--b3)}.payment-confirm label{display:flex;align-items:center;gap:9px;color:var(--w2);font-size:12px;cursor:pointer}.payment-confirm input{accent-color:var(--p)}.fieldhint{display:block;margin-top:6px;color:var(--w4);font-size:10px;line-height:1.45}
