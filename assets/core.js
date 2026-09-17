@@ -124,7 +124,7 @@ function readLocalData(){
 }
 function finishDataLoad(){
   dataLoaded=true;populateCats();renderLeadFolders();renderLeadAddons();renderTaskCategories();applyProfileSettings();updateBadges();
-  renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();if(curpg==='tasks')renderTaskManager();if(curpg==='work')renderWorkTaskManager();
+  renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();if(curpg==='tasks')renderTaskManager();if(curpg==='work')renderWorkTaskManager();if(curpg==='reports'&&window.renderReports)renderReports();
   setTimeout(hideAppLoader,100);
 }
 function loadData(){
@@ -153,7 +153,7 @@ function refreshServerData(){
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&syncPending)flushSave();else if(document.visibilityState==='visible')refreshServerData();});
 setInterval(refreshServerData,15000);
 // ── NAVIGATION ─────────────────────────────────────────
-var PTITLES = {dash: 'Табло', tasks: 'Календар', work: 'Работни задачи', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', settings: 'Настройки'};
+var PTITLES = {dash: 'Табло', tasks: 'Календар', work: 'Работни задачи', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', reports: 'Отчети', settings: 'Настройки'};
 
 function goPage(id, el) {
   curpg = id;
@@ -174,6 +174,7 @@ function goPage(id, el) {
   if (id === 'leads') renderLeads();
   if (id === 'tasks') renderTaskManager();
   if (id === 'work') renderWorkTaskManager();
+  if (id === 'reports' && window.renderReports) renderReports();
   if (id === 'settings' && window.D8OneSignal) window.D8OneSignal.refresh();
   updateBadges();
   closeSb();
@@ -187,7 +188,7 @@ function syncMobileNavActive(sheetType){
   else if(sheetType==='more')target=document.getElementById('mobileMoreButton');
   else if(['smm','web'].indexOf(curpg)>=0)target=document.getElementById('mobileClientsButton');
   else if(['tasks','work'].indexOf(curpg)>=0)target=document.getElementById('mobileTasksButton');
-  else if(curpg==='settings')target=document.getElementById('mobileMoreButton');
+  else if(curpg==='settings'||curpg==='reports')target=document.getElementById('mobileMoreButton');
   else target=nav.querySelector('button[data-page="'+curpg+'"]');
   Array.prototype.forEach.call(nav.children,function(button){button.classList.toggle('active',button===target);});
 }
