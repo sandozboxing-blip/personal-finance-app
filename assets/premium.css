@@ -413,3 +413,54 @@ button.syncstate{font:9px var(--mono);cursor:pointer;background:rgba(255,255,255
 @media(max-width:1050px){.report-kpis{grid-template-columns:1fr 1fr}.reports-grid{grid-template-columns:1fr}.followup-list{max-height:none}}
 @media(max-width:700px){.reports-shell{padding:16px 10px 100px}.reports-hero{align-items:stretch;flex-direction:column}.reports-hero .btn{width:100%}.report-kpis{grid-template-columns:1fr 1fr}.report-kpi{padding:14px}.report-kpi strong{font-size:20px}.profitability-head{display:none}.profit-row{grid-template-columns:1fr 1fr;gap:10px}.profit-client{grid-column:1/-1}.forecast-bars>div{grid-template-columns:75px 85px 1fr}.followup-row{align-items:flex-start;flex-direction:column}.followup-row>div{width:100%}.followup-row>div .btn{flex:1}.profitability-panel>header{align-items:flex-start;flex-direction:column}}
 @media(max-width:420px){.report-kpis{grid-template-columns:1fr}.forecast-bars>div{grid-template-columns:70px 1fr}.forecast-bars i{grid-column:1/-1}.report-panel>header{padding:15px}.forecast-bars{padding:16px}}
+/* 2026-09-17 spacious application layout */
+@media(min-width:769px){
+  :root{--page-pad:clamp(24px,2vw,36px);--section-gap:22px}
+  .content{padding-bottom:32px}
+  .dashwrap,.taskmgr,.workmgr,.reports-shell,.settings-shell{width:min(100%,1600px);margin-inline:auto}
+  .dashwrap,.taskmgr,.workmgr,.reports-shell{padding:30px var(--page-pad) 64px}
+  .settings-shell{max-width:1480px!important;padding:30px var(--page-pad) 64px!important}
+  .dashwrap,.taskmgr,.workmgr{gap:22px}
+  .dashhero,.taskhero,.workhero,.reports-hero{margin-bottom:2px}
+  .dashwrap .dgrid,.sgrid,.report-kpis{gap:18px}
+  .dashcols,.tasklayout,.reports-grid,.settings-grid{gap:20px}
+  .dashpanelhead,.report-panel>header,.workcomposerhead,.workboardhead{padding:19px 22px}
+  .dashpanelbody,.forecast-bars{padding:21px 22px}
+  .dc,.sc,.report-kpi{padding:22px}
+  .ccard{padding:21px}
+  .taskcomposer,.workcomposergrid{padding:18px 20px;gap:12px}
+  .managerlist,.worktasklist{padding:16px;gap:10px}
+  .worktask,.mtask{padding:14px}
+  .settings-card{padding:23px}
+  .settings-card-head{margin-bottom:21px}
+  .leadfolderview,#pgleads>.leadsummary,#pgleads>.ptbar,#pgleads>.activeleadfilters,#pgleads>.twrap,#pgsmm>.sgrid,#pgsmm>.ptbar,#pgsmm>.twrap,#pgweb>.sgrid,#pgweb>.ptbar,#pgweb>.twrap{width:min(calc(100% - (var(--page-pad) * 2)),1560px);margin-left:auto!important;margin-right:auto!important}
+  .leadfolderview{padding:30px 0 8px}
+  .leadfolderview.compact{margin-top:24px!important;padding:18px 21px!important}
+  .folderhomehead{margin-bottom:24px}
+  .folderkpis{margin-bottom:22px}
+  .leadfoldergrid{gap:18px}
+  .leadfoldercard{min-height:146px;padding:23px}
+  #pgleads>.leadsummary{margin-top:18px!important}
+  #pgleads>.ptbar{margin-top:18px!important;margin-bottom:14px!important;padding:14px 16px!important}
+  #pgleads>.activeleadfilters:not(:empty){margin-top:0!important;margin-bottom:14px!important}
+  #pgleads>.twrap{margin-bottom:32px!important}
+  #pgsmm>.sgrid,#pgweb>.sgrid{padding:30px 0 18px}
+  #pgsmm>.ptbar,#pgweb>.ptbar{margin-bottom:20px!important;padding:14px 16px}
+  #pgsmm>.twrap>.cgrid,#pgweb>.twrap>.cgrid{width:100%;margin:0;padding:0 0 36px;gap:18px}
+  .report-kpis{margin-bottom:20px}.reports-grid{margin-bottom:20px}
+  .profitability-head{padding:13px 22px}.profitability-rows{padding:0 13px 14px}.profit-row{min-height:68px;padding:13px 9px}
+}
+@media(min-width:769px) and (max-width:1199px){
+  :root{--page-pad:22px;--section-gap:18px}
+  .dashwrap,.taskmgr,.workmgr,.reports-shell{padding-top:22px}
+  .leadfolderview{padding-top:22px}
+  .leadfoldergrid{gap:14px}
+  .leadfoldercard{min-height:132px;padding:19px}
+  .settings-card{padding:20px}
+}
+@media(max-width:768px){
+  .dashwrap,.taskmgr,.workmgr,.reports-shell,.settings-shell{width:100%;margin-inline:0}
+  .page>.sgrid:first-child{padding-top:16px}
+  .dashwrap,.taskmgr,.workmgr{gap:14px}
+  .report-kpis,.reports-grid{gap:10px}
+}
