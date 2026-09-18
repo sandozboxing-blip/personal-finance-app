@@ -1,0 +1,39 @@
+(function(){
+'use strict';
+function n(v){var x=Number(String(v==null?'':v).replace(',','.'));return Number.isFinite(x)?x:0;}
+function money(v){return fmt(Math.round((v+Number.EPSILON)*100)/100)+' €';}
+function monthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function validDate(v){if(!v)return null;var d=new Date(v+'T00:00:00');return isNaN(d)?null:d;}
+function cycles(c){return c&&c.start&&c.paidThrough?paidCycles(c):0;}
+function actualClient(c,type){
+  var monthly=type==='smm'||(c.paymentType||'monthly')==='monthly',count=monthly?cycles(c):0,revenue=0,cost=0;
+  if(type==='smm'){revenue=count*n(c.monthly);cost=count*n(c.cost);}
+  else if(monthly){revenue=(c.initialPaid===true?n(c.initial):0)+count*n(c.monthly);cost=count*n(c.cost);}
+  else if(c.oneTimePaid===true){revenue=n(c.oneTime);cost=n(c.cost);}
+  return{revenue:revenue,cost:cost,profit:revenue-cost,cycles:count};
+}
+function addTrendPayment(trend,date,revenue,cost){var d=validDate(date);if(!d)return;var row=trend[monthKey(d)];if(row){row.revenue+=revenue;row.cost+=cost;}}
+function addMonthlyTrend(trend,c,revenue,cost,count){var start=validDate(c.start);if(!start)return;for(var i=0;i<count;i++){var d=new Date(start);d.setMonth(d.getMonth()+i);var row=trend[monthKey(d)];if(row){row.revenue+=revenue;row.cost+=cost;}}}
+window.financeSnapshot=function(){
+  var activeSmm=smm.filter(function(c){return c.status==='active';});
+  var activeWeb=web.filter(function(c){return c.status==='active'&&(c.paymentType||'monthly')==='monthly';});
+  var recurringRevenue=activeSmm.reduce(function(s,c){return s+n(c.monthly);},0)+activeWeb.reduce(function(s,c){return s+n(c.monthly);},0);
+  var recurringCosts=activeSmm.reduce(function(s,c){return s+n(c.cost);},0)+activeWeb.reduce(function(s,c){return s+n(c.cost);},0);
+  var actualRevenue=0,actualCosts=0,rows=[];
+  smm.forEach(function(c){var x=actualClient(c,'smm');actualRevenue+=x.revenue;actualCosts+=x.cost;rows.push({id:c.id,type:'smm',name:c.name||'Без име',revenue:x.revenue,cost:x.cost,profit:x.profit,cycles:x.cycles});});
+  web.forEach(function(c){var x=actualClient(c,'web');actualRevenue+=x.revenue;actualCosts+=x.cost;rows.push({id:c.id,type:'web',name:c.name||'Без име',revenue:x.revenue,cost:x.cost,profit:x.profit,cycles:x.cycles});});
+  var months=[],trend={};for(var i=5;i>=0;i--){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);var key=monthKey(d);trend[key]={key:key,label:d.toLocaleDateString('bg-BG',{month:'short'}),revenue:0,cost:0};months.push(trend[key]);}
+  smm.forEach(function(c){addMonthlyTrend(trend,c,n(c.monthly),n(c.cost),cycles(c));});
+  web.forEach(function(c){if((c.paymentType||'monthly')==='monthly'){addMonthlyTrend(trend,c,n(c.monthly),n(c.cost),cycles(c));if(c.initialPaid===true)addTrendPayment(trend,c.start,n(c.initial),0);}else if(c.oneTimePaid===true)addTrendPayment(trend,c.statusChangedAt||c.deadline||c.start,n(c.oneTime),n(c.cost));});
+  var incomplete=smm.concat(web.filter(function(c){return(c.paymentType||'monthly')==='monthly';})).filter(function(c){return n(c.monthly)>0&&(!c.start||!c.paidThrough);}).length;
+  return{recurringRevenue:recurringRevenue,recurringCosts:recurringCosts,recurringProfit:recurringRevenue-recurringCosts,recurringMargin:recurringRevenue?Math.round((recurringRevenue-recurringCosts)/recurringRevenue*100):0,actualRevenue:actualRevenue,actualCosts:actualCosts,actualProfit:actualRevenue-actualCosts,actualMargin:actualRevenue?Math.round((actualRevenue-actualCosts)/actualRevenue*100):0,incomplete:incomplete,trend:months,rows:rows};
+};
+function icon(path){return'<svg viewBox="0 0 24 24" aria-hidden="true">'+path+'</svg>';}
+function renderCards(s){var el=document.getElementById('dashCards');if(!el)return;el.innerHTML='<div class="dc acc"><div class="dcico">'+icon('<path d="M5 16l4-4 3 3 7-8"/><path d="M14 7h5v5"/>')+'</div><div class="dclbl">Реално получени приходи</div><div class="dcval">'+money(s.actualRevenue)+'</div><div class="dcdelta">Само потвърдени плащания</div></div><div class="dc"><div class="dcico">'+icon('<path d="M4 7h16M7 3v4m10-4v4"/><rect x="4" y="5" width="16" height="16" rx="2"/>')+'</div><div class="dclbl">Текущ месечен приход</div><div class="dcval">'+money(s.recurringRevenue)+'</div><div class="dcsub">Активни абонаменти</div></div><div class="dc"><div class="dcico">'+icon('<path d="M4 6h16v12H4zM8 10h8M8 14h5"/>')+'</div><div class="dclbl">Реално отчетени разходи</div><div class="dcval">'+money(s.actualCosts)+'</div><div class="dcsub">За платените периоди</div></div><div class="dc"><div class="dcico">'+icon('<circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/>')+'</div><div class="dclbl">Реална нетна печалба</div><div class="dcval '+(s.actualProfit>=0?'finance-positive':'finance-negative')+'">'+money(s.actualProfit)+'</div><div class="dcdelta">'+s.actualMargin+'% реализиран марж</div></div>';
+}
+function renderPipeline(s){var el=document.getElementById('dashPipeline');if(!el)return;var values=[s.recurringRevenue,s.recurringCosts,Math.max(0,s.recurringProfit)],max=Math.max.apply(null,values.concat([1]));el.innerHTML=pipeRow('Приход / месец',s.recurringRevenue,max)+pipeRow('Разход / месец',s.recurringCosts,max)+pipeRow('Нетно / месец',s.recurringProfit,max);}
+function renderCashflow(s){var el=document.getElementById('dashCashflow');if(!el)return;var max=Math.max.apply(null,s.trend.map(function(x){return Math.max(x.revenue,x.cost);}).concat([1]));el.innerHTML=s.trend.map(function(x){var rh=Math.round(x.revenue/max*100),ch=Math.round(x.cost/max*100);return'<div class="cashmonth" title="'+x.label+': приход '+money(x.revenue)+', разход '+money(x.cost)+'"><div class="cashvalues"><span>'+money(x.revenue)+'</span><span>'+money(x.cost)+'</span></div><div class="cashbars"><i style="height:'+rh+'%"></i><i style="height:'+ch+'%"></i></div><b>'+x.label+'</b></div>';}).join('');}
+function renderHealth(s){var el=document.getElementById('dashAnalysis');if(!el)return;var ready=leads.filter(function(l){return l.phone||l.email;}).length;el.innerHTML='<div class="insight"><strong class="'+(s.recurringProfit>=0?'profitpos':'profitneg')+'">'+money(s.recurringProfit)+' нетно / месец</strong><span>'+s.recurringMargin+'% марж от активните абонаменти.</span></div><div class="insight"><strong>'+money(s.actualProfit)+' реална печалба</strong><span>Получени приходи минус отчетени разходи.</span></div><div class="insight '+(s.incomplete?'finance-warning':'')+'"><strong>'+s.incomplete+' непълни финансови записа</strong><span>'+(s.incomplete?'Добави „Начало“ и „Платено до“, за да не се показва нула.':'Всички платени периоди имат нужните дати.')+'</span></div><div class="insight"><strong>'+ready+' достижими leads</strong><span>'+(leads.length?Math.round(ready/leads.length*100):0)+'% имат телефон или имейл.</span></div>';}
+var originalDash=window.renderDash;window.renderDash=function(){if(originalDash)originalDash();var s=financeSnapshot();renderCards(s);renderPipeline(s);renderCashflow(s);renderHealth(s);};
+var originalReports=window.renderReports;window.renderReports=function(){if(originalReports)originalReports();var s=financeSnapshot(),el=document.getElementById('reportKpis');if(el)el.innerHTML='<div class="report-kpi accent"><span>Текущ месечен приход</span><strong>'+money(s.recurringRevenue)+'</strong><small>Само активни абонаменти</small></div><div class="report-kpi"><span>Реално получени приходи</span><strong>'+money(s.actualRevenue)+'</strong><small>Само потвърдени плащания</small></div><div class="report-kpi"><span>Реално отчетени разходи</span><strong>'+money(s.actualCosts)+'</strong><small>За платените периоди</small></div><div class="report-kpi '+(s.actualProfit>=0?'positive':'negative')+'"><span>Реална нетна печалба</span><strong>'+money(s.actualProfit)+'</strong><small>'+s.actualMargin+'% реализиран марж</small></div>';};
+})();
