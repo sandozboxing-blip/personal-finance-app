@@ -32,7 +32,7 @@ window.syncOutreachReplies=function(manual){
       normalizeData();saveLocal(false);renderLeads();if(window.renderReports)renderReports();
       var opened=openLatestLeadReply(preferredId);
       if(opened)toast('Отговорът е зареден в профила','var(--green)');
-      else if(manual)toast('Проверени '+(result.sync.checked||0)+' входящи писма · няма съвпадение за този lead','var(--blue)');
+      else if(manual){var diag=result.sync.diagnostics||{},box=diag.mailbox?(' в '+diag.mailbox):'';toast('Проверени '+(result.sync.checked||0)+' входящи писма'+box+' · няма съвпадение за този lead','var(--blue)');}
     })
     .catch(function(e){if(manual)toast(e.message||'Грешка при проверката на пощата','var(--red)');})
     .finally(function(){outreachReplySyncing=false;if(btn){btn.disabled=false;btn.textContent='Провери отговори';}});

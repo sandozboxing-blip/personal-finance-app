@@ -61,7 +61,7 @@ if($action==='sendOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
 if($action==='syncOutreachReplies'&&$_SERVER['REQUEST_METHOD']==='POST'){
   require_once __DIR__.'/lib/d8-imap-v2.php';
   try{$replies=d8FetchReplyHeaders($config);$file=dataFile();$fh=fopen($file,'c+');if(!$fh||!flock($fh,LOCK_EX))throw new RuntimeException('Данните са заключени');rewind($fh);$state=decodeState((string)stream_get_contents($fh));$updated=d8ApplyReplies($state,$replies);if($updated){$state['updatedAt']=gmdate('c');rewind($fh);ftruncate($fh,0);fwrite($fh,"<?php exit; ?>
-".json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));fflush($fh);}flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>true,'updated'=>$updated,'checked'=>count($replies),'updatedAt'=>$state['updatedAt']??null]);}
+".json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));fflush($fh);}flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>true,'updated'=>$updated,'checked'=>count($replies),'diagnostics'=>d8MailDiagnostics(),'updatedAt'=>$state['updatedAt']??null]);}
   catch(Throwable $e){reply(['ok'=>false,'error'=>$e->getMessage()],502);}
 }
 if($action==='load'&&$_SERVER['REQUEST_METHOD']==='GET'){
