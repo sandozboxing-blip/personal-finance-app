@@ -108,7 +108,8 @@ function normalizeData(){
     l.extra=l.extra&&typeof l.extra==='object'&&!Array.isArray(l.extra)?l.extra:{};
     l.id=l.id||Date.now()+i;l.name=String(l.name||l.title||l.business||'Без име');
     l.website=String(l.website||'');l.phone=String(l.phone||'');l.email=String(l.email||'');
-    if(l.email.trim().toLowerCase()==='simona.rangelova2004@gmail.com'){
+    var normalizedLeadEmail=l.email.trim().toLowerCase(),normalizedLeadFolder=String(l.folder||'').trim().toLowerCase(),legacyTestEmail=normalizedLeadFolder==='test'&&normalizedLeadEmail.indexOf('simona.')===0&&/@gmail[.]com$/.test(normalizedLeadEmail);
+    if(legacyTestEmail){
       l.email='kikonbg@gmail.com';
       leadDataMigrationPending=true;
     }
