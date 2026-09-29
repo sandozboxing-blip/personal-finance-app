@@ -40,7 +40,7 @@ $currentUser=requireLogin($config);
 
 if($action==='sendOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
   require_once __DIR__.'/lib/d8-smtp.php';
-  $b=body();if(empty($b['consentConfirmed']))reply(['ok'=>false,'error'=>'Липсва потвърждение за съгласие'],400);$individual=!empty($b['individual']);
+  $b=body();if(empty($b['consentConfirmed']))reply(['ok'=>false,'error'=>'Липсва потвърждение за съгласие'],400);
   $leadId=(string)($b['leadId']??'');$subject=trim((string)($b['subject']??''));$message=trim((string)($b['body']??''));
   $subjectLen=function_exists('mb_strlen')?mb_strlen($subject):strlen($subject);$messageLen=function_exists('mb_strlen')?mb_strlen($message):strlen($message);
   if($subject===''||$subjectLen>120||$messageLen<40||$messageLen>5000)reply(['ok'=>false,'error'=>'Невалидно съдържание'],400);
@@ -48,7 +48,7 @@ if($action==='sendOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
   foreach($state['leads']??[] as $lead){if((string)($lead['id']??'')===$leadId){$target=$lead;break;}}
   if(!is_array($target))reply(['ok'=>false,'error'=>'Lead не е намерен'],404);$email=trim((string)($target['email']??''));
   $extra=is_array($target['extra']??null)?$target['extra']:[];$social=false;foreach($extra as $k=>$v){if(preg_match('/facebook|instagram|linkedin|youtube|tiktok|twitter|x[.]com/i',(string)$k.' '.(string)$v)){$social=true;break;}}
-  if(!filter_var($email,FILTER_VALIDATE_EMAIL))reply(['ok'=>false,'error'=>'Lead няма валиден имейл'],400);if(!$individual&&(trim((string)($target['website']??''))!==''||$social))reply(['ok'=>false,'error'=>'Lead не отговаря на сегмента'],400);
+  if(!filter_var($email,FILTER_VALIDATE_EMAIL)||trim((string)($target['website']??''))!==''||$social)reply(['ok'=>false,'error'=>'Lead не отговаря на сегмента'],400);
   $smtp=is_array($config['smtp']??null)?$config['smtp']:[];if(empty($smtp['password'])||strpos((string)$smtp['password'],'CHANGE-ME')!==false)reply(['ok'=>false,'error'=>'SMTP не е настроен'],503);
   try{
     $transport=(string)($smtp['transport']??'smtp');
@@ -58,6 +58,20 @@ if($action==='sendOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
   }catch(Throwable $e){$reason=preg_replace('/[^A-Za-z0-9 _.-]/','',(string)$e->getMessage());reply(['ok'=>false,'error'=>'Mail: '.($reason?:'неизвестна грешка')],502);}
 }
 
+if($action==='sendIndividualOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
+  require_once __DIR__.'/lib/d8-smtp.php';
+  $b=body();if(empty($b['consentConfirmed']))reply(['ok'=>false,'error'=>'Липсва потвърждение за съгласие'],400);
+  $leadId=(string)($b['leadId']??'');$subject=trim((string)($b['subject']??''));$message=trim((string)($b['body']??''));
+  $subjectLen=function_exists('mb_strlen')?mb_strlen($subject):strlen($subject);$messageLen=function_exists('mb_strlen')?mb_strlen($message):strlen($message);
+  if($subject===''||$subjectLen>120||$messageLen<40||$messageLen>5000)reply(['ok'=>false,'error'=>'Провери темата и текста на имейла'],400);
+  $state=is_file(dataFile())?decodeState((string)file_get_contents(dataFile())):emptyState();$target=null;
+  foreach($state['leads']??[] as $lead){if((string)($lead['id']??'')===$leadId){$target=$lead;break;}}
+  if(!is_array($target))reply(['ok'=>false,'error'=>'Бизнесът не е намерен на сървъра. Изчакай запазването и опитай пак.'],404);
+  $email=trim((string)($target['email']??''));if(!filter_var($email,FILTER_VALIDATE_EMAIL))reply(['ok'=>false,'error'=>'Бизнесът няма валиден имейл адрес'],400);
+  $smtp=is_array($config['smtp']??null)?$config['smtp']:[];if(empty($smtp['password'])||strpos((string)$smtp['password'],'CHANGE-ME')!==false)reply(['ok'=>false,'error'=>'SMTP не е настроен'],503);
+  try{$transport=(string)($smtp['transport']??'smtp');if($transport==='local'){d8SendLocalMail($smtp,$email,$subject,$message);reply(['ok'=>true,'leadId'=>$leadId,'email'=>$email,'transport'=>'local']);}try{d8SendSmtp($smtp,$email,$subject,$message);reply(['ok'=>true,'leadId'=>$leadId,'email'=>$email,'transport'=>'smtp']);}catch(Throwable $smtpError){if(strpos($smtpError->getMessage(),'connection 111')===false)throw $smtpError;d8SendLocalMail($smtp,$email,$subject,$message);reply(['ok'=>true,'leadId'=>$leadId,'email'=>$email,'transport'=>'local']);}}
+  catch(Throwable $e){reply(['ok'=>false,'error'=>'Изпращането не успя: '.$e->getMessage()],502);}
+}
 if($action==='syncOutreachReplies'&&$_SERVER['REQUEST_METHOD']==='POST'){
   require_once __DIR__.'/lib/d8-imap-v2.php';
   try{$replies=d8FetchReplyHeaders($config);$file=dataFile();$fh=fopen($file,'c+');if(!$fh||!flock($fh,LOCK_EX))throw new RuntimeException('Данните са заключени');rewind($fh);$state=decodeState((string)stream_get_contents($fh));$updated=d8ApplyReplies($state,$replies);if($updated){$state['updatedAt']=gmdate('c');rewind($fh);ftruncate($fh,0);fwrite($fh,"<?php exit; ?>
