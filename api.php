@@ -24,6 +24,14 @@ function requireLogin(array $config): string { $user=currentUser($config);if(!$u
 function dataFile(): string { return __DIR__.'/data/panel-data.php'; }
 function decodeState(string $raw): array { $json=preg_replace('/^<\?php exit; \?>\s*/','',$raw);$state=json_decode($json?:'{}',true);return is_array($state)?$state:[]; }
 function emptyState(): array { return ['version'=>8,'leads'=>[],'leadFolders'=>[],'leadFolderMeta'=>[],'smm'=>[],'web'=>[],'workTasks'=>[],'tasks'=>[],'userData'=>[]]; }
+function migrateLegacyTestLeadEmail(array &$state): bool {
+  $changed=false;
+  foreach($state['leads']??[] as &$lead){
+    if(strtolower(trim((string)($lead['email']??'')))==='simona.rangelova2004@gmail.com'){$lead['email']='kikonbg@gmail.com';$changed=true;}
+  }
+  unset($lead);
+  return $changed;
+}
 
 if($action==='login'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $b=body();$u=trim((string)($b['username']??''));$p=(string)($b['password']??'');$users=$config['users']??[];
@@ -44,7 +52,7 @@ if($action==='sendOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $leadId=(string)($b['leadId']??'');$subject=trim((string)($b['subject']??''));$message=trim((string)($b['body']??''));
   $subjectLen=function_exists('mb_strlen')?mb_strlen($subject):strlen($subject);$messageLen=function_exists('mb_strlen')?mb_strlen($message):strlen($message);
   if($subject===''||$subjectLen>120||$messageLen<40||$messageLen>5000)reply(['ok'=>false,'error'=>'Невалидно съдържание'],400);
-  $state=is_file(dataFile())?decodeState((string)file_get_contents(dataFile())):emptyState();$target=null;
+  $state=is_file(dataFile())?decodeState((string)file_get_contents(dataFile())):emptyState();migrateLegacyTestLeadEmail($state);$target=null;
   foreach($state['leads']??[] as $lead){if((string)($lead['id']??'')===$leadId){$target=$lead;break;}}
   if(!is_array($target))reply(['ok'=>false,'error'=>'Lead не е намерен'],404);$email=trim((string)($target['email']??''));
   $extra=is_array($target['extra']??null)?$target['extra']:[];$social=false;foreach($extra as $k=>$v){if(preg_match('/facebook|instagram|linkedin|youtube|tiktok|twitter|x[.]com/i',(string)$k.' '.(string)$v)){$social=true;break;}}
@@ -64,7 +72,7 @@ if($action==='sendIndividualOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
   $leadId=(string)($b['leadId']??'');$subject=trim((string)($b['subject']??''));$message=trim((string)($b['body']??''));
   $subjectLen=function_exists('mb_strlen')?mb_strlen($subject):strlen($subject);$messageLen=function_exists('mb_strlen')?mb_strlen($message):strlen($message);
   if($subject===''||$subjectLen>120||$messageLen<40||$messageLen>5000)reply(['ok'=>false,'error'=>'Провери темата и текста на имейла'],400);
-  $state=is_file(dataFile())?decodeState((string)file_get_contents(dataFile())):emptyState();$target=null;
+  $state=is_file(dataFile())?decodeState((string)file_get_contents(dataFile())):emptyState();migrateLegacyTestLeadEmail($state);$target=null;
   foreach($state['leads']??[] as $lead){if((string)($lead['id']??'')===$leadId){$target=$lead;break;}}
   if(!is_array($target))reply(['ok'=>false,'error'=>'Бизнесът не е намерен на сървъра. Изчакай запазването и опитай пак.'],404);
   $email=trim((string)($target['email']??''));if(!filter_var($email,FILTER_VALIDATE_EMAIL))reply(['ok'=>false,'error'=>'Бизнесът няма валиден имейл адрес'],400);
@@ -74,12 +82,12 @@ if($action==='sendIndividualOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
 }
 if($action==='syncOutreachReplies'&&$_SERVER['REQUEST_METHOD']==='POST'){
   require_once __DIR__.'/lib/d8-imap-v2.php';
-  try{$replies=d8FetchReplyHeaders($config);$file=dataFile();$fh=fopen($file,'c+');if(!$fh||!flock($fh,LOCK_EX))throw new RuntimeException('Данните са заключени');rewind($fh);$state=decodeState((string)stream_get_contents($fh));$updated=d8ApplyReplies($state,$replies);if($updated){$state['updatedAt']=gmdate('c');rewind($fh);ftruncate($fh,0);fwrite($fh,"<?php exit; ?>
+  try{$replies=d8FetchReplyHeaders($config);$file=dataFile();$fh=fopen($file,'c+');if(!$fh||!flock($fh,LOCK_EX))throw new RuntimeException('Данните са заключени');rewind($fh);$state=decodeState((string)stream_get_contents($fh));$migrated=migrateLegacyTestLeadEmail($state);$updated=d8ApplyReplies($state,$replies);if($updated||$migrated){$state['updatedAt']=gmdate('c');rewind($fh);ftruncate($fh,0);fwrite($fh,"<?php exit; ?>
 ".json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));fflush($fh);}flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>true,'updated'=>$updated,'checked'=>count($replies),'diagnostics'=>d8MailDiagnostics(),'updatedAt'=>$state['updatedAt']??null]);}
   catch(Throwable $e){reply(['ok'=>false,'error'=>$e->getMessage()],502);}
 }
 if($action==='load'&&$_SERVER['REQUEST_METHOD']==='GET'){
-  $file=dataFile();$state=is_file($file)?decodeState((string)file_get_contents($file)):emptyState();$user=$currentUser;$allUsers=is_array($state['userData']??null)?$state['userData']:[];$profile=is_array($allUsers[$user]??null)?$allUsers[$user]:[];$legacyTasks=is_array($state['tasks']??null)?$state['tasks']:[];
+  $file=dataFile();$state=is_file($file)?decodeState((string)file_get_contents($file)):emptyState();migrateLegacyTestLeadEmail($state);$user=$currentUser;$allUsers=is_array($state['userData']??null)?$state['userData']:[];$profile=is_array($allUsers[$user]??null)?$allUsers[$user]:[];$legacyTasks=is_array($state['tasks']??null)?$state['tasks']:[];
   reply(['ok'=>true,'state'=>['version'=>8,'updatedAt'=>$state['updatedAt']??null,'leads'=>is_array($state['leads']??null)?$state['leads']:[],'leadFolders'=>is_array($state['leadFolders']??null)?$state['leadFolders']:[],'leadFolderMeta'=>is_array($state['leadFolderMeta']??null)?$state['leadFolderMeta']:[],'smm'=>is_array($state['smm']??null)?$state['smm']:[],'web'=>is_array($state['web']??null)?$state['web']:[],'workTasks'=>is_array($state['workTasks']??null)?$state['workTasks']:[],'tasks'=>is_array($profile['tasks']??null)?$profile['tasks']:($user==='Admin'?$legacyTasks:[]),'focusTasks'=>is_array($profile['focusTasks']??null)?$profile['focusTasks']:[],'focusInitialized'=>array_key_exists('focusTasks',$profile),'taskCategories'=>is_array($profile['taskCategories']??null)?$profile['taskCategories']:[],'settings'=>is_array($profile['settings']??null)?$profile['settings']:[]]]);
 }
 if($action==='save'&&$_SERVER['REQUEST_METHOD']==='POST'){
