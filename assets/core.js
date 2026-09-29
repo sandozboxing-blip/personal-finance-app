@@ -57,7 +57,7 @@ function logout(){
 }
 
 // ── STATE + RELIABLE SYNC ────────────────────────────
-var leads=[],leadFolders=[],leadFolderMeta={},smm=[],web=[],workTasks=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='',syncWarningShown=false;
+var leads=[],leadFolders=[],leadFolderMeta={},smm=[],web=[],workTasks=[],sharedTasks=[],focusTasks=[],taskCategories=[],userSettings={},currentUser='',syncTimer=null,syncInFlight=false,syncPending=false,syncScope='',dataLoaded=false,lastServerUpdatedAt='',syncWarningShown=false,leadDataMigrationPending=false;
 var leadPage=1,leadPageSize=50,leadFilterKey='';var lftab='all',lbid=null,curpg='dash',editid=null,edittype=null;
 function localState(){return{leads:leads,leadFolders:leadFolders,leadFolderMeta:leadFolderMeta,smm:smm,web:web,workTasks:workTasks,tasks:sharedTasks,focusTasks:focusTasks,taskCategories:taskCategories,settings:userSettings};}
 function mergeRecords(remote,local){var merged=[],positions={};(Array.isArray(remote)?remote:[]).forEach(function(item){var key=item&&item.id!=null?String(item.id):'';if(key)positions[key]=merged.length;merged.push(item);});(Array.isArray(local)?local:[]).forEach(function(item){var key=item&&item.id!=null?String(item.id):'';if(key&&positions[key]!=null)merged[positions[key]]=item;else{if(key)positions[key]=merged.length;merged.push(item);}});return merged;}
@@ -108,6 +108,10 @@ function normalizeData(){
     l.extra=l.extra&&typeof l.extra==='object'&&!Array.isArray(l.extra)?l.extra:{};
     l.id=l.id||Date.now()+i;l.name=String(l.name||l.title||l.business||'Без име');
     l.website=String(l.website||'');l.phone=String(l.phone||'');l.email=String(l.email||'');
+    if(l.email.trim().toLowerCase()==='simona.rangelova2004@gmail.com'){
+      l.email='kikonbg@gmail.com';
+      leadDataMigrationPending=true;
+    }
     l.category=String(l.category||'');l.address=String(l.address||'');l.folder=String(l.folder||'');l.note=String(l.note||'');
     l.reviews=String(l.reviews||'');l.price=String(l.price||'');l.followup=String(l.followup||'');
     l.stars=parseFloat(l.stars)||0;l.status=['unset','prospect','maybe','not'].indexOf(l.status)>=0?l.status:'unset';
@@ -139,7 +143,7 @@ function loadData(){
         var migrateLeadFolders=(state.leads||[]).length&&!(state.leadFolders||[]).length&&(state.leads||[]).every(function(l){return !l.folder;});
         leads=state.leads||[];leadFolders=state.leadFolders||[];leadFolderMeta=state.leadFolderMeta||{};smm=state.smm||[];web=state.web||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};
         if(!state.focusInitialized){var migratedFocus=sharedTasks.filter(function(t){return !t.due&&!t.category&&(t.repeat||'none')==='none';});if(migratedFocus.length){syncScope='profile';focusTasks=migratedFocus.map(function(t){return{id:t.id,text:t.text||'',done:!!t.done};});sharedTasks=sharedTasks.filter(function(t){return migratedFocus.indexOf(t)<0;});syncPending=true;}}
-        normalizeData();if(migrateLeadFolders){syncScope='shared';syncPending=true;}saveLocal(false);lastServerUpdatedAt=state.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
+        normalizeData();if(migrateLeadFolders||leadDataMigrationPending){syncScope='shared';syncPending=true;}saveLocal(false);lastServerUpdatedAt=state.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);setSyncState('saved','Всичко е запазено');if(syncPending)flushSave();
       }
       localStorage.setItem('d8ServerInitialized','1');
       finishDataLoad();
