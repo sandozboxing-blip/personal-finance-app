@@ -1,0 +1,37 @@
+:root{--app-content-width:1480px;--app-gap:24px;--app-radius:16px}
+@media(min-width:769px){
+  .dashwrap,.taskmgr,.workmgr,.reports-shell,.settings-shell{width:min(100%,var(--app-content-width));padding:32px var(--page-pad) 72px}
+  .leadfolderview,#pgleads>.leadsummary,#pgleads>.ptbar,#pgleads>.activeleadfilters,#pgleads>.twrap,#pgsmm>.sgrid,#pgsmm>.ptbar,#pgsmm>.twrap,#pgweb>.sgrid,#pgweb>.ptbar,#pgweb>.twrap{width:min(calc(100% - (var(--page-pad) * 2)),var(--app-content-width))}
+  .dashwrap,.taskmgr,.workmgr{gap:var(--app-gap)}
+  .dashcols,.tasklayout,.reports-grid,.settings-grid{gap:var(--app-gap)}
+  #pgsmm>.sgrid,#pgweb>.sgrid{padding-top:32px}
+}
+.topbar{padding-inline:clamp(18px,2.4vw,36px)}
+.dashhero,.taskhero,.workhero{min-height:148px;padding:28px 30px;border-radius:var(--app-radius)}
+.reports-hero{min-height:112px;align-items:center;padding:4px 0 8px}
+.dashhero h1,.taskhero h2,.workhero h2,.reports-hero h2,.settings-hero h2{line-height:1.18;letter-spacing:-.035em}
+.dashhero p,.taskhero p,.workhero p,.reports-hero p,.settings-hero p{max-width:720px;font-size:14px;line-height:1.6}
+.dashpanel,.cardpanel,.report-panel,.settings-card,.ccard,.sc,.dc{border-radius:var(--app-radius)}
+.dashpanelhead,.workcomposerhead,.workboardhead,.report-panel>header{min-height:72px}
+.btn{min-height:40px;padding-inline:15px;border-radius:10px;font-weight:700;cursor:pointer;transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s}
+.btnsm{min-height:38px}
+.btn:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--pl);outline-offset:2px}
+.quick-create{position:relative}.quick-create>summary{list-style:none;min-width:124px;justify-content:center}.quick-create>summary::-webkit-details-marker{display:none}.quick-create-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:30;display:grid;min-width:210px;padding:7px;border:1px solid var(--line2);border-radius:12px;background:var(--b2);box-shadow:0 18px 44px rgba(0,0,0,.42)}.quick-create-menu button{padding:11px 12px;border:0;border-radius:8px;background:transparent;color:var(--w1);font:600 13px/1.2 inherit;text-align:left;cursor:pointer}.quick-create-menu button:hover,.quick-create-menu button:focus-visible{background:var(--b4);color:var(--w0)}
+.ptbar{min-height:68px}.ptbar>select{min-width:190px}.sgrid{gap:16px}.sc{min-height:128px}
+.leadfoldercard{border-radius:var(--app-radius);transition:border-color .18s,box-shadow .18s,background-color .18s}.leadfoldercard:hover{transform:none;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+.folderhomehead{align-items:center}.folderhomehead p{max-width:660px;line-height:1.55}.folderkpis{border-radius:var(--app-radius);overflow:hidden}
+.folder-editor-actions{align-items:center}.folder-editor-actions .action-spacer{flex:1}.folder-editor-actions #folderEditorDelete{margin-right:auto}
+.leads-toolbar-copy small{font-size:11px;line-height:1.45}.lead-quick-tabs{display:flex;gap:6px;flex-wrap:wrap}.lead-category-picker .fi{height:40px}.campaign-cta{font-size:13px}.lead-more-menu{min-width:220px}
+@media(min-width:1101px){.leads-toolbar{grid-template-columns:minmax(260px,1fr) auto auto auto auto!important;grid-template-areas:"copy replies campaign add more" "quick quick category filters filters"!important;padding:17px 18px!important;gap:13px 10px!important}}
+@media(min-width:701px) and (max-width:1100px){.leads-toolbar{grid-template-columns:minmax(210px,1fr) auto auto auto!important;grid-template-areas:"copy replies campaign more" "quick quick category filters" "add add add add"!important;padding:15px!important}}
+.leadsummary{gap:10px}.leadsummary>div{min-height:82px;padding:16px 18px}.leadsummary strong{font-size:22px}.leadsummary span{font-size:11px}
+#pgleads>.twrap{border-radius:var(--app-radius)}#ltable th{height:46px}#ltable td{padding-top:14px;padding-bottom:14px}
+.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.settings-card{min-height:220px}.settings-card-wide{grid-column:1/-1}.settings-actions{align-items:center;gap:10px;flex-wrap:wrap}
+.taskcomposer,.workcomposergrid{border-radius:var(--app-radius)}.taskcomposer .fi,.workcomposergrid .fi{min-height:44px}.taskboardhead,.workboardhead{align-items:center}.managerlist,.worktasklist{max-height:none}
+.mfoot{min-height:72px;padding:14px 20px}.mfoot>div[style*="flex:1"]{flex:1}.modal{border-radius:18px}
+@media(max-width:768px){
+  :root{--app-gap:14px}.topbar{padding-inline:12px}.dashwrap,.taskmgr,.workmgr,.reports-shell,.settings-shell{padding-top:16px}.dashhero,.taskhero,.workhero{min-height:0;padding:20px}.dashactions{display:block;width:100%}.quick-create,.quick-create>summary{width:100%}.quick-create-menu{left:0;right:0;min-width:0}.reports-hero{min-height:0;padding:2px 4px 8px}.settings-grid{grid-template-columns:1fr}.settings-card-wide{grid-column:auto}
+  #pgleads>.leads-toolbar{grid-template-columns:1fr auto!important;grid-template-areas:"copy more" "replies replies" "campaign campaign" "add add" "quick quick" "category filters"!important;gap:10px!important}.lead-replies-cta,.campaign-cta,.add-leads-cta{width:100%!important;justify-content:center}.lead-quick-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}.lead-quick-tabs .btn{width:100%;justify-content:center}.lead-category-picker{align-items:stretch;flex-direction:column}.leadfilterpicker{align-self:end}.folder-editor-actions{display:grid;grid-template-columns:1fr 1fr}.folder-editor-actions .action-spacer{display:none}.folder-editor-actions #folderEditorDelete{grid-column:1/-1;grid-row:2;width:100%;margin-top:4px}.folder-editor-actions .btn{width:100%}
+}
+@media(max-width:480px){.lead-quick-tabs{grid-template-columns:1fr}.folderhomehead{align-items:stretch;flex-direction:column}.folderhomehead .btn{width:100%;justify-content:center}.leadsummary>div{min-height:72px;padding:13px}.settings-card{min-height:0}.mfoot{padding:12px}}
+@media(prefers-reduced-motion:reduce){.btn,.leadfoldercard,.quick-create-menu button{transition:none}}

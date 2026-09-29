@@ -21,8 +21,6 @@ window.syncOutreachReplies=function(manual,selectedId){
   if(outreachReplySyncing||!currentUser)return;
   var preferredId=manual?(selectedId!=null?selectedId:lbid):null;
   outreachReplySyncing=true;
-  var btn=document.getElementById('outreachSyncBtn');
-  if(btn){btn.disabled=true;btn.textContent='Проверяваме…';}
   fetch('api.php?action=syncOutreachReplies',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify((function(){var current=preferredId?leads.find(function(l){return String(l.id)===String(preferredId);}):null;return current?{leadId:current.id,recipientEmail:current.email||'',subject:(current.outreach&&current.outreach.subject)||''}:{};})())})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(!r.ok)throw new Error(d.error||'Грешка при проверката');return d;});})
     .then(function(sync){return fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||'Данните не се заредиха');return{sync:sync,state:d.state||{}};});});})
@@ -33,6 +31,6 @@ window.syncOutreachReplies=function(manual,selectedId){
       if(manual)openReplyInbox(result.sync.messages||[],result.sync.checked||0,preferredId);
     })
     .catch(function(e){if(manual)toast(e.message||'Грешка при проверката на пощата','var(--red)');})
-    .finally(function(){outreachReplySyncing=false;if(btn){btn.disabled=false;btn.textContent='Провери отговори';}});
+    .finally(function(){outreachReplySyncing=false;});
 };
 })();

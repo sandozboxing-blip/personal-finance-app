@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="assets/manual-lead.css?v=20260929-1">
 <link rel="stylesheet" href="assets/reply-inbox.css?v=20260929-1">
 <link rel="stylesheet" href="assets/finance-dashboard.css?v=20260918-1">
+<link rel="stylesheet" href="assets/ui-cleanup.css?v=20260929-1">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/d8-apple-touch-v2.png" />
@@ -85,7 +86,7 @@
       <div class="dashwrap">
         <section class="dashhero">
           <div><div class="dashdate" id="dashDate"></div><h1>Добре дошъл, <span id="dashName">Admin</span></h1><p>Ето най-важното за приходите, проектите и следващите ти действия.</p></div>
-          <div class="dashactions"><button class="btn btng btnsm" onclick="openManualLead()">＋ Нов бизнес</button><button class="btn btng btnsm" onclick="openAdd('web')">＋ Уеб проект</button><button class="btn btnp btnsm" onclick="openAdd('smm')">＋ SMM клиент</button></div>
+          <div class="dashactions"><details class="quick-create"><summary class="btn btnp btnsm">Създай</summary><div class="quick-create-menu"><button onclick="openManualLead()">Нов бизнес</button><button onclick="openAdd('web')">Уеб проект</button><button onclick="openAdd('smm')">SMM клиент</button></div></details></div>
         </section>
         <div class="dgrid" id="dashCards"></div>
         <div class="dashcols">
@@ -165,14 +166,13 @@
         </div>
         <div class="leads-toolbar-spacer"></div>
         <button class="btn btnsm lead-replies-cta" id="leadRepliesBtn" onclick="openLeadReplies()">Отговори</button>
-        <button class="btn btng btnsm campaign-history-cta" id="leadCampaignsBtn" onclick="openLeadCampaignHistory()">Кампании</button>
         <button class="btn btnp btnsm campaign-cta" id="leadOutreachBtn" onclick="openLeadOutreach()">✉ Стартирай кампания</button>
         <button class="btn btng btnsm add-leads-cta" onclick="openManualLead()">＋ Нов бизнес</button>
         <details class="lead-more">
           <summary class="btn btng btnsm" aria-label="Още действия">•••</summary>
           <div class="lead-more-menu">
-            <label><span>Смени папката</span><select class="fi" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select></label>
-            <button onclick="createLeadFolder()">＋ Нова папка</button><button onclick="document.getElementById('fi').click()">↑ Импортирай CSV / JSON</button>
+            <button onclick="openLeadCampaignHistory()">Кампании</button><label><span>Смени папката</span><select class="fi" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select></label>
+            <button onclick="document.getElementById('fi').click()">↑ Импортирай CSV / JSON</button>
             <button onclick="doExport()">↓ Експорт в CSV</button>
             <button onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
             <button class="danger" onclick="deleteAllLeads()">⌫ Изтрий всички leads</button>
@@ -205,7 +205,7 @@
 
     <div class="page" id="pgreports">
       <div class="reports-shell">
-        <section class="reports-hero"><div><span>БИЗНЕС АНАЛИЗ</span><h2>Финансови отчети</h2><p>Приходи, разходи, прогноза и рентабилност по клиент на едно място.</p></div><button class="btn btng" onclick="renderReports()">Обнови отчета</button></section>
+        <section class="reports-hero"><div><span>БИЗНЕС АНАЛИЗ</span><h2>Финансови отчети</h2><p>Приходи, разходи, прогноза и рентабилност по клиент на едно място.</p></div></section>
         <section class="report-kpis" id="reportKpis"></section>
         <div class="reports-grid">
           <section class="report-panel"><header><div><h3>Очаквана нетна печалба по месеци</h3><p>Отчита края на активните договори.</p></div><span class="report-chip">3 месеца</span></header><div class="forecast-bars" id="reportForecast"></div></section>
@@ -218,7 +218,6 @@
       <div class="taskmgr">
         <section class="taskhero">
           <div><div class="dashdate">ЛИЧНО ПЛАНИРАНЕ</div><h2>Календар</h2><p>Събития за един ден или период, отделни за твоя профил.</p></div>
-          <button class="btn btnp" onclick="focusTaskComposer()">＋ Ново събитие</button>
         </section>
         <section class="taskcomposer" id="taskComposer" data-event-type="day">
           <input id="tmTitle" class="fi" placeholder="Какво трябва да се свърши?">
@@ -258,7 +257,7 @@
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">✓</span><div><h3>Задачи и календар</h3><p>Стойности при създаване на ново събитие.</p></div></div><div class="settings-fields"><label>Приоритет по подразбиране<select class="fi" id="defaultTaskPriority" onchange="saveProfileSettings()"><option value="normal">Нормален</option><option value="high">Висок</option><option value="low">Нисък</option></select></label><label>Повторение по подразбиране<select class="fi" id="defaultTaskRepeat" onchange="saveProfileSettings()"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select></label></div></section>
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">⌕</span><div><h3>Leads</h3><p>Колко бизнеса да виждаш наведнъж.</p></div></div><div class="settings-fields"><label>Записи на страница<select class="fi" id="settingsLeadPageSize" onchange="saveProfileSettings()"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label></div><div class="settings-note">Тази настройка се запомня само за текущия профил.</div></section><section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">↗</span><div><h3>Follow-up автоматизация</h3><p>Създава задача след изпратен outreach имейл.</p></div></div><div class="settings-fields"><label>Напомни след<select class="fi" id="settingsFollowupDays" onchange="saveProfileSettings()"><option value="3">3 дни</option><option value="5">5 дни</option><option value="7">7 дни</option><option value="10">10 дни</option><option value="14">14 дни</option></select></label></div><div class="settings-note">При получен отговор задачата се затваря автоматично.</div></section>
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">◐</span><div><h3>Изглед</h3><p>Настрой плътността и движенията в интерфейса.</p></div></div><div class="settings-fields"><label>Плътност<select class="fi" id="settingsDensity" onchange="saveProfileSettings()"><option value="comfortable">Комфортна</option><option value="compact">Компактна</option></select></label><label class="setting-toggle"><span><b>Намалени анимации</b><small>Подходящо за по-слаби устройства</small></span><input type="checkbox" id="settingsReduceMotion" onchange="saveProfileSettings()"><i></i></label><label class="setting-toggle"><span><b>Компактни показатели</b><small>По-ниски карти на Dashboard</small></span><input type="checkbox" id="settingsCompactMetrics" onchange="saveProfileSettings()"><i></i></label></div></section>
-          <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">↻</span><div><h3>Синхронизация</h3><p>SMM, Web и Leads са общи за двата профила.</p></div></div><div class="settings-actions"><button class="btn btnp" onclick="manualDataSync()">Синхронизирай сега</button><button class="btn btng" onclick="exportFullBackup()">Свали backup</button><button class="btn btng" onclick="document.getElementById('backupFile').click()">Възстанови backup</button><input type="file" id="backupFile" accept=".json,application/json" hidden onchange="importFullBackup(event)"></div></section>
+          <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">↻</span><div><h3>Архив и възстановяване</h3><p>Запази защитно копие или възстанови предишни данни.</p></div></div><div class="settings-actions"><button class="btn btng" onclick="exportFullBackup()">Свали backup</button><button class="btn btng" onclick="document.getElementById('backupFile').click()">Възстанови backup</button><input type="file" id="backupFile" accept=".json,application/json" hidden onchange="importFullBackup(event)"></div></section>
           <section class="settings-card settings-card-wide pushsettings"><div class="settings-card-head"><span class="settings-card-icon">◉</span><div><h3>Телефонни известия</h3><p>Получавай push известия на телефона, дори когато панелът е затворен.</p></div></div><div class="settings-actions"><button class="btn btnp" type="button" onclick="enablePhoneNotifications()">Включи известията</button><span class="chip cgr" id="pushStatus" data-state="off">Известията не са включени</span></div><div class="settings-note">На iPhone първо добави панела на Home Screen, отвори го от иконата и натисни бутона.</div></section>
           <section class="settings-card settings-danger"><div class="settings-card-head"><span class="settings-card-icon">!</span><div><h3>Опасна зона</h3><p>Изтрива всички бизнес данни за двата профила.</p></div></div><button class="btn btnd" onclick="nukeAll()">Изчисти всички данни</button></section>
         </div>
@@ -270,7 +269,7 @@
 
 <div class="ov outreachov" id="leadOutreachOv" role="dialog" aria-modal="true" aria-labelledby="leadOutreachTitle" onclick="if(event.target===this)closeLeadOutreach()">
   <div class="modal outreachmodal">
-    <div class="mhdr outreach-simple-head"><div><span class="modaleyebrow">КАМПАНИЯ</span><h3 id="leadOutreachTitle">Имейл кампания</h3><small>1. Избери → 2. Прегледай → 3. Изпрати</small></div><div class="outreachheadactions"><button class="btn btnp btnsm" id="outreachSendAllBtn" onclick="sendApprovedOutreachBatch()">Изпрати одобрените</button><details class="lead-more outreach-more"><summary class="btn btng btnsm" aria-label="Още действия">•••</summary><div class="lead-more-menu"><button id="outreachSyncBtn" onclick="syncOutreachReplies(true)">Виж отговорите</button><button id="outreachApproveAllBtn" onclick="approveOutreachSegment()">Одобри целия сегмент</button></div></details><button class="mclose" onclick="closeLeadOutreach()" aria-label="Затвори">✕</button></div></div>
+    <div class="mhdr outreach-simple-head"><div><span class="modaleyebrow">КАМПАНИЯ</span><h3 id="leadOutreachTitle">Имейл кампания</h3><small>1. Избери → 2. Прегледай → 3. Изпрати</small></div><div class="outreachheadactions"><button class="btn btnp btnsm" id="outreachSendAllBtn" onclick="sendApprovedOutreachBatch()">Изпрати одобрените</button><details class="lead-more outreach-more"><summary class="btn btng btnsm" aria-label="Още действия">•••</summary><div class="lead-more-menu"><button id="outreachApproveAllBtn" onclick="approveOutreachSegment()">Одобри целия сегмент</button></div></details><button class="mclose" onclick="closeLeadOutreach()" aria-label="Затвори">✕</button></div></div>
     <div class="outreachbody">
       <aside class="outreachqueue">
         <div class="outreachsegments" id="outreachSegments"></div>
@@ -285,7 +284,7 @@
   <div class="modal foldereditor">
     <div class="mhdr"><div><span class="modaleyebrow">LEADS БИБЛИОТЕКА</span><h3 id="folderEditorTitle">Създай папка</h3></div><button class="mclose" onclick="closeLeadFolderEditor()" aria-label="Затвори">✕</button></div>
     <div class="foldereditorbody" id="folderEditorBody"></div>
-    <div class="mfoot"><button class="btn btng" onclick="closeLeadFolderEditor()">Отказ</button><button class="btn btnp" id="folderEditorSave" onclick="saveLeadFolderEditor()">Създай папка</button></div>
+    <div class="mfoot folder-editor-actions"><button class="btn btnd" id="folderEditorDelete" onclick="deleteLeadFolder()" hidden>Изтрий папката</button><div class="action-spacer"></div><button class="btn btng" onclick="closeLeadFolderEditor()">Отказ</button><button class="btn btnp" id="folderEditorSave" onclick="saveLeadFolderEditor()">Създай папка</button></div>
   </div>
 </div>
 <div class="ov manual-lead-ov" id="manualLeadOv" role="dialog" aria-modal="true" aria-labelledby="manualLeadTitle" onclick="if(event.target===this)closeManualLead()">
@@ -398,12 +397,12 @@
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260929-8"></script>
 <script src="assets/clients.js?v=20260917-1"></script>
-<script src="assets/leads.js?v=20260929-9"></script>
-<script src="assets/mail-replies-fix.js?v=20260929-6"></script>
+<script src="assets/leads.js?v=20260929-10"></script>
+<script src="assets/mail-replies-fix.js?v=20260929-7"></script>
 <script src="assets/reply-inbox.js?v=20260929-1"></script>
 <script src="assets/individual-email.js?v=20260929-8"></script>
 <script src="assets/manual-lead.js?v=20260929-1"></script>
-<script src="assets/tasks.js?v=20260917-2"></script><script src="assets/reports.js?v=20260917-2"></script><script src="assets/worktasks.js?v=20260726-21"></script>
+<script src="assets/tasks.js?v=20260929-1"></script><script src="assets/reports.js?v=20260917-2"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/finance-dashboard.js?v=20260918-1"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/app.js?v=20260917-1"></script>
