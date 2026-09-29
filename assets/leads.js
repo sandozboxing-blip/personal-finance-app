@@ -142,7 +142,7 @@ function renderLeads() {
   var q = (document.getElementById('srchQ').value || '').toLowerCase();
   var cat = document.getElementById('lCatF').value;
   var folder = getSelectedLeadFolder();
-  var folderHome=!folder;renderLeadFolderView(folder);var outreachBtn=document.getElementById('leadOutreachBtn');if(outreachBtn)outreachBtn.style.display=folderHome?'none':'';var folderToolbar=document.querySelector('#pgleads>.ptbar'),folderTable=document.querySelector('#pgleads>.twrap'),activeFilters=document.getElementById('activeLeadFilters');if(folderToolbar)folderToolbar.style.display=folderHome?'none':'';if(folderTable)folderTable.style.display=folderHome?'none':'';if(activeFilters)activeFilters.style.display=folderHome?'none':'';
+  var folderHome=!folder;renderLeadFolderView(folder);var folderToolbar=document.querySelector('#pgleads>.ptbar'),folderTable=document.querySelector('#pgleads>.twrap'),activeFilters=document.getElementById('activeLeadFilters'),summaryPanel=document.getElementById('leadSummary');if(folderToolbar)folderToolbar.hidden=folderHome;if(folderTable)folderTable.hidden=folderHome;if(activeFilters)activeFilters.hidden=folderHome;if(summaryPanel)summaryPanel.hidden=folderHome;
   var sort = document.getElementById('lSortF').value;
   var contact = (document.getElementById('lContactF') || {}).value || '';
   var rating = parseFloat((document.getElementById('lRatingF') || {}).value) || 0;

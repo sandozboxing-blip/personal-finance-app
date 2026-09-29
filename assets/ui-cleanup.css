@@ -1,3 +1,4 @@
+[hidden]{display:none!important}
 :root{--app-content-width:1480px;--app-gap:24px;--app-radius:16px}
 @media(min-width:769px){
   .dashwrap,.taskmgr,.workmgr,.reports-shell,.settings-shell{width:min(100%,var(--app-content-width));padding:32px var(--page-pad) 72px}
