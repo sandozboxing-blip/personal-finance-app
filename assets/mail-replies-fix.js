@@ -23,7 +23,7 @@ window.syncOutreachReplies=function(manual){
   outreachReplySyncing=true;
   var btn=document.getElementById('outreachSyncBtn');
   if(btn){btn.disabled=true;btn.textContent='Проверяваме…';}
-  fetch('api.php?action=syncOutreachReplies',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'})
+  fetch('api.php?action=syncOutreachReplies',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify((function(){var current=preferredId?leads.find(function(l){return String(l.id)===String(preferredId);}):null;return current?{leadId:current.id,recipientEmail:current.email||'',subject:(current.outreach&&current.outreach.subject)||''}:{};})())})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(!r.ok)throw new Error(d.error||'Грешка при проверката');return d;});})
     .then(function(sync){return fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||'Данните не се заредиха');return{sync:sync,state:d.state||{}};});});})
     .then(function(result){

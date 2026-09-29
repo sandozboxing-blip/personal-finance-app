@@ -74,7 +74,8 @@ if($action==='sendIndividualOutreach'&&$_SERVER['REQUEST_METHOD']==='POST'){
 }
 if($action==='syncOutreachReplies'&&$_SERVER['REQUEST_METHOD']==='POST'){
   require_once __DIR__.'/lib/d8-imap-v2.php';
-  try{$replies=d8FetchReplyHeaders($config);$file=dataFile();$fh=fopen($file,'c+');if(!$fh||!flock($fh,LOCK_EX))throw new RuntimeException('Данните са заключени');rewind($fh);$state=decodeState((string)stream_get_contents($fh));$updated=d8ApplyReplies($state,$replies);if($updated){$state['updatedAt']=gmdate('c');rewind($fh);ftruncate($fh,0);fwrite($fh,"<?php exit; ?>
+  $b=body();
+  try{$replies=d8FetchReplyHeaders($config);$file=dataFile();$fh=fopen($file,'c+');if(!$fh||!flock($fh,LOCK_EX))throw new RuntimeException('Данните са заключени');rewind($fh);$state=decodeState((string)stream_get_contents($fh));$preferredId=(string)($b['leadId']??'');$preferredEmail=strtolower(trim((string)($b['recipientEmail']??'')));$preferredSubject=trim((string)($b['subject']??''));if($preferredId!==''){foreach($state['leads']??[] as &$preferredLead){if((string)($preferredLead['id']??'')!==$preferredId)continue;$preferredOut=is_array($preferredLead['outreach']??null)?$preferredLead['outreach']:[];if(filter_var($preferredEmail,FILTER_VALIDATE_EMAIL))$preferredOut['recipientEmail']=$preferredEmail;if($preferredSubject!=='')$preferredOut['subject']=$preferredSubject;$preferredLead['outreach']=$preferredOut;break;}unset($preferredLead);}$updated=d8ApplyReplies($state,$replies);if($updated){$state['updatedAt']=gmdate('c');rewind($fh);ftruncate($fh,0);fwrite($fh,"<?php exit; ?>
 ".json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));fflush($fh);}flock($fh,LOCK_UN);fclose($fh);reply(['ok'=>true,'updated'=>$updated,'checked'=>count($replies),'diagnostics'=>d8MailDiagnostics(),'updatedAt'=>$state['updatedAt']??null]);}
   catch(Throwable $e){reply(['ok'=>false,'error'=>$e->getMessage()],502);}
 }
