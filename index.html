@@ -7,7 +7,7 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=20260917-1">
-<link rel="stylesheet" href="assets/premium.css?v=20260917-9">
+<link rel="stylesheet" href="assets/premium.css?v=20260929-10">
 <link rel="stylesheet" href="assets/lead-lightbox.css?v=20260928-1">
 <link rel="stylesheet" href="assets/individual-email.css?v=20260929-2">
 <link rel="stylesheet" href="assets/finance-dashboard.css?v=20260918-1">
@@ -157,9 +157,7 @@
               <label>Follow-up<select class="fi" id="lFollowF" onchange="renderLeads()"><option value="">Всеки follow-up</option><option value="today">Днес / просрочен</option><option value="week">Следващите 7 дни</option><option value="none">Без follow-up</option></select></label>
               <label>Подреждане<select class="fi" id="lSortF" onchange="renderLeads()"><option value="priority">Моят приоритет</option><option value="quality">Най-добри първо</option><option value="stars_desc">Оценка: висока → ниска</option><option value="stars_asc">Оценка: ниска → висока</option><option value="name_asc">Име: А → Я</option><option value="name_desc">Име: Я → А</option><option value="category">Категория</option><option value="status">Статус</option><option value="contacts">Най-много контакти</option><option value="followup">Следващ follow-up</option><option value="newest">Последно добавени</option></select></label>
             </div>
-            <small class="filtertitle">БЪРЗ ИЗБОР</small><div class="quickfilters"><button onclick="applyLeadQuickFilter('contact','no_website')">Без сайт</button><button onclick="applyLeadQuickFilter('contact','phone')">С телефон</button><button onclick="applyLeadQuickFilter('contact','email')">С имейл</button><button onclick="applyLeadQuickFilter('rating','4')">4+ звезди</button><button onclick="applyLeadQuickFilter('followup','today')">Follow-up днес</button></div>
-            <div class="filterdivider"></div><small class="filtertitle">ПОДРЕЖДАНЕ ПО ВАЖНОСТ</small><div class="prioritychoices"><button onclick="toggleLeadPriority('no_site')">Без сайт първо <span id="fp-no_site">＋</span></button><button onclick="toggleLeadPriority('low_reviews')">Малко ревюта <span id="fp-low_reviews">＋</span></button><button onclick="toggleLeadPriority('low_rating')">Ниска оценка <span id="fp-low_rating">＋</span></button><button onclick="toggleLeadPriority('has_phone')">С телефон <span id="fp-has_phone">＋</span></button><button onclick="toggleLeadPriority('has_email')">С имейл <span id="fp-has_email">＋</span></button></div>
-            <div class="filtermenufooter"><button class="btn btng" onclick="if(resetLeadFilters())renderLeads()">Нулирай</button><button class="btn btnp" onclick="closeLeadFilterMenu()">Покажи резултатите</button></div>
+            <div class="filtermenufooter"><button class="btn btnp" onclick="closeLeadFilterMenu()">Покажи резултатите</button></div>
           </div>
           <div class="leadfilterbackdrop" id="leadFilterBackdrop" onclick="closeLeadFilterMenu()"></div>
         </div>
@@ -187,16 +185,13 @@
              ondragover="event.preventDefault();this.classList.add('drag')"
              ondragleave="this.classList.remove('drag')"
              ondrop="this.classList.remove('drag');handleDrop(event)">
-          <div style="font-size:42px;margin-bottom:16px">📥</div>
-          <h2>Пусни файл от Instant Data Scraper</h2>
-          <p>Влачи CSV или JSON тук, или кликни за избор на файл.<br>Колоните се разпознават автоматично.</p>
-          <div style="margin-top:20px;display:flex;gap:10px;justify-content:center" onclick="event.stopPropagation()">
-            <button class="btn btnp btnsm" onclick="loadSample()">Зареди примерни данни</button>
-          </div>
+          <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true" style="margin-bottom:16px;color:var(--pll);fill:none;stroke:currentColor;stroke-width:1.6"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18v2h14v-2"/></svg>
+          <h2>Добави или обнови leads</h2>
+          <p>Пусни CSV или JSON файл. Новите бизнеси се добавят, а при съществуващите липсващите имейли и контакти се попълват автоматично.</p>
         </div>
         <table id="ltable" style="display:none">
           <thead><tr>
-            <th>Наименование</th><th>Папка</th><th>Уебсайт</th><th>Оценка</th><th>Статус</th><th>Категория</th><th>Контакти</th><th>Follow-up</th><th style="min-width:130px">Действия</th>
+            <th>Наименование</th><th>Папка</th><th>Уебсайт</th><th>Оценка</th><th>Статус</th><th>Категория</th><th>Контакти</th><th>Follow-up</th>
           </tr></thead>
           <tbody id="ltbody"></tbody>
         </table>
@@ -382,7 +377,7 @@
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260929-5"></script>
 <script src="assets/clients.js?v=20260917-1"></script>
-<script src="assets/leads.js?v=20260929-6"></script>
+<script src="assets/leads.js?v=20260929-7"></script>
 <script src="assets/mail-replies-fix.js?v=20260929-3"></script>
 <script src="assets/individual-email.js?v=20260929-6"></script>
 <script src="assets/tasks.js?v=20260917-2"></script><script src="assets/reports.js?v=20260917-2"></script><script src="assets/worktasks.js?v=20260726-21"></script>
