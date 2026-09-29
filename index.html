@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="assets/premium.css?v=20260929-10">
 <link rel="stylesheet" href="assets/lead-lightbox.css?v=20260928-1">
 <link rel="stylesheet" href="assets/individual-email.css?v=20260929-2">
+<link rel="stylesheet" href="assets/manual-lead.css?v=20260929-1">
 <link rel="stylesheet" href="assets/finance-dashboard.css?v=20260918-1">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
@@ -83,7 +84,7 @@
       <div class="dashwrap">
         <section class="dashhero">
           <div><div class="dashdate" id="dashDate"></div><h1>Добре дошъл, <span id="dashName">Admin</span></h1><p>Ето най-важното за приходите, проектите и следващите ти действия.</p></div>
-          <div class="dashactions"><button class="btn btng btnsm" onclick="jumpPage('leads')">＋ Lead</button><button class="btn btng btnsm" onclick="openAdd('web')">＋ Уеб проект</button><button class="btn btnp btnsm" onclick="openAdd('smm')">＋ SMM клиент</button></div>
+          <div class="dashactions"><button class="btn btng btnsm" onclick="openManualLead()">＋ Нов бизнес</button><button class="btn btng btnsm" onclick="openAdd('web')">＋ Уеб проект</button><button class="btn btnp btnsm" onclick="openAdd('smm')">＋ SMM клиент</button></div>
         </section>
         <div class="dgrid" id="dashCards"></div>
         <div class="dashcols">
@@ -165,12 +166,12 @@
         <button class="btn btnsm lead-replies-cta" id="leadRepliesBtn" onclick="openLeadReplies()">Отговори</button>
         <button class="btn btng btnsm campaign-history-cta" id="leadCampaignsBtn" onclick="openLeadCampaignHistory()">Кампании</button>
         <button class="btn btnp btnsm campaign-cta" id="leadOutreachBtn" onclick="openLeadOutreach()">✉ Стартирай кампания</button>
-        <button class="btn btng btnsm add-leads-cta" onclick="document.getElementById('fi').click()">＋ Добави leads</button>
+        <button class="btn btng btnsm add-leads-cta" onclick="openManualLead()">＋ Нов бизнес</button>
         <details class="lead-more">
           <summary class="btn btng btnsm" aria-label="Още действия">•••</summary>
           <div class="lead-more-menu">
             <label><span>Смени папката</span><select class="fi" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select></label>
-            <button onclick="createLeadFolder()">＋ Нова папка</button>
+            <button onclick="createLeadFolder()">＋ Нова папка</button><button onclick="document.getElementById('fi').click()">↑ Импортирай CSV / JSON</button>
             <button onclick="doExport()">↓ Експорт в CSV</button>
             <button onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
             <button class="danger" onclick="deleteAllLeads()">⌫ Изтрий всички leads</button>
@@ -186,8 +187,8 @@
              ondragleave="this.classList.remove('drag')"
              ondrop="this.classList.remove('drag');handleDrop(event)">
           <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true" style="margin-bottom:16px;color:var(--pll);fill:none;stroke:currentColor;stroke-width:1.6"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18v2h14v-2"/></svg>
-          <h2>Добави или обнови leads</h2>
-          <p>Пусни CSV или JSON файл. Новите бизнеси се добавят, а при съществуващите липсващите имейли и контакти се попълват автоматично.</p>
+          <h2>Импортирай leads</h2>
+          <p>Пусни CSV или JSON файл, когато искаш да добавиш много бизнеси наведнъж. За единичен запис използвай „Нов бизнес“.</p>
         </div>
         <table id="ltable" style="display:none">
           <thead><tr>
@@ -286,6 +287,25 @@
     <div class="mfoot"><button class="btn btng" onclick="closeLeadFolderEditor()">Отказ</button><button class="btn btnp" id="folderEditorSave" onclick="saveLeadFolderEditor()">Създай папка</button></div>
   </div>
 </div>
+<div class="ov manual-lead-ov" id="manualLeadOv" role="dialog" aria-modal="true" aria-labelledby="manualLeadTitle" onclick="if(event.target===this)closeManualLead()">
+  <div class="manual-lead-modal">
+    <header class="manual-lead-head"><div><span>НОВ LEAD</span><h2 id="manualLeadTitle">Добави бизнес</h2><p>Запиши бизнеса ръчно в избраната папка.</p></div><button class="manual-lead-close" type="button" onclick="closeManualLead()" aria-label="Затвори"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+    <form class="manual-lead-form" onsubmit="saveManualLead(event)">
+      <div class="manual-lead-grid">
+        <label class="manual-lead-field wide"><span>Име на бизнеса <b>*</b></span><input id="manualLeadName" maxlength="120" autocomplete="organization" required placeholder="Напр. Дентална клиника София"></label>
+        <label class="manual-lead-field"><span>Папка <b>*</b></span><select id="manualLeadFolder" required></select></label>
+        <label class="manual-lead-field"><span>Категория</span><input id="manualLeadCategory" maxlength="80" placeholder="Напр. Зъболекар"></label>
+        <label class="manual-lead-field"><span>Имейл</span><input id="manualLeadEmail" type="email" maxlength="160" autocomplete="email" placeholder="office@example.bg"></label>
+        <label class="manual-lead-field"><span>Телефон</span><input id="manualLeadPhone" type="tel" maxlength="60" autocomplete="tel" placeholder="+359..."></label>
+        <label class="manual-lead-field wide"><span>Уебсайт</span><input id="manualLeadWebsite" maxlength="300" autocomplete="url" placeholder="https://example.bg"></label>
+        <label class="manual-lead-field wide"><span>Адрес</span><input id="manualLeadAddress" maxlength="240" autocomplete="street-address" placeholder="Град, улица и номер"></label>
+        <label class="manual-lead-field wide"><span>Бележка</span><textarea id="manualLeadNote" maxlength="1200" placeholder="Кратка информация или следваща стъпка"></textarea></label>
+      </div>
+      <div class="manual-lead-error" id="manualLeadError" role="alert" hidden></div>
+      <footer class="manual-lead-actions"><button class="btn btng" type="button" onclick="closeManualLead()">Отказ</button><button class="btn btnp" type="submit">Добави бизнеса</button></footer>
+    </form>
+  </div>
+</div>
 <div class="ov" id="lbOv" role="dialog" aria-modal="true" aria-label="Lead профил" onclick="if(event.target===this)closeLB()">
   <div class="modal lbm">
     <div class="lbhdr" id="lbhdr"></div>
@@ -380,6 +400,7 @@
 <script src="assets/leads.js?v=20260929-7"></script>
 <script src="assets/mail-replies-fix.js?v=20260929-3"></script>
 <script src="assets/individual-email.js?v=20260929-6"></script>
+<script src="assets/manual-lead.js?v=20260929-1"></script>
 <script src="assets/tasks.js?v=20260917-2"></script><script src="assets/reports.js?v=20260917-2"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/finance-dashboard.js?v=20260918-1"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>

@@ -76,26 +76,11 @@ function importLeads(raw) {
     imported.push({id: now + i, name: n, website: pick(r, ['website','site','web','homepage','mre4xd href']), phone: pick(r, ['phone','tel','telephone','phone_number','mobile']), email: pick(r, ['email','email_address','contact_email','mail']), category: cleanGoogle(pick(r, ['category','categories','categoryName','type','niche','industry','business_category','rllt__details'])), address: pick(r, ['address','location','place','full_address','rllt__details 3']) || [pick(r,['street']),pick(r,['city']),pick(r,['state']),pick(r,['country','countryCode'])].filter(Boolean).join(', '), stars: pickN(r, ['rating','stars','score','rate','totalScore','yi40hd']), reviews: pick(r,['reviews','review_count','reviewsCount','rdapee']), price: pick(r,['price','price_range','rllt__details 2']), image: pick(r,['image','image_url','wA1Bge src','wa1bge src']), status: 'unset', pipeline: 'new', folder: getSelectedLeadFolder(), note: '', followup: '', tags: [], extra: extra});
   }
   if (!imported.length) { toast('⚠ Не намерих записи с наименование. Провери файла.', 'var(--yellow)'); return; }
-  var normalizedWebsite=function(value){try{var raw=String(value||'').trim();if(!raw)return'';var u=new URL(/^https?:\/\//i.test(raw)?raw:'https://'+raw);return(u.hostname.replace(/^www\./,'')+u.pathname.replace(/\/$/,'')).toLowerCase();}catch(e){return String(value||'').trim().toLowerCase();}},digits=function(value){return String(value||'').replace(/\D/g,'');},key=function(value){return String(value||'').trim().toLowerCase();};
-  var added=[],updated=0,emailsAdded=0;
-  imported.forEach(function(candidate){
-    var site=normalizedWebsite(candidate.website),phone=digits(candidate.phone),nameAddress=key(candidate.name)+'|'+key(candidate.address);
-    var existing=leads.find(function(lead){return(site&&normalizedWebsite(lead.website)===site)||(phone.length>=7&&digits(lead.phone)===phone)||(candidate.address&&lead.address&&key(lead.name)+'|'+key(lead.address)===nameAddress);});
-    if(!existing){leads.push(candidate);added.push(candidate);return;}
-    var changed=false;existing.extra=existing.extra&&typeof existing.extra==='object'&&!Array.isArray(existing.extra)?existing.extra:{};
-    if(!existing.email&&candidate.email){existing.email=candidate.email;emailsAdded++;changed=true;}
-    else if(candidate.email&&candidate.email.toLowerCase()!==String(existing.email||'').toLowerCase()){
-      var alternatives=String(existing.extra['Alternative business emails']||'').split(',').map(function(x){return x.trim().toLowerCase();}).filter(Boolean);
-      if(alternatives.indexOf(candidate.email.toLowerCase())<0){alternatives.push(candidate.email.toLowerCase());existing.extra['Alternative business emails']=alternatives.join(', ');changed=true;}
-    }
-    ['website','phone','category','address','reviews','price','image'].forEach(function(field){if(!existing[field]&&candidate[field]){existing[field]=candidate[field];changed=true;}});
-    if(!existing.stars&&candidate.stars){existing.stars=candidate.stars;changed=true;}
-    Object.keys(candidate.extra||{}).forEach(function(field){if(!existing.extra[field]&&candidate.extra[field]){existing.extra[field]=candidate.extra[field];changed=true;}});
-    if(changed)updated++;
-  });
+  leads = leads.concat(imported);
   saveData(); renderLeads(); updateBadges(); populateCats();
-  var withPhone=added.filter(function(x){return x.phone;}).length,withEmail=added.filter(function(x){return x.email;}).length,withWeb=added.filter(function(x){return x.website;}).length;
-  toast('Добавени '+added.length+' · обновени '+updated+' · нови имейли '+emailsAdded+(added.length?' · '+withPhone+' телефона · '+withEmail+' имейла · '+withWeb+' сайта':''),'var(--green)');}
+  var withPhone=imported.filter(function(x){return x.phone;}).length,withEmail=imported.filter(function(x){return x.email;}).length,withWeb=imported.filter(function(x){return x.website;}).length;
+  toast('Добавени '+imported.length+' записа · '+withPhone+' телефона · '+withEmail+' имейла · '+withWeb+' сайта','var(--green)');
+}
 
 // ── LEADS RENDER ───────────────────────────────────────
 var SC = {unset:'prospect', prospect:'maybe', maybe:'not', not:'unset'};
