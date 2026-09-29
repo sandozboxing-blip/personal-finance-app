@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="assets/lead-lightbox.css?v=20260928-1">
 <link rel="stylesheet" href="assets/individual-email.css?v=20260929-2">
 <link rel="stylesheet" href="assets/manual-lead.css?v=20260929-1">
+<link rel="stylesheet" href="assets/reply-inbox.css?v=20260929-1">
 <link rel="stylesheet" href="assets/finance-dashboard.css?v=20260918-1">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
@@ -269,7 +270,7 @@
 
 <div class="ov outreachov" id="leadOutreachOv" role="dialog" aria-modal="true" aria-labelledby="leadOutreachTitle" onclick="if(event.target===this)closeLeadOutreach()">
   <div class="modal outreachmodal">
-    <div class="mhdr outreach-simple-head"><div><span class="modaleyebrow">КАМПАНИЯ</span><h3 id="leadOutreachTitle">Имейл кампания</h3><small>1. Избери → 2. Прегледай → 3. Изпрати</small></div><div class="outreachheadactions"><button class="btn btnp btnsm" id="outreachSendAllBtn" onclick="sendApprovedOutreachBatch()">Изпрати одобрените</button><details class="lead-more outreach-more"><summary class="btn btng btnsm" aria-label="Още действия">•••</summary><div class="lead-more-menu"><button id="outreachSyncBtn" onclick="syncOutreachReplies(true)">Провери отговори</button><button id="outreachApproveAllBtn" onclick="approveOutreachSegment()">Одобри целия сегмент</button></div></details><button class="mclose" onclick="closeLeadOutreach()" aria-label="Затвори">✕</button></div></div>
+    <div class="mhdr outreach-simple-head"><div><span class="modaleyebrow">КАМПАНИЯ</span><h3 id="leadOutreachTitle">Имейл кампания</h3><small>1. Избери → 2. Прегледай → 3. Изпрати</small></div><div class="outreachheadactions"><button class="btn btnp btnsm" id="outreachSendAllBtn" onclick="sendApprovedOutreachBatch()">Изпрати одобрените</button><details class="lead-more outreach-more"><summary class="btn btng btnsm" aria-label="Още действия">•••</summary><div class="lead-more-menu"><button id="outreachSyncBtn" onclick="syncOutreachReplies(true)">Виж отговорите</button><button id="outreachApproveAllBtn" onclick="approveOutreachSegment()">Одобри целия сегмент</button></div></details><button class="mclose" onclick="closeLeadOutreach()" aria-label="Затвори">✕</button></div></div>
     <div class="outreachbody">
       <aside class="outreachqueue">
         <div class="outreachsegments" id="outreachSegments"></div>
@@ -397,8 +398,9 @@
 <script src="assets/onesignal.js?v=20260726-20"></script>
 <script src="assets/core.js?v=20260929-8"></script>
 <script src="assets/clients.js?v=20260917-1"></script>
-<script src="assets/leads.js?v=20260929-8"></script>
-<script src="assets/mail-replies-fix.js?v=20260929-5"></script>
+<script src="assets/leads.js?v=20260929-9"></script>
+<script src="assets/mail-replies-fix.js?v=20260929-6"></script>
+<script src="assets/reply-inbox.js?v=20260929-1"></script>
 <script src="assets/individual-email.js?v=20260929-8"></script>
 <script src="assets/manual-lead.js?v=20260929-1"></script>
 <script src="assets/tasks.js?v=20260917-2"></script><script src="assets/reports.js?v=20260917-2"></script><script src="assets/worktasks.js?v=20260726-21"></script>

@@ -30,9 +30,7 @@ window.syncOutreachReplies=function(manual,selectedId){
       var state=result.state;
       leads=state.leads||[];leadFolders=state.leadFolders||leadFolders;leadFolderMeta=state.leadFolderMeta||leadFolderMeta;lastServerUpdatedAt=state.updatedAt||lastServerUpdatedAt;
       normalizeData();saveLocal(false);renderLeads();if(window.renderReports)renderReports();
-      var opened=openLatestLeadReply(preferredId);
-      if(opened)toast('Отговорът е зареден в профила','var(--green)');
-      else if(manual){var diag=result.sync.diagnostics||{},box=diag.mailbox?(' в '+diag.mailbox):'';toast('Проверени '+(result.sync.checked||0)+' входящи писма'+box+' · няма съвпадение за този lead','var(--blue)');}
+      if(manual)openReplyInbox(result.sync.messages||[],result.sync.checked||0,preferredId);
     })
     .catch(function(e){if(manual)toast(e.message||'Грешка при проверката на пощата','var(--red)');})
     .finally(function(){outreachReplySyncing=false;if(btn){btn.disabled=false;btn.textContent='Провери отговори';}});
