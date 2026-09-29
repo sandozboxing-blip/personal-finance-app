@@ -17,9 +17,9 @@ window.openLatestLeadReply=function(preferredId){
   if(campaign&&campaign.classList.contains('open'))closeLeadOutreach();
   openLB(rows[0].id);return true;
 };
-window.syncOutreachReplies=function(manual){
+window.syncOutreachReplies=function(manual,selectedId){
   if(outreachReplySyncing||!currentUser)return;
-  var preferredId=manual&&lbid?lbid:null;
+  var preferredId=manual?(selectedId!=null?selectedId:lbid):null;
   outreachReplySyncing=true;
   var btn=document.getElementById('outreachSyncBtn');
   if(btn){btn.disabled=true;btn.textContent='Проверяваме…';}
