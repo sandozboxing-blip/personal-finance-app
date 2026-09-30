@@ -4,8 +4,8 @@ function num(v){return parseFloat(v)||0;}
 function pct(profit,revenue){return revenue?Math.round(profit/revenue*100):0;}
 function actualRow(c,type){
   var monthly=type==='smm'||(c.paymentType||'monthly')==='monthly',cycles=monthly?paidCycles(c):0,gross=0,cost=0,kind='';
-  if(type==='smm'){gross=cycles*num(c.monthly);cost=cycles*num(c.cost);kind='SMM · '+cycles+' отчетени мес.';}
-  else if(monthly){gross=(c.initialPaid===true?num(c.initial):0)+cycles*num(c.monthly);cost=cycles*num(c.cost);kind='Web · '+cycles+' отчетени мес.';}
+  if(type==='smm'){gross=cycles*num(c.monthly);cost=cycles*num(c.cost);kind='SMM · '+cycles+' платени мес.';}
+  else if(monthly){gross=(c.initialPaid===true?num(c.initial):0)+cycles*num(c.monthly);cost=cycles*num(c.cost);kind='Web · '+(c.initialPaid===true?'изработка + ':'')+cycles+' платени мес.';}
   else{gross=c.oneTimePaid===true?num(c.oneTime):0;cost=c.oneTimePaid===true?num(c.cost):0;kind='Web · еднократен';}
   return{id:c.id,type:type,name:c.name||'Без име',kind:kind,status:c.status,revenue:gross,cost:cost,profit:gross-cost,margin:pct(gross-cost,gross)};
 }
