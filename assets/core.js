@@ -63,9 +63,8 @@ function localState(){return{leads:leads,leadFolders:leadFolders,leadFolderMeta:
 function mergeRecords(remote,local){var merged=[],positions={};(Array.isArray(remote)?remote:[]).forEach(function(item){var key=item&&item.id!=null?String(item.id):'';if(key)positions[key]=merged.length;merged.push(item);});(Array.isArray(local)?local:[]).forEach(function(item){var key=item&&item.id!=null?String(item.id):'';if(key&&positions[key]!=null)merged[positions[key]]=item;else{if(key)positions[key]=merged.length;merged.push(item);}});return merged;}
 function mergeExternalShared(state,local){leads=mergeRecords(state.leads,local.leads);leadFolders=[].concat(state.leadFolders||[],local.leadFolders||[]).filter(function(name,index,all){return name&&all.indexOf(name)===index;});leadFolderMeta=Object.assign({},state.leadFolderMeta||{},local.leadFolderMeta||{});smm=mergeRecords(state.smm,local.smm);web=mergeRecords(state.web,local.web);workTasks=mergeRecords(state.workTasks,local.workTasks);}
 function setSyncState(state,text){
-  var el=document.getElementById('syncStatus'),label=document.getElementById('settingsSyncLabel');
+  var el=document.getElementById('syncStatus');
   if(el){el.dataset.state=state;el.disabled=state==='saving'||state==='loading';el.setAttribute('aria-busy',state==='saving'||state==='loading'?'true':'false');el.title=state==='error'?'Синхронизацията не успя — натисни за нов опит':'Натисни за синхронизация';var span=el.querySelector('span');if(span)span.textContent=text;}
-  if(label)label.textContent=text;
 }
 function hideAppLoader(){
   var loader=document.getElementById('appLoader');if(!loader)return;

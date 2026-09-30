@@ -7,13 +7,13 @@
 <title>Digital Eight Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=20260917-1">
-<link rel="stylesheet" href="assets/premium.css?v=20260929-10">
+<link rel="stylesheet" href="assets/premium.css?v=20260930-11">
 <link rel="stylesheet" href="assets/lead-lightbox.css?v=20260928-1">
 <link rel="stylesheet" href="assets/individual-email.css?v=20260929-2">
 <link rel="stylesheet" href="assets/manual-lead.css?v=20260929-1">
 <link rel="stylesheet" href="assets/reply-inbox.css?v=20260929-1">
 <link rel="stylesheet" href="assets/finance-dashboard.css?v=20260918-1">
-<link rel="stylesheet" href="assets/ui-cleanup.css?v=20260930-2">
+<link rel="stylesheet" href="assets/ui-cleanup.css?v=20260930-3">
 <link rel="icon" type="image/png" href="/d8-favicon-96-v2.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v2.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/d8-apple-touch-v2.png" />
@@ -140,7 +140,6 @@
       <div class="leadfolderview" id="leadFolderView"></div>
       <div class="leadsummary" id="leadSummary"></div>
       <div class="ptbar leads-toolbar">
-        <div class="leads-toolbar-copy"><span>РАБОТНО ПРОСТРАНСТВО</span><strong>Потенциални клиенти</strong><small>Филтрирай списъка или стартирай кампания.</small></div>
         <div class="lead-quick-tabs" id="lfTabs" aria-label="Бързи филтри">
           <button class="btn btnsm active" data-f="all" onclick="clearLeadQuickFilters(this)" style="background:var(--b4);color:var(--w0)">Всички</button>
           <button class="btn btng btnsm" data-quick="noWebsite" onclick="toggleLeadQuick('noWebsite',this)">Без сайт</button>
@@ -164,18 +163,16 @@
           </div>
           <div class="leadfilterbackdrop" id="leadFilterBackdrop" onclick="closeLeadFilterMenu()"></div>
         </div>
-        <div class="leads-toolbar-spacer"></div>
         <button class="btn btnsm lead-replies-cta" id="leadRepliesBtn" onclick="openLeadReplies()">Отговори</button>
         <button class="btn btnp btnsm campaign-cta" id="leadOutreachBtn" onclick="openLeadOutreach()">✉ Стартирай кампания</button>
         <button class="btn btng btnsm add-leads-cta" onclick="openManualLead()">＋ Нов бизнес</button>
         <details class="lead-more">
           <summary class="btn btng btnsm" aria-label="Още действия">•••</summary>
           <div class="lead-more-menu">
-            <button onclick="openLeadCampaignHistory()">Кампании</button><label><span>Смени папката</span><select class="fi" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select></label>
+            <button onclick="openLeadCampaignHistory()">Кампании</button><label hidden><span>Смени папката</span><select class="fi" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select></label>
             <button onclick="document.getElementById('fi').click()">↑ Импортирай CSV / JSON</button>
             <button onclick="doExport()">↓ Експорт в CSV</button>
             <button onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
-            <button class="danger" onclick="deleteAllLeads()">⌫ Изтрий всички leads</button>
           </div>
         </details>
         <input type="file" id="fi" accept=".csv,.json,text/csv,application/json" style="display:none" onchange="handleFile(event)">
@@ -252,7 +249,7 @@
       </div>
     </div>    <div class="page" id="pgsettings">
       <div class="setwrap settings-shell">
-        <div class="settings-hero"><div><span class="settings-eyebrow">КОНТРОЛЕН ЦЕНТЪР</span><h2>Настройки</h2><p class="setsub">Персонализирай работния процес за <strong id="settingsProfileName">профила</strong>. Промените се пазят отделно за всеки акаунт.</p></div><div class="settings-status"><span class="sync-dot"></span><div><b>Общи бизнес данни</b><small id="settingsSyncLabel">Автоматично синхронизиране</small></div></div></div>
+        <div class="settings-hero"><div><span class="settings-eyebrow">КОНТРОЛЕН ЦЕНТЪР</span><h2>Настройки</h2><p class="setsub">Персонализирай работния процес за <strong id="settingsProfileName">профила</strong>. Промените се пазят отделно за всеки акаунт.</p></div></div>
         <div class="settings-grid">
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">✓</span><div><h3>Задачи и календар</h3><p>Стойности при създаване на ново събитие.</p></div></div><div class="settings-fields"><label>Приоритет по подразбиране<select class="fi" id="defaultTaskPriority" onchange="saveProfileSettings()"><option value="normal">Нормален</option><option value="high">Висок</option><option value="low">Нисък</option></select></label><label>Повторение по подразбиране<select class="fi" id="defaultTaskRepeat" onchange="saveProfileSettings()"><option value="none">Еднократно</option><option value="yearly">Всяка година</option><option value="monthly">Всеки месец</option><option value="weekly">Всяка седмица</option></select></label></div></section>
           <section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">⌕</span><div><h3>Leads</h3><p>Колко бизнеса да виждаш наведнъж.</p></div></div><div class="settings-fields"><label>Записи на страница<select class="fi" id="settingsLeadPageSize" onchange="saveProfileSettings()"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label></div><div class="settings-note">Тази настройка се запомня само за текущия профил.</div></section><section class="settings-card"><div class="settings-card-head"><span class="settings-card-icon">↗</span><div><h3>Follow-up автоматизация</h3><p>Създава задача след изпратен outreach имейл.</p></div></div><div class="settings-fields"><label>Напомни след<select class="fi" id="settingsFollowupDays" onchange="saveProfileSettings()"><option value="3">3 дни</option><option value="5">5 дни</option><option value="7">7 дни</option><option value="10">10 дни</option><option value="14">14 дни</option></select></label></div><div class="settings-note">При получен отговор задачата се затваря автоматично.</div></section>
@@ -314,11 +311,7 @@
       <div class="lbcol" id="lbinfo"></div>
       <div class="lbcol" id="lbnotes"></div>
     </div>
-    <div class="mfoot">
-      <button class="btn btnd btnsm" onclick="lbDel()">⌫ Изтрий запис</button>
-      <div style="flex:1"></div>
-      <button class="btn btng" onclick="closeLB()">Затвори</button>
-    </div>
+    <div class="mfoot lead-profile-actions"><button class="btn btnd btnsm" onclick="lbDel()">⌫ Изтрий запис</button></div>
   </div>
 </div>
 
@@ -395,9 +388,9 @@
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
 <script src="assets/onesignal.js?v=20260726-20"></script>
-<script src="assets/core.js?v=20260929-8"></script>
+<script src="assets/core.js?v=20260930-9"></script>
 <script src="assets/clients.js?v=20260917-1"></script>
-<script src="assets/leads.js?v=20260930-11"></script>
+<script src="assets/leads.js?v=20260930-12"></script>
 <script src="assets/mail-replies-fix.js?v=20260929-7"></script>
 <script src="assets/reply-inbox.js?v=20260929-1"></script>
 <script src="assets/individual-email.js?v=20260929-8"></script>
