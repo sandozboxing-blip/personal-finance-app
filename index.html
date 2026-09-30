@@ -92,7 +92,7 @@
         <div class="dashcols">
           <div style="display:flex;flex-direction:column;gap:16px">
             <section class="dashpanel"><div class="dashpanelhead"><div><h3>Финансов преглед</h3><span>Активни договори и проекти</span></div><button class="btn btng btnsm" onclick="jumpPage('smm')">Клиенти →</button></div><div class="dashpanelbody"><div class="pipeline" id="dashPipeline"></div></div></section>
-            <section class="dashpanel"><div class="dashpanelhead"><div><h3>Паричен поток</h3><span>Последните 6 месеца · потвърдени плащания</span></div><span class="dashlegend"><i></i> Приход <i></i> Разход</span></div><div class="dashpanelbody"><div class="cashflowchart" id="dashCashflow"></div></div></section>
+            <section class="dashpanel"><div class="dashpanelhead"><div><h3>Паричен поток</h3><span>Последните 6 месеца · отчетени периоди</span></div><span class="dashlegend"><i></i> Приход <i></i> Разход</span></div><div class="dashpanelbody"><div class="cashflowchart" id="dashCashflow"></div></div></section>
             <section class="dashpanel"><div class="dashpanelhead"><div><h3>Нуждае се от внимание</h3><span id="alertCount">0 известия</span></div></div><div class="dashpanelbody"><div class="alertlist" id="dashAlerts"></div></div></section>
             <section class="dashpanel"><div class="dashpanelhead"><div><h3>Бизнес анализ</h3><span>Автоматично от твоите данни</span></div></div><div class="dashpanelbody"><div class="insightgrid" id="dashAnalysis"></div></div></section>
           </div>
@@ -208,7 +208,7 @@
           <section class="report-panel"><header><div><h3>Очаквана нетна печалба по месеци</h3><p>Отчита края на активните договори.</p></div><span class="report-chip">3 месеца</span></header><div class="forecast-bars" id="reportForecast"></div></section>
           <section class="report-panel"><header><div><h3>Follow-up задачи</h3><p>Създават се след изпратен имейл и спират при отговор.</p></div><b class="report-count" id="reportFollowupCount">0</b></header><div class="followup-list" id="reportFollowups"></div></section>
         </div>
-        <section class="report-panel profitability-panel"><header><div><h3>Рентабилност по клиент</h3><p>Само потвърдени плащания и свързаните с тях разходи.</p></div><span class="report-chip">По реална печалба</span></header><div class="profitability-head"><span>Клиент</span><span>Приход</span><span>Разход</span><span>Печалба</span><span>Марж</span></div><div class="profitability-rows" id="profitabilityRows"></div></section>
+        <section class="report-panel profitability-panel"><header><div><h3>Рентабилност по клиент</h3><p>От началната дата до днес или до зададената крайна дата.</p></div><span class="report-chip">По реална печалба</span></header><div class="profitability-head"><span>Клиент</span><span>Приход</span><span>Разход</span><span>Печалба</span><span>Марж</span></div><div class="profitability-rows" id="profitabilityRows"></div></section>
       </div>
     </div>
     <div class="page" id="pgtasks">
@@ -388,16 +388,16 @@
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
 <script src="assets/onesignal.js?v=20260726-20"></script>
-<script src="assets/core.js?v=20260930-9"></script>
-<script src="assets/clients.js?v=20260917-1"></script>
+<script src="assets/core.js?v=20260930-11"></script>
+<script src="assets/clients.js?v=20260930-3"></script>
 <script src="assets/leads.js?v=20260930-12"></script>
 <script src="assets/mail-replies-fix.js?v=20260929-7"></script>
 <script src="assets/reply-inbox.js?v=20260929-1"></script>
 <script src="assets/individual-email.js?v=20260929-8"></script>
 <script src="assets/manual-lead.js?v=20260929-1"></script>
-<script src="assets/tasks.js?v=20260929-1"></script><script src="assets/reports.js?v=20260917-2"></script><script src="assets/worktasks.js?v=20260726-21"></script>
-<script src="assets/finance-dashboard.js?v=20260918-1"></script>
+<script src="assets/tasks.js?v=20260929-1"></script><script src="assets/reports.js?v=20260930-4"></script><script src="assets/worktasks.js?v=20260726-21"></script>
+<script src="assets/finance-dashboard.js?v=20260930-3"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
-<script src="assets/app.js?v=20260917-1"></script>
+<script src="assets/app.js?v=20260930-2"></script>
 </body>
 </html>

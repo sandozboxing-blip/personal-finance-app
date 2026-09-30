@@ -2,7 +2,7 @@
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmt(n) { return Number(n || 0).toLocaleString('bg-BG', {maximumFractionDigits: 0}); }
 function fmtD(d) { try { return new Date(d).toLocaleDateString('bg-BG', {day: '2-digit', month: 'short'}); } catch(e) { return d || ''; } }
-function addMonths(date, m) { var d = new Date(date); d.setMonth(d.getMonth() + m); return d; }
+function addMonths(date,m){var match=typeof date==='string'&&String(date).match(/^(\d{4})-(\d{2})-(\d{2})/),d=match?new Date(Number(match[1]),Number(match[2])-1,Number(match[3])):new Date(date);if(isNaN(d))return d;var day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+(parseInt(m)||0));d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return d;}
 function toast(msg, col) {
   var c = document.getElementById('toasts'); var t = document.createElement('div');
   t.className = 'toast'; t.innerHTML = '<span style="color:' + col + '">●</span> ' + msg;
