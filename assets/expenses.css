@@ -1,0 +1,28 @@
+#pgexpenses{padding:8px 0 32px}
+#expensesContent{max-width:1200px;margin:0 auto}
+.expenses-panel .dashpanelhead{padding:28px;gap:24px;align-items:center;flex-wrap:wrap}
+.expenses-panel .dashpanelhead h3{margin:0 0 10px;font-size:24px}
+.expenses-panel .dashpanelhead span{display:block;line-height:1.6}
+.expenses-panel .dashpanelbody{padding:28px;display:flex;flex-direction:column;gap:28px}
+.expenses-description{margin:0;max-width:820px;line-height:1.8;color:var(--w3)}
+.expense-form{padding:24px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}
+.expense-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.expense-fields label{display:flex;flex-direction:column;gap:10px;min-width:0;color:var(--w2);font-size:13px}
+.expense-fields .linp{width:100%;min-width:0;margin:0;box-sizing:border-box;padding:12px 14px;font-size:16px}
+.expense-form-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
+.expense-list{display:flex;flex-direction:column;gap:16px;line-height:1.7}
+.expense-row{display:flex;flex-wrap:wrap;align-items:center;gap:24px;padding:24px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
+.expense-info{flex:1;min-width:0;overflow-wrap:anywhere;display:flex;flex-direction:column;gap:10px}
+.expense-info strong{font-size:16px}.expense-info p{margin:0;color:var(--w2)}.expense-info small{color:var(--w3)}.expense-info small:empty{display:none}
+.expense-row-actions{display:flex;flex-wrap:wrap;gap:12px}
+.expenses-panel .btn{min-height:44px;padding:12px 18px}
+@media(max-width:700px){
+ #pgexpenses{padding:8px 0 24px}
+ .expenses-panel .dashpanelhead{padding:24px 20px;gap:20px;align-items:stretch;flex-direction:column}
+ .expenses-panel .dashpanelbody{padding:24px 20px;gap:24px}
+ .expense-form{padding:20px 16px}
+ .expense-fields{grid-template-columns:1fr;gap:22px}
+ .expense-row{padding:20px;gap:20px;align-items:stretch;flex-direction:column}
+ .expense-row-actions,.expense-form-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .expenses-panel .btn{white-space:normal}
+}
