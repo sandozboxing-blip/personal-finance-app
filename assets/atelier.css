@@ -180,3 +180,58 @@ body.lead-filter-open{overflow-y:hidden!important}
 .folderprogress label,.folderprogress label b{font:550 12px/1.6 var(--sans)}
 @media(max-width:700px){.leadfolderview.compact{grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:22px!important}.leadfolderview.compact .compactfoldericon{display:none}.leadfolderview.compact .folderback{grid-column:1/-1;justify-self:start;max-width:calc(100% - 48px)}.leadfolderview.compact .compactedit{position:absolute;right:20px;top:22px}.leadfolderview.compact>b{font-size:12px;margin:0}.leadfolderview.compact h2{font-size:20px}}
 .page .managerlist{max-height:none;overflow:visible}
+/* Clearer glass throughout, with an unmistakable warm selected destination. */
+:root{
+ --glass:linear-gradient(135deg,rgba(255,255,255,.24),rgba(255,252,246,.09)),rgba(245,238,228,.25);
+ --glass-heavy:linear-gradient(135deg,rgba(255,255,255,.30),rgba(252,247,239,.13)),rgba(237,226,210,.42);
+ --glass-shadow:0 14px 38px rgba(89,63,40,.08),inset 0 1px 0 rgba(255,255,255,.82),inset 1px 0 0 rgba(255,255,255,.20);
+ --control-bg:rgba(255,252,246,.34);--surface-chrome:rgba(250,245,238,.66);--surface-panel:rgba(255,249,241,.20);
+ --nav-active:linear-gradient(130deg,rgba(119,82,52,.94),rgba(79,54,37,.88));
+}
+:root[data-theme=dark]{
+ --glass:linear-gradient(135deg,rgba(231,201,255,.09),rgba(213,177,243,.025)),rgba(23,16,33,.34);
+ --glass-heavy:linear-gradient(135deg,rgba(232,209,255,.12),rgba(211,173,242,.04)),rgba(23,15,32,.55);
+ --glass-shadow:0 16px 42px rgba(0,0,0,.18),inset 0 1px 0 rgba(245,222,255,.22),inset 1px 0 0 rgba(245,222,255,.06);
+ --control-bg:rgba(17,10,26,.24);--surface-chrome:rgba(31,21,42,.72);--surface-panel:rgba(231,208,250,.035);
+ --nav-active:linear-gradient(130deg,rgba(146,103,68,.94),rgba(93,63,43,.90));
+}
+.sidebar .glass-nav-marker{background:var(--nav-active)!important;box-shadow:inset 0 1px 0 rgba(255,244,226,.36),inset 0 0 0 1px rgba(255,234,209,.18),0 8px 20px rgba(75,41,21,.16)}
+body .sbi.active,body .sbi.active .ic{color:#fffaf2!important}
+body .sbi.active .sbdg{background:rgba(255,250,242,.16);color:#fffaf2;border-color:rgba(255,250,242,.16)}
+.sbnav:has(.glass-nav-marker) .sbi.active{background:transparent!important}
+.custom-popover,.reply-inbox-modal,.individual-email-modal,.outreachmodal,.foldereditor{background:var(--glass-heavy)!important;-webkit-backdrop-filter:blur(30px) saturate(125%);backdrop-filter:blur(30px) saturate(125%);border:1px solid var(--line2)!important;box-shadow:var(--glass-shadow);color:var(--w1)}
+/* Every part of the CRM profile follows the selected theme, not the legacy dark palette. */
+#lbOv .lbm{background:var(--glass-heavy)!important;-webkit-backdrop-filter:blur(30px) saturate(125%);backdrop-filter:blur(30px) saturate(125%);border-color:var(--line2)}
+#lbOv .lbhdr,#lbOv>.lbm>.mfoot{background:var(--surface-chrome)!important;background-image:none!important;border-color:var(--line)!important;-webkit-backdrop-filter:blur(28px);backdrop-filter:blur(28px)}
+#lbOv .lbname{color:var(--w0);font-size:clamp(23px,2.4vw,30px)}
+#lbOv .lbmeta,#lbOv .lburl,#lbOv .lbeyebrow,#lbOv .flbl{color:var(--w3)}
+#lbOv .lbav{background:var(--pdim);border-color:var(--line2);color:var(--pl)}
+#lbOv .lbbody{background:transparent!important}
+#lbOv .lbcol,#lbOv .lbcommunication,#lbOv .lbcommunication.replied,#lbOv .lbreplymessage,#lbOv .lbcommdetails>div,#lbOv .lbcommdetails details,#lbOv .scraper-profile-card{background:var(--surface-panel)!important;border-color:var(--line)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+#lbOv .lbreplymessage header{background:var(--control-bg);border-color:var(--line)}
+#lbOv .lbreplybody,#lbOv .lbcommdetails strong,#lbOv .lbsec{color:var(--w1)}
+#lbOv .lbcommdetails span,#lbOv .lbreplymessage header small{color:var(--w3)}
+#lbOv .fi,#lbOv .fsel,#lbOv .fta,#lbOv .custom-control-trigger{background:var(--control-bg)!important;color:var(--w1);border-color:var(--line2)!important;font-size:15px}
+#lbOv .flbl{font:600 13px/1.6 var(--sans);letter-spacing:.025em}
+#lbOv .lbcommhead h3{font-size:21px}
+#lbOv .lbhdr>.mclose{background:var(--control-bg);border-color:var(--line);color:var(--w2)}
+.manual-lead-head,.individual-email-modal>header,.individual-email-modal>footer,.reply-inbox-modal>header,.outreach-simple-head,.foldereditor .mhdr{background:var(--surface-chrome)!important;background-image:none!important;border-color:var(--line)!important}
+.individual-email-modal>main,.reply-inbox-body,.outreachbody,.outreachcomposer,.outreachqueue,.foldereditorbody,.foldereditorform,.folderpreviewwrap{background:transparent!important;color:var(--w1);border-color:var(--line)!important}
+.reply-inbox-heading p,.reply-empty p,.reply-summary-copy small,.reply-thread>summary>time,.reply-message>header time,.reply-summary-chevron,.reply-link-row label{color:var(--w3)}
+.reply-inbox-heading>span,.reply-message.outgoing>header strong{color:var(--pl)}
+.reply-summary-copy strong,.reply-message>p{color:var(--w1)}
+.reply-thread,.reply-thread-content,.reply-message,.reply-empty,.outreachwelcome,.outreachcheck,.outreachlead,.folderpreview,.campaign-history-card,.reply-received-card{background:var(--surface-panel)!important;border-color:var(--line)!important;color:var(--w1)}
+.reply-thread>summary:hover{background:var(--control-bg)}
+.reply-summary-icon,.reply-empty>div,.reply-group-title b{background:var(--pdim);color:var(--pl)}
+.reply-inbox-close{background:var(--control-bg);border-color:var(--line);color:var(--w2)}
+.reply-open-lead,.reply-link-row button{background:var(--primary);border-color:var(--primary);color:var(--primary-text)}
+.reply-message.incoming>header strong{color:var(--green)}
+body.reply-inbox-open{overflow-y:hidden!important}
+@media(max-width:1000px){.sbnav:has(.glass-nav-marker) .sbi.active{background:var(--nav-active)!important}.mobile-nav button.active{background:var(--nav-active)!important;color:#fffaf2!important}.mobile-nav button.active .nav-icon-wrap{background:rgba(255,250,242,.16)!important;color:#fffaf2!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.16)!important}}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){:root{--glass:#f4eee4;--glass-heavy:#f8f3eb;--surface-chrome:#f8f3eb;--surface-panel:#f4eee4;--control-bg:#fffaf2}:root[data-theme=dark]{--glass:#21182b;--glass-heavy:#21182b;--surface-chrome:#21182b;--surface-panel:#291e35;--control-bg:#170f21}}
+.custom-option.is-selected,.lead-quick-tabs .btn.active{background:var(--nav-active)!important;color:#fffaf2!important;border-color:rgba(255,240,220,.22)!important}
+/* The empty-URL hint is inline text, not the page-wide .empty placeholder layout. */
+#lbOv .lburl.empty{padding:0!important;margin:0!important;min-height:0;height:auto;line-height:1.6;text-align:left}
+#lbOv .lbhdr{align-items:start}
+#lbOv{background:rgba(24,18,12,.38)}
+[data-theme=dark] #lbOv{background:rgba(4,2,8,.52)}
