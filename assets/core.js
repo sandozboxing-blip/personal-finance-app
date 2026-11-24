@@ -157,7 +157,7 @@ var PTITLES = {dash: 'Табло', expenses:'Разходи', tasks: 'Кален
 
 function goPage(id, el) {
   var pageChanged=curpg!==id;curpg = id;
-  if(pageChanged){var content=document.getElementById('mainContent');if(content)content.scrollTop=0;}
+  if(pageChanged){var content=document.getElementById('mainContent');if(content)content.scrollTop=0;window.scrollTo({top:0,left:0,behavior:'instant'});}
   closeMobileSheets();
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.sbi').forEach(function(x) { x.classList.remove('active'); });
