@@ -90,13 +90,14 @@ function flushSave(){
   if(syncInFlight||!syncPending||!currentUser)return;
   var scope=syncScope||'all';syncScope='';syncPending=false;syncInFlight=true;setSyncState('saving','Записване...');
   var payload=JSON.stringify(Object.assign(localState(),{saveScope:scope}));
-  fetch('api.php?action=save',{method:'POST',credentials:'same-origin',keepalive:true,headers:{'Content-Type':'application/json'},body:payload})
+  fetch('api.php?action=save',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:payload})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error(d.error||'SAVE');return d;});})
-    .then(function(d){syncWarningShown=false;lastServerUpdatedAt=d.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);if(scope!=='profile')localStorage.removeItem('d8SyncDirty');setSyncState('saved','Всичко е запазено');})
+    .then(function(d){syncWarningShown=false;lastServerUpdatedAt=d.updatedAt||new Date().toISOString();localStorage.setItem('d8LastServerAt',lastServerUpdatedAt);if(scope!=='profile'&&!syncPending)localStorage.removeItem('d8SyncDirty');setSyncState(syncPending?'saving':'saved',syncPending?'Записване...':'Всичко е запазено');})
     .catch(function(e){if(e.message==='AUTH'){showLogin('Сесията изтече. Влез отново.');return;}syncScope=syncScope&&syncScope!==scope?'all':scope;syncPending=true;setSyncState('error','Не е записано');if(!syncWarningShown){syncWarningShown=true;toast('Промените са запазени на устройството, но сървърът не отговори. Ще опитаме отново автоматично.','var(--yellow)');}})
     .finally(function(){syncInFlight=false;if(syncPending&&document.visibilityState==='visible')syncTimer=setTimeout(flushSave,5000);});
 }
 function normalizeData(){
+  ['smm','web','expenses'].forEach(function(key){var list=key==='smm'?smm:key==='web'?web:expenses;list=(Array.isArray(list)?list:[]).filter(function(c){return c&&typeof c==='object';});list.forEach(function(c){c.id=String(c.id||('c'+Date.now()+Math.random().toString(36).slice(2)));c.name=String(c.name||'Без име');});if(key==='smm')smm=list;else if(key==='web')web=list;else expenses=list;});
   if(!Array.isArray(leads))leads=[];if(!Array.isArray(leadFolders))leadFolders=[];if(!leadFolderMeta||typeof leadFolderMeta!=='object'||Array.isArray(leadFolderMeta))leadFolderMeta={};if(!Array.isArray(workTasks))workTasks=[];leadFolders=leadFolders.map(String).map(function(x){return x.trim();}).filter(function(x,i,a){return x&&a.indexOf(x)===i;});
   leads=leads.filter(function(l){return l&&typeof l==='object';});
   if(leads.length&&!leadFolders.length&&leads.every(function(l){return !l.folder;})){leadFolders=['Зъболекари — София'];leads.forEach(function(l){l.folder='Зъболекари — София';});}
@@ -123,7 +124,7 @@ function readLocalData(){
 }
 function finishDataLoad(){
   dataLoaded=true;populateCats();renderLeadFolders();renderLeadAddons();renderTaskCategories();applyProfileSettings();updateBadges();
-  renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();if(curpg==='tasks')renderTaskManager();if(curpg==='work')renderWorkTaskManager();if(curpg==='reports'&&window.renderReports)renderReports();
+  renderDash();if(curpg==='smm')renderSmm();if(curpg==='web')renderWeb();if(curpg==='leads')renderLeads();if(curpg==='tasks')renderTaskManager();if(curpg==='work')renderWorkTaskManager();if(curpg==='expenses'&&window.renderExpenses)renderExpenses();if(curpg==='reports'&&window.renderReports)renderReports();
   setTimeout(hideAppLoader,100);
 }
 function loadData(){
@@ -147,7 +148,7 @@ function loadData(){
 }
 function refreshServerData(){
   if(!currentUser||!dataLoaded||syncPending||syncInFlight||document.visibilityState==='hidden')return;
-  fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error('LOAD');return d;});}).then(function(d){var state=d.state||{},stamp=state.updatedAt||'';if(!stamp||stamp===lastServerUpdatedAt)return;leads=state.leads||[];leadFolders=state.leadFolders||[];leadFolderMeta=state.leadFolderMeta||{};smm=state.smm||[];web=state.web||[];expenses=state.expenses||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};lastServerUpdatedAt=stamp;normalizeData();saveLocal(false,'');finishDataLoad();setSyncState('saved','Синхронизирано');}).catch(function(e){if(e.message==='AUTH')showLogin('Сесията изтече. Влез отново.');});
+  fetch('api.php?action=load',{credentials:'same-origin'}).then(function(r){return r.json().then(function(d){if(r.status===401)throw new Error('AUTH');if(!r.ok)throw new Error('LOAD');return d;});}).then(function(d){if(syncPending||syncInFlight)return;var state=d.state||{},stamp=state.updatedAt||'';if(!stamp||stamp===lastServerUpdatedAt)return;leads=state.leads||[];leadFolders=state.leadFolders||[];leadFolderMeta=state.leadFolderMeta||{};smm=state.smm||[];web=state.web||[];expenses=state.expenses||[];workTasks=state.workTasks||[];sharedTasks=state.tasks||[];focusTasks=state.focusTasks||[];taskCategories=state.taskCategories||[];userSettings=state.settings||{};lastServerUpdatedAt=stamp;normalizeData();saveLocal(false,'');finishDataLoad();setSyncState('saved','Синхронизирано');}).catch(function(e){if(e.message==='AUTH')showLogin('Сесията изтече. Влез отново.');});
 }
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&syncPending)flushSave();else if(document.visibilityState==='visible')refreshServerData();});
 setInterval(refreshServerData,15000);
@@ -155,7 +156,8 @@ setInterval(refreshServerData,15000);
 var PTITLES = {dash: 'Табло', expenses:'Разходи', tasks: 'Календар', work: 'Работни задачи', smm: 'SMM Клиенти', web: 'Уеб Дизайн', leads: 'Leads', reports: 'Отчети', settings: 'Настройки'};
 
 function goPage(id, el) {
-  curpg = id;
+  var pageChanged=curpg!==id;curpg = id;
+  if(pageChanged){var content=document.getElementById('mainContent');if(content)content.scrollTop=0;}
   closeMobileSheets();
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.sbi').forEach(function(x) { x.classList.remove('active'); });

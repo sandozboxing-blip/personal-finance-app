@@ -1,0 +1,6 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');
+function setup(){const calls=[];const c={window:{},smm:[],web:[],editid:null,edittype:'smm',confirm:()=>true,document:{getElementById:id=>id==='fcname'?{value:'Test client'}:{value:'',classList:{remove(){}}},querySelectorAll:()=>[]},saveData:()=>calls.push('save'),renderSmm:()=>calls.push('smm'),renderWeb:()=>calls.push('web'),updateBadges(){},renderDash(){},toast(){},financeTodayIso:()=> '2026-11-24'};vm.createContext(c);vm.runInContext(fs.readFileSync('assets/clients.js','utf8'),c);c.renderSmm=()=>calls.push('smm');c.renderWeb=()=>calls.push('web');return {c,calls};}
+test('Adding SMM client updates visible SMM list',()=>{const {c,calls}=setup();c.saveClient();assert.equal(c.smm.length,1);assert.ok(calls.includes('smm'));});
+test('Deleting SMM client updates visible SMM list',()=>{const {c,calls}=setup();c.smm=[{id:'s1'}];c.editid='s1';c.delClient();assert.equal(c.smm.length,0);assert.ok(calls.includes('smm'));});
+
+test("Imported numeric client ID can be deleted from string UI ID",()=>{const {c}=setup();c.smm=[{id:123}];c.editid="123";c.delClient();assert.equal(c.smm.length,0);});

@@ -27,7 +27,7 @@ function webCard(c){
 
 // ── ADD / EDIT MODAL ───────────────────────────────────
 function openAdd(type,id){
-  edittype=type;editid=id||null;var arr=type==='smm'?smm:web,c=id?(arr.find(function(x){return x.id===id;})||{}):{},title=(id?'Редактирай ':'Нов ')+(type==='smm'?'SMM клиент':'Web Design проект'),body='';
+  edittype=type;editid=id||null;var arr=type==='smm'?smm:web,c=id?(arr.find(function(x){return String(x.id)===String(id);})||{}):{},title=(id?'Редактирай ':'Нов ')+(type==='smm'?'SMM клиент':'Web Design проект'),body='';
   if(type==='smm'){
     var plts=SMM_PLAT.map(function(p){return '<label style="display:inline-flex;align-items:center;gap:6px;margin:4px 9px 4px 0;font-size:14px;color:var(--w2)"><input type="checkbox" value="'+p+'" '+((c.platforms||[]).indexOf(p)>=0?'checked':'')+'> '+p+'</label>';}).join(''),stOpts=Object.keys(SMM_ST).map(function(v){return '<option value="'+v+'"'+(c.status===v?' selected':'')+'>'+SMM_ST[v]+'</option>';}).join('');
     body='<div class="frow"><div class="fg"><label class="flbl">Наименование *</label><input class="fi" id="fcname" value="'+esc(c.name||'')+'"></div><div class="fg"><label class="flbl">Статус</label><select class="fsel" id="fcstatus" onchange="calcClientFinance()">'+stOpts+'</select></div></div><div class="frow"><div class="fg"><label class="flbl">Месечна такса (€) *</label><input type="number" class="fi" id="fcmonthly" value="'+esc(c.monthly||'')+'" oninput="calcSmm()"></div><div class="fg"><label class="flbl">Месечни разходи (€)</label><input type="number" class="fi" id="fccost" value="'+esc(c.cost||'')+'" oninput="calcSmm()"></div></div><div class="frow"><div class="fg"><label class="flbl">Срок (месеци, незадължително)</label><input type="number" class="fi" id="fcdur" value="'+esc(c.duration||'')+'" placeholder="Остави празно за месец за месец" oninput="calcSmm()"></div><div class="fg"><label class="flbl">Начало (незадължително)</label><input type="date" class="fi" id="fcstart" value="'+esc(c.start||'')+'" oninput="calcSmm()"></div></div><div class="fg"><label class="flbl">Изчислявай до</label><input type="date" class="fi" id="fcpaidthrough" value="'+esc(c.paidThrough||'')+'" oninput="calcClientFinance()"><small class="fieldhint">Остави празно, за да се изчислява автоматично от началото до днес.</small></div><div class="fg"><label class="flbl">Изчисление</label><div class="fcalc" id="smmCalc">—</div></div><div class="fg"><label class="flbl">Платформи</label><div style="background:var(--b3);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px">'+plts+'</div></div><div class="fg"><label class="flbl">Контакт</label><input class="fi" id="fccontact" value="'+esc(c.contact||'')+'"></div><div class="fg"><label class="flbl">Бележки</label><textarea class="fta" id="fcnote">'+esc(c.note||'')+'</textarea></div>';setTimeout(calcSmm,30);
@@ -51,7 +51,7 @@ function saveClient() {
       id: editid || ('s' + Date.now()),
       name: name,
       status: (document.getElementById('fcstatus') || {}).value || 'active',
-      statusChangedAt: (function(){var old=editid?smm.find(function(x){return x.id===editid;}):null,ns=(document.getElementById('fcstatus')||{}).value||'active';return old&&old.status===ns?(old.statusChangedAt||(ns==='active'?'':financeTodayIso())):financeTodayIso();})(),
+      statusChangedAt: (function(){var old=editid?smm.find(function(x){return String(x.id)===String(editid);}):null,ns=(document.getElementById('fcstatus')||{}).value||'active';return old&&old.status===ns?(old.statusChangedAt||(ns==='active'?'':financeTodayIso())):financeTodayIso();})(),
       monthly: (document.getElementById('fcmonthly') || {}).value || '',
       cost: (document.getElementById('fccost') || {}).value || '',
       duration: (document.getElementById('fcdur') || {}).value || '',
@@ -61,13 +61,13 @@ function saveClient() {
       platforms: plats,
       paidThrough: (document.getElementById('fcpaidthrough') || {}).value || ''
     };
-    if (editid) smm = smm.map(function(c) { return c.id === editid ? obj : c; }); else smm.push(obj);
+    if (editid) smm = smm.map(function(c) { return String(c.id) === String(editid) ? obj : c; }); else smm.push(obj);
   } else {
     var obj = {
       id: editid || ('w' + Date.now()), name: name,
       type: (document.getElementById('fctype') || {}).value || '',
       status: (document.getElementById('fcstatus') || {}).value || 'in_progress',
-      statusChangedAt: (function(){var old=editid?web.find(function(x){return x.id===editid;}):null,ns=(document.getElementById('fcstatus')||{}).value||'in_progress';return old&&old.status===ns?(old.statusChangedAt||''):financeTodayIso();})(),
+      statusChangedAt: (function(){var old=editid?web.find(function(x){return String(x.id)===String(editid);}):null,ns=(document.getElementById('fcstatus')||{}).value||'in_progress';return old&&old.status===ns?(old.statusChangedAt||''):financeTodayIso();})(),
       paymentType: (document.getElementById('fcpayment') || {}).value || 'monthly',
       monthly: (document.getElementById('fcmonthly') || {}).value || '',
       oneTime: (document.getElementById('fcone') || {}).value || '',
@@ -82,19 +82,19 @@ function saveClient() {
       initialPaid: !!(document.getElementById('fcinitialpaid') || {}).checked,
       oneTimePaid: !!(document.getElementById('fconetimepaid') || {}).checked
     };
-    if (editid) web = web.map(function(c) { return c.id === editid ? obj : c; }); else web.push(obj);
+    if (editid) web = web.map(function(c) { return String(c.id) === String(editid) ? obj : c; }); else web.push(obj);
   }
-  saveData(); closeAdd();
-  if (edittype === 'smm') renderSmm(); else renderWeb();
-  updateBadges(); toast('✓ Запазено', 'var(--green)');
+  var savedType=edittype;saveData(); closeAdd();
+  if (savedType === 'smm') renderSmm(); else renderWeb();
+  renderDash();updateBadges(); toast('✓ Промяната е добавена — синхронизира се', 'var(--green)');
 }
 function delClient() {
   if (!editid || !confirm('Изтриваш клиента?')) return;
-  if (edittype === 'smm') smm = smm.filter(function(c) { return c.id !== editid; });
-  else web = web.filter(function(c) { return c.id !== editid; });
-  saveData(); closeAdd();
-  if (edittype === 'smm') renderSmm(); else renderWeb();
-  updateBadges(); toast('⌫ Изтрит', 'var(--red)');
+  if (edittype === 'smm') smm = smm.filter(function(c) { return String(c.id) !== String(editid); });
+  else web = web.filter(function(c) { return String(c.id) !== String(editid); });
+  var savedType=edittype;saveData(); closeAdd();
+  if (savedType === 'smm') renderSmm(); else renderWeb();
+  renderDash();updateBadges(); toast('⌫ Клиентът е премахнат — синхронизира се', 'var(--red)');
 }
 function closeAdd() { document.getElementById('addOv').classList.remove('open'); editid = null; edittype = null; }
 
