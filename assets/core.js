@@ -17,6 +17,7 @@ function togglePassword(){
   button.setAttribute('aria-label',input.type==='password'?'Покажи паролата':'Скрий паролата');
 }
 function showLogin(message){
+  document.body.classList.remove('panel-authenticated');closeMobileSheets();
   sessionStorage.removeItem(AUTH_KEY);
   document.getElementById('app').classList.remove('on');
   document.getElementById('lw').classList.remove('hidden');
@@ -36,6 +37,7 @@ document.getElementById('loginBtn').addEventListener('click',doLogin);
 document.getElementById('lp').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 document.getElementById('lu').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('lp').focus();});
 function startApp(user,showTransition){
+  document.body.classList.add('panel-authenticated');
   currentUser=user||'Admin';
   if(window.D8OneSignal)window.D8OneSignal.login(currentUser);
   var loader=document.getElementById('appLoader');
@@ -192,7 +194,7 @@ function syncMobileNavActive(sheetType){
   else if(['tasks','work'].indexOf(curpg)>=0)target=document.getElementById('mobileTasksButton');
   else if(curpg==='settings'||curpg==='reports'||curpg==='expenses')target=document.getElementById('mobileMoreButton');
   else target=nav.querySelector('button[data-page="'+curpg+'"]');
-  Array.prototype.forEach.call(nav.children,function(button){button.classList.toggle('active',button===target);});
+  nav.querySelectorAll(':scope > button').forEach(function(button){button.classList.toggle('active',button===target);});nav.dispatchEvent(new Event('d8:mobile-nav'));
 }
 function setMobileSheet(type){
   var more=document.getElementById('mobileMore'),clients=document.getElementById('mobileClients'),tasks=document.getElementById('mobileTasks'),backdrop=document.getElementById('mobileMoreBackdrop');
