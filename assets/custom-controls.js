@@ -1,7 +1,8 @@
 /* Styled proxies retain the original form fields, values and application handlers. */
 (function(){
 'use strict';
-var records=new WeakMap(),active=null,counter=0,popup=document.createElement('div');
+var records=new WeakMap(),active=null,popup=document.createElement('div');
+var selector='select,input[type=date],input[type=time]';
 popup.id='customControlPopover';popup.className='custom-popover';popup.hidden=true;document.body.appendChild(popup);
 var chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg>';
 var calendar='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="4"/><path d="M8 3v4M16 3v4M4 11h16M8 15h.1M12 15h.1M16 15h.1"/></svg>';
@@ -23,9 +24,9 @@ function sync(record){
  trigger.disabled=source.disabled||source.readOnly;
  trigger.classList.toggle('is-placeholder',!source.value);
  trigger.setAttribute('aria-label',labelFor(source)+': '+text);
- var style=getComputedStyle(source);trigger.style.gridColumn=style.gridColumn;trigger.style.alignSelf=style.alignSelf;
  trigger.style.display=source.style.display==='none'||source.hidden?'none':'';
 }
+function syncLayout(record){var style=getComputedStyle(record.source);record.trigger.style.gridColumn=style.gridColumn;record.trigger.style.alignSelf=style.alignSelf;}
 function enhance(source){
  if(records.has(source)||(source.tagName==='SELECT'&&(source.multiple||source.size>1)))return;
  var trigger=document.createElement('button');trigger.type='button';trigger.className=source.className+' custom-control-trigger';trigger.dataset.source=source.id||source.name||'';
@@ -41,7 +42,7 @@ function enhance(source){
  source.addEventListener('invalid',function(event){event.preventDefault();trigger.setAttribute('aria-invalid','true');trigger.title=source.validationMessage;trigger.focus();});
  trigger.addEventListener('click',function(){if(active&&active.source===source){close(true);return;}open(record);});
  trigger.addEventListener('keydown',function(event){if(['ArrowDown','ArrowUp','Enter',' '].indexOf(event.key)>=0){event.preventDefault();open(record);}});
- sync(record);
+ sync(record);syncLayout(record);
 }
 function position(){
  if(!active)return;var rect=active.trigger.getBoundingClientRect(),width=Math.min(innerWidth-24,active.source.tagName==='SELECT'?Math.max(rect.width,260):336);
@@ -108,8 +109,37 @@ document.addEventListener('keydown',function(event){if(!active)return;if(event.k
 document.addEventListener('pointerdown',function(event){if(active&&!popup.contains(event.target)&&!active.trigger.contains(event.target))close(false);},true);
 document.addEventListener('scroll',function(event){if(active&&event.target!==popup&&!popup.contains(event.target))close(false);},true);
 window.addEventListener('resize',function(){close(false);});
-document.addEventListener('reset',function(){requestAnimationFrame(scan);},true);
-function scan(){document.querySelectorAll('select,input[type=date],input[type=time]').forEach(function(source){if(!records.has(source))enhance(source);else sync(records.get(source));});if(active&&(!active.source.isConnected||!active.trigger.getClientRects().length))close(false);}
-var frame=0;new MutationObserver(function(changes){var needs=changes.some(function(change){var el=change.target.nodeType===1?change.target:change.target.parentElement;return el&&!el.closest('.custom-popover,.custom-control-trigger,.glass-nav-marker,.glass-click-flash')&&(change.type==='childList'||change.type==='attributes');});if(needs){cancelAnimationFrame(frame);frame=requestAnimationFrame(scan);}}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled','hidden','style','min','max']});
+/* Only inspect changed fields/subtrees. Animation and badge mutations must not
+   schedule a document-wide scan or force synchronous layout reads. */
+var pending=new Map(),frame=0;
+function queue(source,layout){if(!source.isConnected)return;pending.set(source,!!layout||pending.get(source)===true);}
+function collect(root,layout){
+ if(!root||root.nodeType!==1||root.closest('.custom-popover,.custom-control-trigger,.glass-nav-marker,.glass-click-flash'))return;
+ if(root.matches(selector))queue(root,layout);
+ root.querySelectorAll(selector).forEach(function(source){queue(source,layout);});
+}
+function flush(){
+ frame=0;var work=Array.from(pending);pending.clear();
+ work.forEach(function(item){var source=item[0];if(!source.isConnected)return;if(!records.has(source))enhance(source);else{sync(records.get(source));if(item[1])syncLayout(records.get(source));}});
+ if(active&&(!active.source.isConnected||!active.trigger.getClientRects().length))close(false);
+}
+function schedule(){if(!frame&&pending.size)frame=requestAnimationFrame(flush);}
+function scan(root){collect(root||document.body,true);flush();}
+document.addEventListener('reset',function(event){requestAnimationFrame(function(){scan(event.target);});},true);
+new MutationObserver(function(changes){
+ changes.forEach(function(change){
+  var target=change.target.nodeType===1?change.target:change.target.parentElement;
+  if(!target||target.closest('.custom-popover,.custom-control-trigger,.glass-nav-marker,.glass-click-flash'))return;
+  if(change.type==='attributes'){
+   if(target.matches(selector))queue(target,change.attributeName==='style');
+   else if(change.attributeName==='hidden'||change.attributeName==='style'||change.attributeName==='data-event-type')collect(target,true);
+  }else{
+   var select=target.closest('select');if(select)queue(select,false);
+   change.addedNodes.forEach(function(node){collect(node,true);});
+  }
+ });
+ if(active&&!active.source.isConnected)close(false);schedule();
+}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled','hidden','style','min','max','required','data-event-type']});
+window.addEventListener('resize',function(){collect(document.body,true);schedule();},{passive:true});
 scan();window.d8RefreshControls=scan;
 })();

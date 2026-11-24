@@ -235,3 +235,23 @@ body.reply-inbox-open{overflow-y:hidden!important}
 #lbOv .lbhdr{align-items:start}
 #lbOv{background:rgba(24,18,12,.38)}
 [data-theme=dark] #lbOv{background:rgba(4,2,8,.52)}
+/* Reuse the already blurred room image instead of blurring every content card. */
+:root[data-theme=dark]{--nav-active:linear-gradient(130deg,rgba(151,105,193,.94),rgba(91,57,133,.92))}
+.dc,.sc,.dashpanel,.cardpanel,.ccard,.settings-card,.settings-card-wide,.report-kpi,.report-panel,.worktask,.taskcomposer,.workcomposer,.taskcalendar,.taskboard,.workboard,.calendar-shell,.calwrap,.setwrap,.twrap,.lead-library,.leadfolder,.lead-card,.leadfolderview.compact,.folderkpis,.leadfoldercard,.leadsummary>div,.leads-toolbar,.lead-mobile-card,.leadmobilecard,.lead-replies-panel{
+ -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+/* Blur only the few small chrome/overlay surfaces that actually overlap content. */
+.sidebar,.topbar,.mobile-nav,.mobile-more-sheet,.mobile-client-sheet,.mobile-task-sheet{
+ -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;
+}
+.modal,.manual-lead-modal,.custom-popover,.reply-inbox-modal,.individual-email-modal,.outreachmodal,.foldereditor,#lbOv .lbm{
+ -webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important;
+}
+.ov,.toast,#lbOv .lbhdr,#lbOv>.lbm>.mfoot,.reply-inbox-modal>header,.individual-email-modal>header,.individual-email-modal>footer,.filtermenuhead,.filtermenufooter{
+ -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+.page.active,.page.active .dc,.page.active .sc,.page.active .dashpanel,.page.active .ccard{animation:none!important}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.sidebar,.topbar,.mobile-nav,.mobile-more-sheet,.mobile-client-sheet,.mobile-task-sheet,.modal,.manual-lead-modal,.custom-popover,.reply-inbox-modal,.individual-email-modal,.outreachmodal,.foldereditor,#lbOv .lbm{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
+.quick-create-menu,.lead-more-menu,.filtermenu{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.reply-inbox-ov,.individual-email-ov,.leadfilterbackdrop{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.quick-create-menu,.lead-more-menu,.filtermenu{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
