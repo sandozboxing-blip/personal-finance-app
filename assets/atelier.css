@@ -321,3 +321,11 @@ body.reduce-motion .mobile-nav-indicator{transition:none!important}
 .sbi .ic svg,.mobile-more-grid svg{width:22px;height:22px;stroke-width:1.65!important}
 .mobile-nav button .nav-icon{width:22px!important;height:22px!important;stroke-width:1.65!important}
 .mobile-client-options button>svg{width:42px;height:42px;padding:10px;stroke-width:1.65!important}
+/* Long profiles scroll in one flow. Transparent sticky chrome must not cover form text. */
+#lbOv .lbhdr,#lbOv>.lbm>.mfoot{position:relative!important;top:auto!important;bottom:auto!important;z-index:auto!important;flex:0 0 auto}
+#lbOv .lbcommunication-pane,#lbOv .lbbody{flex:0 0 auto;max-height:none!important;overflow:visible!important}
+#lbOv .lbm{scroll-padding:20px;overscroll-behavior:contain}
+#lbOv .lead-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.individual-email-modal>header,.individual-email-modal>footer,.manual-lead-head,.manual-lead-actions{position:relative;top:auto;bottom:auto}
+@media(max-width:700px){#lbOv .lead-profile-actions{display:grid;grid-template-columns:1fr;gap:12px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}#lbOv .lead-profile-actions .btn{width:100%;justify-content:center}}
+body.manual-lead-open,body.individual-email-open{overflow-y:hidden!important}
