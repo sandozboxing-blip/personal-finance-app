@@ -27,7 +27,7 @@
     toggle.addEventListener('click',function(){var compact=!document.body.classList.contains('nav-compact');setCompact(compact);try{localStorage.setItem('d8NavCompact',compact?'1':'0');}catch(e){}});
     sidebar.querySelector('.sbr').appendChild(toggle);
     var marker=document.createElement('div');marker.className='glass-nav-marker';marker.setAttribute('aria-hidden','true');nav.prepend(marker);
-    var pendingFrame=0;
+    var pendingFrame=0;window.addEventListener('d8:layout',updateMarker);
     function updateMarker(){
       cancelAnimationFrame(pendingFrame);pendingFrame=requestAnimationFrame(function(){
         var active=nav.querySelector('.sbi.active');if(!active){marker.style.opacity='0';return;}

@@ -1,0 +1,5 @@
+Generated with the built-in imagegen tool for Digital Eight Panel.
+Final web asset: atelier-room.webp (optimised from the generated PNG).
+Prompt:
+Create a photorealistic architectural interior photograph to be used as a subdued full-screen background behind a glassmorphism business dashboard. Wide landscape 16:9 composition. Quiet contemporary Scandinavian/Japandi living room, warm off-white plaster walls, pale oak cabinetry, a low beige linen sofa to the left, minimalist wooden coffee table, one softly lit floor lamp and a restrained indoor plant. Large natural daylight window glow. Cream, sand, oatmeal and warm greige palette only. Elegant high-end editorial architecture photography, calm soft light, low contrast, no people, no text, no logos, no UI, no screens. Broad uncluttered wall area in center, furnishings around edges and lower third. Image itself crisp and natural, intended to be softly blurred and veiled in CSS.
+The user's later request is implemented in CSS: 36px background blur and a cream veil; the source image stays intact.
