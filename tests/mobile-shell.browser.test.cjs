@@ -57,6 +57,21 @@ test('mobile shell has one theme-aware moving indicator and stays hidden on logi
       assert.equal(color,'rgb(115, 83, 61)');
       assert.ok(accent);
     });
+    await t.test('mobile destinations reuse the exact desktop SVG geometry and stroke', async () => {
+      const differences = await page.evaluate(() => {
+        const desktop = {};
+        document.querySelectorAll('.sbi').forEach(button => { const route=(button.getAttribute('onclick')||'').match(/'([^']+)'/);if(route)desktop[route[1]]=button.querySelector('svg'); });
+        const errors=[];
+        document.querySelectorAll('.mobile-more-grid button,.mobile-client-options button').forEach(button => {
+          const route=(button.getAttribute('onclick')||'').match(/'([^']+)'/),icon=button.querySelector('svg');
+          const source=route&&desktop[route[1]];
+          if(source&&(!icon||source.innerHTML!==icon.innerHTML||source.getAttribute('stroke-width')!==icon.getAttribute('stroke-width')))errors.push(route[1]);
+        });
+        [['#mobileClientsButton','smm'],['#mobileLeadAdd','leads'],['.nav-home','dash'],['#mobileTasksButton','work']].forEach(([selector,route])=>{const icon=document.querySelector(selector+' svg');if(icon.innerHTML!==desktop[route].innerHTML||getComputedStyle(icon).strokeWidth!==getComputedStyle(desktop[route]).strokeWidth)errors.push(selector);});
+        return errors;
+      });
+      assert.deepEqual(differences,[]);
+    });
     assert.deepEqual(errors, []);
   } finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 });

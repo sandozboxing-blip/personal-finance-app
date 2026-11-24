@@ -12,16 +12,17 @@ var paths={
  tasks:'<rect x="3" y="5" width="18" height="16" rx="4"/><path d="M7.5 3v4M16.5 3v4M3 11h18M8 15h.1M12 15h.1M16 15h.1M8 18h.1M12 18h.1"/>',
  work:'<rect x="3.5" y="4" width="17" height="17" rx="3.5"/><path d="M8 4V2.5h8V4M7.5 10l1.5 1.5 3-3M7.5 16l1.5 1.5 3-3M15 10h2M15 16h2"/>',
  settings:'<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.08-1l2-1.55-2-3.46-2.4.97a7 7 0 0 0-1.72-1L14.45 3h-4.9L9.2 5.96a7 7 0 0 0-1.72 1l-2.4-.97-2 3.46 2 1.55A7 7 0 0 0 5 12c0 .34.03.67.08 1l-2 1.55 2 3.46 2.4-.97a7 7 0 0 0 1.72 1l.35 2.96h4.9l.35-2.96a7 7 0 0 0 1.72-1l2.4.97 2-3.46-2-1.55c.05-.33.08-.66.08-1z"/>',
+ more:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
  moon:'<path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/>'
 };
 function svg(name){return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">'+(paths[name]||paths.dashboard)+'</svg>';}
 window.d8Icon=svg;
 document.querySelectorAll('.sbi').forEach(function(button){var match=(button.getAttribute('onclick')||'').match(/goPage\('([^']+)'/);var icon=button.querySelector('.ic');if(match&&icon){icon.innerHTML=svg(match[1]==='dash'?'dashboard':match[1]);icon.style.color='';}});
-var mobile={'mobileClientsButton':'smm','mobileLeadAdd':'leads','mobileTasksButton':'work'};
+var mobile={'mobileClientsButton':'smm','mobileLeadAdd':'leads','mobileTasksButton':'work','mobileMoreButton':'more'};
 Object.keys(mobile).forEach(function(id){var icon=document.querySelector('#'+id+' .nav-icon-wrap');if(icon){icon.innerHTML=svg(mobile[id]);icon.firstChild.classList.add('nav-icon');}});
 var home=document.querySelector('.nav-home .nav-icon-wrap');if(home){home.innerHTML=svg('dashboard');home.firstChild.classList.add('nav-icon');}
-document.querySelectorAll('.mobile-more-grid button').forEach(function(button){var m=(button.getAttribute('onclick')||'').match(/'([^']+)'/),old=button.querySelector('svg');if(m&&old)old.outerHTML=svg(m[1]==='dash'?'dashboard':m[1]);});
+document.querySelectorAll('.mobile-more-grid button,.mobile-client-options button').forEach(function(button){var m=(button.getAttribute('onclick')||'').match(/'([^']+)'/),old=button.querySelector('svg');if(m&&old)old.outerHTML=svg(m[1]==='dash'?'dashboard':m[1]);});
 var top=document.querySelector('.topbar');if(top){var toggle=document.createElement('button');toggle.type='button';toggle.className='theme-toggle';toggle.id='themeToggle';toggle.setAttribute('data-theme-toggle','');top.insertBefore(toggle,document.getElementById('syncStatus'));}
 function applyTheme(theme){document.documentElement.dataset.theme=theme;document.querySelectorAll('[data-theme-toggle]').forEach(function(button){button.innerHTML=svg(theme==='dark'?'sun':'moon')+'<span>'+(theme==='dark'?'Светла':'Тъмна')+'</span>';button.setAttribute('aria-label',theme==='dark'?'Включи светлата тема':'Включи тъмната тема');button.setAttribute('aria-pressed',String(theme==='dark'));});var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=theme==='dark'?'#110c19':'#eee8df';}
 document.addEventListener('click',function(event){document.querySelectorAll('details.quick-create[open],details.lead-more[open]').forEach(function(details){if(!details.contains(event.target)||event.target.closest('.quick-create-menu button,.lead-more-menu button'))details.open=false;});});
