@@ -334,3 +334,24 @@ body.manual-lead-open,body.individual-email-open{overflow-y:hidden!important}
 #lw .lcard{flex:0 0 auto;margin:auto}
 #lw .loginbrand{flex-wrap:wrap;gap:16px}
 #lw .loginbrand .lsub{margin-bottom:0}
+/* The complete desktop shell uses the same visible viewport as the login. */
+@media(min-width:1001px){
+ .app.on{width:min(100%,var(--panel-width,100%));margin-left:var(--panel-left,0px)}
+ .app.on .content{width:100%;min-width:0;container:panel-content / inline-size}
+ .sidebar{top:calc(var(--panel-top,0px) + 16px);height:calc(var(--panel-height,100dvh) - 32px)}
+ .topbar{top:calc(var(--panel-top,0px) + 16px)}
+ .dashwrap{width:100%;margin-inline:auto}
+ body.panel-authenticated .ov,body.panel-authenticated .individual-email-ov,body.panel-authenticated .reply-inbox-ov{inset:auto;left:var(--panel-left,0px);top:var(--panel-top,0px);width:var(--panel-width,100%);height:var(--panel-height,100dvh)}
+ body.panel-authenticated .modal,body.panel-authenticated .lbm,body.panel-authenticated .manual-lead-modal,body.panel-authenticated .individual-email-modal,body.panel-authenticated .reply-inbox-modal{max-width:100%;max-height:calc(var(--panel-height,100dvh) - 48px)}
+ body.panel-authenticated .mbody{max-height:calc(var(--panel-height,100dvh) - 190px)}
+ @container panel-content (max-width:1000px){
+  .dgrid,.sgrid,.cgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dashcols,.report-grid,.reports-grid,.tasklayout,.worklayout{grid-template-columns:minmax(0,1fr)!important}
+  .taskcomposer,.workcomposer{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ }
+ @container panel-content (max-width:600px){
+  .dgrid,.sgrid,.cgrid,.settings-grid,.taskcomposer,.workcomposer{grid-template-columns:minmax(0,1fr)!important}
+  .dashhero,.taskhero{flex-wrap:wrap}
+  .dashactions{margin-left:0;justify-content:flex-start}
+ }
+}

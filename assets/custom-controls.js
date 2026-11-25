@@ -45,14 +45,14 @@ function enhance(source){
  sync(record);syncLayout(record);
 }
 function position(){
- if(!active)return;var rect=active.trigger.getBoundingClientRect(),width=Math.min(innerWidth-24,active.source.tagName==='SELECT'?Math.max(rect.width,260):336);
+ if(!active)return;var rect=active.trigger.getBoundingClientRect(),viewport=window.visualViewport,viewLeft=viewport?viewport.offsetLeft:0,viewTop=viewport?viewport.offsetTop:0,viewWidth=viewport?viewport.width:innerWidth,viewHeight=viewport?viewport.height:innerHeight,width=Math.min(viewWidth-24,active.source.tagName==='SELECT'?Math.max(rect.width,260):336);
  active.anchorLeft=rect.left;active.anchorTop=rect.top;
- popup.style.width=width+'px';popup.style.left=Math.max(12,Math.min(innerWidth-width-12,rect.left))+'px';
- popup.style.maxHeight=Math.max(150,Math.min(500,innerHeight-24))+'px';
- var height=Math.min(popup.scrollHeight,parseFloat(popup.style.maxHeight)),bottom=innerHeight-rect.bottom-20,above=rect.top-20,top;
+ popup.style.width=width+'px';popup.style.left=Math.max(viewLeft+12,Math.min(viewLeft+viewWidth-width-12,rect.left))+'px';
+ popup.style.maxHeight=Math.max(100,Math.min(500,viewHeight-24))+'px';
+ var height=Math.min(popup.scrollHeight,parseFloat(popup.style.maxHeight)),bottom=viewTop+viewHeight-rect.bottom-20,above=rect.top-viewTop-20,top;
  if(bottom>=height)top=rect.bottom+8;
  else if(above>=height)top=rect.top-height-8;
- else top=Math.max(12,Math.min(innerHeight-height-12,rect.bottom+8));
+ else top=Math.max(viewTop+12,Math.min(viewTop+viewHeight-height-12,rect.bottom+8));
  popup.style.top=top+'px';popup.classList.toggle('opens-above',top<rect.top);
 }
 function close(focus){if(!active)return;var previous=active;active=null;popup.hidden=true;popup.replaceChildren();previous.trigger.setAttribute('aria-expanded','false');if(focus&&previous.trigger.isConnected)previous.trigger.focus();}
@@ -116,6 +116,7 @@ document.addEventListener('scroll',function(event){
  if(Math.abs(rect.left-active.anchorLeft)>1||Math.abs(rect.top-active.anchorTop)>1)close(false);
 },true);
 window.addEventListener('resize',function(){close(false);});
+if(window.visualViewport){visualViewport.addEventListener('resize',function(){close(false);},{passive:true});visualViewport.addEventListener('scroll',function(){close(false);},{passive:true});}
 /* Only inspect changed fields/subtrees. Animation and badge mutations must not
    schedule a document-wide scan or force synchronous layout reads. */
 var pending=new Map(),frame=0;
