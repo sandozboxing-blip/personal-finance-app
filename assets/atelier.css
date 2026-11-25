@@ -329,3 +329,8 @@ body.reduce-motion .mobile-nav-indicator{transition:none!important}
 .individual-email-modal>header,.individual-email-modal>footer,.manual-lead-head,.manual-lead-actions{position:relative;top:auto;bottom:auto}
 @media(max-width:700px){#lbOv .lead-profile-actions{display:grid;grid-template-columns:1fr;gap:12px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}#lbOv .lead-profile-actions .btn{width:100%;justify-content:center}}
 body.manual-lead-open,body.individual-email-open{overflow-y:hidden!important}
+/* Center in the visible window, with safe scrolling when the form is taller. */
+#lw{inset:auto;left:var(--login-left,0px);top:var(--login-top,0px);width:var(--login-width,100%);height:var(--login-height,100dvh);align-items:flex-start;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:24px clamp(12px,2vw,24px) max(24px,env(safe-area-inset-bottom,0px))!important}
+#lw .lcard{flex:0 0 auto;margin:auto}
+#lw .loginbrand{flex-wrap:wrap;gap:16px}
+#lw .loginbrand .lsub{margin-bottom:0}
