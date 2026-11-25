@@ -23,3 +23,24 @@ details[open]>.quick-create-menu,details[open]>.lead-more-menu{transform-origin:
 @media(prefers-reduced-motion:reduce){.ov.open>.modal,.ov.open>.lbm,.ov.open>.manual-lead-modal,.individual-email-ov.open>.individual-email-modal,.reply-inbox-ov.open>.reply-inbox-modal,.custom-popover,details[open]>.quick-create-menu,details[open]>.lead-more-menu,.toast,.toast.out,.toast-check path{animation:none!important}.mobile-client-options button>i{transform:none!important}}
 body.reduce-motion .ov.open>.modal,body.reduce-motion .ov.open>.lbm,body.reduce-motion .ov.open>.manual-lead-modal,body.reduce-motion .individual-email-modal,body.reduce-motion .reply-inbox-modal,body.reduce-motion .custom-popover,body.reduce-motion details[open]>.quick-create-menu,body.reduce-motion details[open]>.lead-more-menu,body.reduce-motion .toast,body.reduce-motion .toast-check path{animation:none!important}
 body.reduce-motion .mobile-client-options button>i{transform:none!important}
+/* Expressive is a reversible profile choice. Hover effects move icons, never data. */
+.motion-preview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.motion-settings .settings-fields{grid-template-columns:minmax(0,1fr)}
+.motion-preview-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-width:0;min-height:102px;padding:14px 6px;border:1px solid var(--line);border-radius:16px;background:var(--control-bg);color:var(--w2)}
+.motion-preview-tile span{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--pdim);color:var(--pl)}
+.motion-preview-tile svg,.motion-settings .settings-card-icon svg{width:22px;height:22px}
+.motion-preview-tile b{font-size:14px;font-weight:650}
+.motion-settings .settings-card-icon{background:var(--pdim);color:var(--pl);border-color:var(--line)}
+body[data-motion-style=expressive] .ov.open>.modal,body[data-motion-style=expressive] .ov.open>.lbm,body[data-motion-style=expressive] .ov.open>.manual-lead-modal,body[data-motion-style=expressive] .individual-email-modal,body[data-motion-style=expressive] .reply-inbox-modal{animation:none!important}
+body[data-motion-style=expressive] .sbi .ic svg,body[data-motion-style=expressive] .dcico svg,body[data-motion-style=expressive] .mobile-nav .nav-icon,body[data-motion-style=expressive] .theme-toggle svg{transition:transform 140ms var(--motion-out)}
+body[data-motion-style=expressive] .mobile-nav button:active .nav-icon{transform:scale(.9)}
+body[data-motion-style=expressive] .btnp{overflow:hidden}
+body[data-motion-style=expressive] .btnp::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.18) 48%,transparent 78%);opacity:0;transition:opacity 120ms}
+@media(hover:hover) and (pointer:fine){
+ body[data-motion-style=expressive] .sbi:hover .ic svg,body[data-motion-style=expressive] .dc:hover .dcico svg{transform:rotate(-6deg) scale(1.06)}
+ body[data-motion-style=expressive] .sbi[onclick*="settings"]:hover .ic svg{transform:rotate(24deg)}
+ body[data-motion-style=expressive] .theme-toggle:hover svg{transform:rotate(-16deg)}
+ body[data-motion-style=expressive] .btnp:hover::after{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){body[data-motion-style=expressive] .sbi .ic svg,body[data-motion-style=expressive] .dcico svg,body[data-motion-style=expressive] .mobile-nav .nav-icon,body[data-motion-style=expressive] .theme-toggle svg{transform:none!important}}
+body.reduce-motion[data-motion-style=expressive] .sbi .ic svg,body.reduce-motion[data-motion-style=expressive] .dcico svg,body.reduce-motion[data-motion-style=expressive] .mobile-nav .nav-icon,body.reduce-motion[data-motion-style=expressive] .theme-toggle svg{transform:none!important}

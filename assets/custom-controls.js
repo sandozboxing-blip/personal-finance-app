@@ -46,6 +46,7 @@ function enhance(source){
 }
 function position(){
  if(!active)return;var rect=active.trigger.getBoundingClientRect(),width=Math.min(innerWidth-24,active.source.tagName==='SELECT'?Math.max(rect.width,260):336);
+ active.anchorLeft=rect.left;active.anchorTop=rect.top;
  popup.style.width=width+'px';popup.style.left=Math.max(12,Math.min(innerWidth-width-12,rect.left))+'px';
  popup.style.maxHeight=Math.max(150,Math.min(500,innerHeight-24))+'px';
  var height=Math.min(popup.scrollHeight,parseFloat(popup.style.maxHeight)),bottom=innerHeight-rect.bottom-20,above=rect.top-20,top;
@@ -107,7 +108,13 @@ popup.addEventListener('keydown',function(event){
 });
 document.addEventListener('keydown',function(event){if(!active)return;if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();close(true);}else if(event.key==='Tab'){var stops=Array.from(popup.querySelectorAll('button:not(:disabled),input:not(:disabled),[tabindex="0"]')).filter(function(el){return el.tabIndex>=0;});if(active.source.tagName==='SELECT'||(event.shiftKey&&document.activeElement===stops[0])||(!event.shiftKey&&document.activeElement===stops[stops.length-1]))close(true);}},true);
 document.addEventListener('pointerdown',function(event){if(active&&!popup.contains(event.target)&&!active.trigger.contains(event.target))close(false);},true);
-document.addEventListener('scroll',function(event){if(active&&event.target!==popup&&!popup.contains(event.target))close(false);},true);
+document.addEventListener('scroll',function(event){
+ if(!active||event.target===popup||popup.contains(event.target))return;
+ // Activation can deliver a queued scroll event after the popup has opened.
+ // Dismiss only when its anchor actually moved, not for that earlier scroll.
+ var rect=active.trigger.getBoundingClientRect();
+ if(Math.abs(rect.left-active.anchorLeft)>1||Math.abs(rect.top-active.anchorTop)>1)close(false);
+},true);
 window.addEventListener('resize',function(){close(false);});
 /* Only inspect changed fields/subtrees. Animation and badge mutations must not
    schedule a document-wide scan or force synchronous layout reads. */

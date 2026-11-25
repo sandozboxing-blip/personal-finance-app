@@ -31,14 +31,19 @@ function saveProfileSettings(){
   userSettings.defaultPriority=document.getElementById('defaultTaskPriority').value;userSettings.defaultRepeat=document.getElementById('defaultTaskRepeat').value;
   userSettings.leadPageSize=parseInt(document.getElementById('settingsLeadPageSize').value)||50;userSettings.outreachFollowupDays=parseInt((document.getElementById('settingsFollowupDays')||{}).value)||7;userSettings.density=document.getElementById('settingsDensity').value;
   userSettings.reduceMotion=document.getElementById('settingsReduceMotion').checked;userSettings.compactMetrics=document.getElementById('settingsCompactMetrics').checked;
+  userSettings.motionStyle=document.getElementById('settingsMotionStyle').value==='calm'?'calm':'expressive';
   saveData('profile');applyProfileSettings();renderLeads();renderDash();toast('Настройките за '+currentUser+' са запазени','var(--green)');
 }
 function applyProfileSettings(){
+  userSettings.motionStyle=userSettings.motionStyle==='calm'?'calm':'expressive';
   userSettings.defaultPriority=userSettings.defaultPriority||'normal';userSettings.defaultRepeat=userSettings.defaultRepeat||'none';userSettings.leadPageSize=parseInt(userSettings.leadPageSize)||50;userSettings.outreachFollowupDays=parseInt(userSettings.outreachFollowupDays)||7;userSettings.density=userSettings.density||'comfortable';
   var p=document.getElementById('defaultTaskPriority'),r=document.getElementById('defaultTaskRepeat'),name=document.getElementById('settingsProfileName');if(p)p.value=userSettings.defaultPriority;if(r)r.value=userSettings.defaultRepeat;if(name)name.textContent=currentUser||'профила';
   var cp=document.getElementById('tmPriority'),cr=document.getElementById('tmRepeat');if(cp)cp.value=userSettings.defaultPriority;if(cr)cr.value=userSettings.defaultRepeat;
   var ps=document.getElementById('settingsLeadPageSize'),ds=document.getElementById('settingsDensity'),rm=document.getElementById('settingsReduceMotion'),cm=document.getElementById('settingsCompactMetrics');if(ps)ps.value=String(userSettings.leadPageSize);var fd=document.getElementById('settingsFollowupDays');if(fd)fd.value=String(userSettings.outreachFollowupDays);if(ds)ds.value=userSettings.density;if(rm)rm.checked=!!userSettings.reduceMotion;if(cm)cm.checked=!!userSettings.compactMetrics;
   leadPageSize=userSettings.leadPageSize;document.body.dataset.density=userSettings.density;document.body.classList.toggle('reduce-motion',!!userSettings.reduceMotion);document.body.classList.toggle('compact-metrics',!!userSettings.compactMetrics);
+  var motion=document.getElementById('settingsMotionStyle');if(motion)motion.value=userSettings.motionStyle;
+  var motionChanged=document.body.dataset.motionStyle!==userSettings.motionStyle;document.body.dataset.motionStyle=userSettings.motionStyle;
+  if(motionChanged)window.dispatchEvent(new Event('d8:motion-style'));
 }
 function manualDataSync(){if(syncInFlight){toast('Синхронизацията вече се изпълнява','var(--yellow)');return;}var retrying=syncPending;lastServerUpdatedAt='';setSyncState('saving',retrying?'Записвам промените...':'Проверявам данните...');if(retrying)flushSave();else refreshServerData();toast(retrying?'Повтарям записа към сървъра...':'Синхронизирам с общия панел...','var(--pll)');}
 
