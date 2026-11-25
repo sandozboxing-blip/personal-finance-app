@@ -5,7 +5,9 @@ function fmtD(d) { try { return new Date(d).toLocaleDateString('bg-BG', {day: '2
 function addMonths(date,m){var match=typeof date==='string'&&String(date).match(/^(\d{4})-(\d{2})-(\d{2})/),d=match?new Date(Number(match[1]),Number(match[2])-1,Number(match[3])):new Date(date);if(isNaN(d))return d;var day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+(parseInt(m)||0));d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return d;}
 function toast(msg, col) {
   var c = document.getElementById('toasts'); var t = document.createElement('div');
-  t.className = 'toast'; t.innerHTML = '<span style="color:' + col + '">●</span> ' + msg;
+  t.className = 'toast'; t.setAttribute('role','status');
+  var icon=col==='var(--green)'?'<svg class="toast-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m7.5 12 3 3 6-6"/></svg>':'<span style="color:' + col + '" aria-hidden="true">●</span>';
+  t.innerHTML = icon + ' ' + msg;
   c.appendChild(t); setTimeout(function() { t.classList.add('out'); setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 150); }, 3200);
 }
 function exportFullBackup() {

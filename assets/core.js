@@ -66,7 +66,9 @@ function mergeRecords(remote,local){var merged=[],positions={};(Array.isArray(re
 function mergeExternalShared(state,local){leads=mergeRecords(state.leads,local.leads);leadFolders=[].concat(state.leadFolders||[],local.leadFolders||[]).filter(function(name,index,all){return name&&all.indexOf(name)===index;});leadFolderMeta=Object.assign({},state.leadFolderMeta||{},local.leadFolderMeta||{});smm=mergeRecords(state.smm,local.smm);web=mergeRecords(state.web,local.web);expenses=mergeRecords(state.expenses,local.expenses);workTasks=mergeRecords(state.workTasks,local.workTasks);}
 function setSyncState(state,text){
   var el=document.getElementById('syncStatus');
+  var savedNow=el&&el.dataset.state==='saving'&&state==='saved';
   if(el){el.dataset.state=state;el.disabled=state==='saving'||state==='loading';el.setAttribute('aria-busy',state==='saving'||state==='loading'?'true':'false');el.title=state==='error'?'Синхронизацията не успя — натисни за нов опит':'Натисни за синхронизация';var span=el.querySelector('span');if(span)span.textContent=text;}
+  if(savedNow)window.dispatchEvent(new Event('d8:saved'));
 }
 function hideAppLoader(){
   var loader=document.getElementById('appLoader');if(!loader)return;
@@ -182,6 +184,7 @@ function goPage(id, el) {
   if (id === 'settings' && window.D8OneSignal) window.D8OneSignal.refresh();
   updateBadges();
   closeSb();
+  if(pageChanged)window.dispatchEvent(new CustomEvent('d8:page',{detail:{page:id}}));
 }
 function goPageFromMobile(id,el){goPage(id,el);}
 function syncMobileNavActive(sheetType){

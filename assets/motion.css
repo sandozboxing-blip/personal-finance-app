@@ -1,0 +1,25 @@
+/* Short, purposeful feedback. Lists, numbers and the shared backdrop stay still. */
+:root{--motion-out:cubic-bezier(.16,1,.3,1);--motion-in:cubic-bezier(.7,0,.84,0)}
+.btn,.lbtn,.theme-toggle,.custom-control-trigger,.mobile-more-grid button,.mobile-client-options button{transition:background-color 120ms,border-color 120ms,box-shadow 120ms,color 120ms}
+.btn:active,.lbtn:active,.sbi:active,.ccard:active,.mobile-nav button:active,.theme-toggle:active{transform:none!important}
+.btn:not(:disabled):active,.lbtn:not(:disabled):active,.custom-control-trigger:not(:disabled):active{box-shadow:inset 0 2px 5px rgba(0,0,0,.13);border-color:var(--pl)}
+.theme-toggle:not(:disabled):active,.mobile-more-grid button:active,.mobile-client-options button:active{background:var(--selection)!important}
+.btn:focus-visible,.lbtn:focus-visible,.theme-toggle:focus-visible,.mobile-nav button:focus-visible,.sbi:focus-visible{outline:2px solid var(--pl);outline-offset:3px}
+.mobile-client-options button>i{transition:transform 120ms var(--motion-out)}
+@media(hover:hover) and (pointer:fine){.mobile-client-options button:hover>i{transform:translateX(3px)}}
+/* Fade surfaces without transforming scroll containers or moving their fields. */
+.ov.open>.modal,.ov.open>.lbm,.ov.open>.manual-lead-modal,.individual-email-ov.open>.individual-email-modal,.reply-inbox-ov.open>.reply-inbox-modal{animation:d8-surface-in 180ms var(--motion-out)!important}
+.custom-popover{transform-origin:top left;animation:custom-pop-in 150ms var(--motion-out)}
+.custom-popover.opens-above{transform-origin:bottom left}
+details[open]>.quick-create-menu,details[open]>.lead-more-menu{transform-origin:top right;animation:d8-surface-in 150ms var(--motion-out)}
+.toast{animation:d8-toast-in 180ms var(--motion-out)}
+.toast.out{animation:d8-toast-out 100ms var(--motion-in) forwards}
+.toast-check{flex:0 0 22px;width:22px;height:22px;color:var(--green)}
+.toast-check path{stroke-dasharray:22;stroke-dashoffset:0;animation:d8-check-in 240ms var(--motion-out)}
+@keyframes d8-surface-in{from{opacity:.35}to{opacity:1}}
+@keyframes d8-toast-in{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
+@keyframes d8-toast-out{to{opacity:0;translate:0 3px}}
+@keyframes d8-check-in{from{stroke-dashoffset:22}to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.ov.open>.modal,.ov.open>.lbm,.ov.open>.manual-lead-modal,.individual-email-ov.open>.individual-email-modal,.reply-inbox-ov.open>.reply-inbox-modal,.custom-popover,details[open]>.quick-create-menu,details[open]>.lead-more-menu,.toast,.toast.out,.toast-check path{animation:none!important}.mobile-client-options button>i{transform:none!important}}
+body.reduce-motion .ov.open>.modal,body.reduce-motion .ov.open>.lbm,body.reduce-motion .ov.open>.manual-lead-modal,body.reduce-motion .individual-email-modal,body.reduce-motion .reply-inbox-modal,body.reduce-motion .custom-popover,body.reduce-motion details[open]>.quick-create-menu,body.reduce-motion details[open]>.lead-more-menu,body.reduce-motion .toast,body.reduce-motion .toast-check path{animation:none!important}
+body.reduce-motion .mobile-client-options button>i{transform:none!important}
