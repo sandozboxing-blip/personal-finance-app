@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="assets/expenses.css?v=20261012-2">
 <link rel="stylesheet" href="assets/glass.css?v=20261124-3">
 <link rel="stylesheet" href="assets/atelier.css?v=20261125-2">
-<link rel="stylesheet" href="assets/motion.css?v=20261125-2">
+<link rel="stylesheet" href="assets/motion.css?v=20261127-1">
 <link rel="icon" type="image/svg+xml" href="/assets/app-icon.svg?v=20261124-1" />
 <link rel="icon" type="image/png" href="/d8-favicon-96-v3.png" sizes="96x96" />
 <link rel="shortcut icon" href="/d8-favicon-v3.ico" />
@@ -177,9 +177,8 @@
           <summary class="btn btng btnsm" aria-label="Още действия">•••</summary>
           <div class="lead-more-menu">
             <button onclick="openLeadCampaignHistory()">Кампании</button><label hidden><span>Смени папката</span><select class="fi" id="lFolderF" onchange="renderLeads()" aria-label="Филтър по папка"><option value="">Всички папки</option></select></label>
-            <button onclick="document.getElementById('fi').click()">↑ Импортирай CSV / JSON</button>
+            <span class="menu-group-label">Данни</span><button onclick="document.getElementById('fi').click()">↑ Импортирай CSV / JSON</button>
             <button onclick="doExport()">↓ Експорт в CSV</button>
-            <button onclick="resetLeadFilters()">↺ Нулирай филтрите</button>
           </div>
         </details>
         <input type="file" id="fi" accept=".csv,.json,text/csv,application/json" style="display:none" onchange="handleFile(event)">
@@ -400,23 +399,24 @@
   <button class="mobile-more-logout" onclick="logout()">Излез от акаунта</button>
 </section>
 <script src="assets/onesignal.js?v=20260726-20"></script>
-<script src="assets/core.js?v=20261125-1"></script>
+<script src="assets/core.js?v=20261127-1"></script>
 <script src="assets/clients.js?v=20261124-1"></script>
-<script src="assets/leads.js?v=20260930-12"></script>
+<script src="assets/leads.js?v=20261127-1"></script>
 <script src="assets/mail-replies-fix.js?v=20260929-7"></script>
 <script src="assets/reply-inbox.js?v=20260930-2"></script>
-<script src="assets/individual-email.js?v=20260929-8"></script>
+<script src="assets/individual-email.js?v=20261127-1"></script>
 <script src="assets/manual-lead.js?v=20260929-1"></script>
 <script src="assets/tasks.js?v=20261125-1"></script><script src="assets/reports.js?v=20260930-5"></script><script src="assets/worktasks.js?v=20260726-21"></script>
 <script src="assets/expenses.js?v=20261012-2"></script><script src="assets/finance-dashboard.js?v=20261124-1"></script>
 <script src="assets/calendar-reminders.js?v=20260726-22"></script>
 <script src="assets/glass.js?v=20261124-3"></script>
-<script src="assets/atelier.js?v=20261124-4"></script>
+<script src="assets/atelier.js?v=20261127-1"></script>
 <script src="assets/login-layout.js?v=20261125-1"></script>
 <script src="assets/panel-layout.js?v=20261125-1"></script>
 <script src="assets/mobile-shell.js?v=20261124-1"></script>
-<script src="assets/custom-controls.js?v=20261125-2"></script>
-<script src="assets/motion.js?v=20261125-2"></script>
+<script src="assets/custom-controls.js?v=20261127-1"></script>
+<script src="assets/motion.js?v=20261127-1"></script>
+<script src="assets/ux-interactions.js?v=20261127-1"></script>
 <script src="assets/app.js?v=20261125-1"></script>
 </body>
 </html>

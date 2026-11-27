@@ -44,3 +44,30 @@ body[data-motion-style=expressive] .btnp::after{content:'';position:absolute;ins
 }
 @media(prefers-reduced-motion:reduce){body[data-motion-style=expressive] .sbi .ic svg,body[data-motion-style=expressive] .dcico svg,body[data-motion-style=expressive] .mobile-nav .nav-icon,body[data-motion-style=expressive] .theme-toggle svg{transform:none!important}}
 body.reduce-motion[data-motion-style=expressive] .sbi .ic svg,body.reduce-motion[data-motion-style=expressive] .dcico svg,body.reduce-motion[data-motion-style=expressive] .mobile-nav .nav-icon,body.reduce-motion[data-motion-style=expressive] .theme-toggle svg{transform:none!important}
+/* Video principles: continuity, clear completion, short masks and generous targets. */
+.theme-icon-slot{display:inline-grid;place-items:center;position:relative;width:19px;height:19px;flex:0 0 19px;font-style:normal}
+.theme-icon-slot>svg{grid-area:1/1}
+.d8-shared-icon{z-index:1600;pointer-events:none;display:grid;place-items:center}
+.d8-shared-icon svg{width:24px;height:24px}
+body[data-motion-style=expressive] .custom-popover{animation:d8-surface-in 140ms var(--motion-out)}
+body[data-motion-style=expressive] .custom-popover::before,body[data-motion-style=expressive] details[open]>.quick-create-menu::before,body[data-motion-style=expressive] details[open]>.lead-more-menu::before{content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(115deg,rgba(255,255,255,.09),transparent 70%);animation:d8-menu-reveal 160ms var(--motion-out)}
+body[data-motion-style=expressive] .custom-popover.opens-above::before{animation-name:d8-menu-reveal-above}
+body[data-motion-style=expressive] .custom-popover[data-motion-repeat=true]{animation:none!important}
+body[data-motion-style=expressive] details[open]>.quick-create-menu,body[data-motion-style=expressive] details[open]>.lead-more-menu{animation:d8-surface-in 140ms var(--motion-out)}
+body[data-motion-style=expressive] .custom-popover[data-motion-repeat=true]::before{animation:none!important}
+@keyframes d8-menu-reveal{from{opacity:.6;clip-path:inset(0 0 75% 0 round 16px)}to{opacity:1;clip-path:inset(0 round 16px)}}
+@keyframes d8-menu-reveal-above{from{opacity:.6;clip-path:inset(75% 0 0 0 round 16px)}to{opacity:1;clip-path:inset(0 round 16px)}}
+.mclose,.lbclose,.individual-email-close,.reply-inbox-close,.filterclose,.mobile-more-head>button,.calendar-arrow{min-width:44px!important;min-height:44px!important}
+.passwordtoggle{top:2px;min-height:44px;min-width:64px;font-size:13px}
+.menu-group-label{display:block;padding:10px 12px 4px;color:var(--w3);font:650 11px/1.5 var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.menu-group-label:not(:first-child){border-top:1px solid var(--line);margin-top:5px}
+.modal:focus,.manual-lead-modal:focus,.individual-email-modal:focus,.reply-inbox-modal:focus{outline:none}
+.modal:not(.lbm):has(>.mbody){display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.modal:not(.lbm)>.mhdr,.modal:not(.lbm)>.mfoot{flex:0 0 auto}
+body.panel-authenticated .modal:not(.lbm)>.mbody{flex:1 1 auto;min-height:0;max-height:none!important;overflow-y:auto}
+button[aria-busy=true]{cursor:progress}
+.lbtn[aria-busy=true]::before{content:'';display:inline-block;vertical-align:-2px;width:14px;height:14px;margin-right:9px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:d8-busy-spin .7s linear infinite}
+@keyframes d8-busy-spin{to{rotate:360deg}}
+@media(max-width:1000px){.mobile-more-handle{position:relative;touch-action:none;cursor:grab;flex:0 0 auto;width:72px;height:44px;margin:-14px auto 0!important;background:transparent!important;border-radius:0}.mobile-more-handle::after{content:'';position:absolute;top:20px;left:18px;width:36px;height:4px;border-radius:4px;background:var(--line2)}.mobile-more-handle:active{cursor:grabbing}}
+@media(prefers-reduced-motion:reduce){body[data-motion-style=expressive] .custom-popover,body[data-motion-style=expressive] details[open]>.quick-create-menu,body[data-motion-style=expressive] details[open]>.lead-more-menu,body[data-motion-style=expressive] .custom-popover::before,body[data-motion-style=expressive] details[open]>.quick-create-menu::before,body[data-motion-style=expressive] details[open]>.lead-more-menu::before,.lbtn[aria-busy=true]::before{animation:none!important}}
+body.reduce-motion[data-motion-style=expressive] .custom-popover,body.reduce-motion[data-motion-style=expressive] details[open]>.quick-create-menu,body.reduce-motion[data-motion-style=expressive] details[open]>.lead-more-menu,body.reduce-motion[data-motion-style=expressive] .custom-popover::before,body.reduce-motion[data-motion-style=expressive] details[open]>.quick-create-menu::before,body.reduce-motion[data-motion-style=expressive] details[open]>.lead-more-menu::before,body.reduce-motion .lbtn[aria-busy=true]::before{animation:none!important}

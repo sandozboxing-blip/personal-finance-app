@@ -30,12 +30,12 @@ window.sendIndividualEmail=function(){
   if(!subject){toast('Добави тема на имейла','var(--yellow)');document.getElementById('individualEmailSubject').focus();return;}
   if(body.length<40){toast('Съобщението трябва да е поне 40 символа','var(--yellow)');document.getElementById('individualEmailBody').focus();return;}
   if(!confirm('Да изпратя този имейл само до '+l.email+'?'))return;
-  individualSending=true;btn.disabled=true;btn.classList.add('loading');btn.querySelector('span').textContent='Изпращане…';
+  individualSending=true;btn.disabled=true;btn.setAttribute('aria-busy','true');btn.classList.add('loading');btn.querySelector('span').textContent='Изпращане…';
   syncOutreachStateBeforeSend().then(function(){return fetch('api.php?action=sendIndividualOutreach',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({leadId:l.id,recipientEmail:l.email,subject:subject,body:body,consentConfirmed:true,individual:true})})
     .then(function(r){return r.json().catch(function(){return{};}).then(function(d){if(!r.ok)throw new Error(d.error||'Грешка при изпращане');return d;});});})
     .then(function(result){var now=new Date().toISOString();l.email=result.email||l.email;l.outreach=Object.assign({},l.outreach||{},{subject:subject,body:body,status:'sent',sentAt:now,updatedAt:now,sendError:'',recipientEmail:result.email||l.email});scheduleLeadFollowup(l);saveData();individualSending=false;closeIndividualEmail();openLB(l.id);toast('Имейлът е изпратен до '+l.email,'var(--green)');})
     .catch(function(e){var message=e.message||'Имейлът не беше изпратен',errorBox=document.getElementById('individualEmailError');if(errorBox){errorBox.hidden=false;errorBox.textContent=message;}toast(message,'var(--red)');})
-    .finally(function(){individualSending=false;if(btn){btn.disabled=false;btn.classList.remove('loading');btn.querySelector('span').textContent='Изпрати имейла';}});
+    .finally(function(){individualSending=false;if(btn){btn.disabled=false;btn.setAttribute('aria-busy','false');btn.classList.remove('loading');btn.querySelector('span').textContent='Изпрати имейла';}});
 };
 document.addEventListener('keydown',function(e){var ov=document.getElementById('individualEmailOv');if(e.key==='Escape'&&ov&&ov.classList.contains('open')){e.preventDefault();e.stopImmediatePropagation();closeIndividualEmail();}},true);
 })();

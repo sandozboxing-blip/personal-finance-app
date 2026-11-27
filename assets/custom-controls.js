@@ -57,7 +57,9 @@ function position(){
 }
 function close(focus){if(!active)return;var previous=active;active=null;popup.hidden=true;popup.replaceChildren();previous.trigger.setAttribute('aria-expanded','false');if(focus&&previous.trigger.isConnected)previous.trigger.focus();}
 function open(record){
- if(record.source.disabled||record.source.readOnly)return;close(false);active=record;popup.replaceChildren();popup.hidden=false;record.trigger.setAttribute('aria-expanded','true');record.trigger.removeAttribute('aria-invalid');
+ if(record.source.disabled||record.source.readOnly)return;
+ popup.dataset.motionRepeat=record.opened?'true':'false';record.opened=true;
+ close(false);active=record;popup.replaceChildren();popup.hidden=false;record.trigger.setAttribute('aria-expanded','true');record.trigger.removeAttribute('aria-invalid');
  if(record.source.tagName==='SELECT')renderSelect('');else if(record.source.type==='date'){var d=date(record.source.value)||new Date();if(record.source.min&&iso(d)<record.source.min)d=date(record.source.min)||d;if(record.source.max&&iso(d)>record.source.max)d=date(record.source.max)||d;active.month=new Date(d.getFullYear(),d.getMonth(),1);active.focusDate=iso(d);renderCalendar();}else renderTime();
  position();requestAnimationFrame(function(){if(!active)return;var focus=popup.querySelector('.custom-search')||popup.querySelector('.calendar-day[tabindex="0"]:not(:disabled)')||popup.querySelector('[role="option"][aria-selected="true"]:not(:disabled)')||popup.querySelector('button:not(:disabled),input');if(focus){focus.focus({preventScroll:true});var bounds=focus.getBoundingClientRect(),box=popup.getBoundingClientRect();if(bounds.bottom>box.bottom||bounds.top<box.top)popup.scrollTop=Math.max(0,focus.offsetTop-popup.clientHeight/2);}});
 }

@@ -26,12 +26,12 @@ function showLogin(message){
 }
 function doLogin(){
   var u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value,err=document.getElementById('lerr'),btn=document.getElementById('loginBtn');
-  err.classList.remove('show');btn.disabled=true;btn.textContent='Влизане...';
+  err.classList.remove('show');btn.disabled=true;btn.setAttribute('aria-busy','true');btn.textContent='Влизане...';
   fetch('api.php?action=login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})})
     .then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||'Грешка при вход');return d;});})
     .then(function(d){if(!d.authToken)throw new Error('Сървърът не върна защитена сесия');sessionStorage.setItem(AUTH_KEY,d.authToken);startApp(d.user||u,true);})
     .catch(function(e){err.textContent=e.message||'Грешно потребителско име или парола';err.classList.add('show');document.getElementById('lp').value='';document.getElementById('lp').focus();})
-    .finally(function(){btn.disabled=false;btn.textContent='Влез в панела →';});
+    .finally(function(){btn.disabled=false;btn.setAttribute('aria-busy','false');btn.textContent='Влез в панела →';});
 }
 document.getElementById('loginBtn').addEventListener('click',doLogin);
 document.getElementById('lp').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
